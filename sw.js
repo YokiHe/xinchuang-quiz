@@ -1,5 +1,5 @@
 // 信创理论题库 · Service Worker：缓存优先，支持离线刷题与 PWA 安装
-const CACHE = 'xinchuang-quiz-v4';
+const CACHE = 'xinchuang-quiz-v5';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

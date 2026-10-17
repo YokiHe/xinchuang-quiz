@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b4bd6">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<title>信创规划管理师题库</title>
+<style>
+  :root{ --blue:#5b4bd6; --blue-d:#4232b4; --blue-l:#eeecfc; --green:#1e9e58; --green-l:#e6f6ee;
+         --red:#d64545; --red-l:#fdeeee; --amber:#e8990c; --amber-l:#fdf3e0;
+         --bg:#f1f3f8; --card:#fff; --line:#e4e8f0; --soft:#f8fafd; --field:#f8fafd; --soft2:#edf1f7;
+         --text:#232a3b; --muted:#7c8597; }
+  body.dark{ --bg:#10141d; --card:#1a2233; --line:#2a3450; --soft:#202a3d; --field:#202a3d; --soft2:#232c40;
+             --text:#e7ecf6; --muted:#92a0b8; --blue:#8f7bff; --blue-d:#b9adff; --blue-l:#2b2454;
+             --green:#37b573; --green-l:#173429; --red:#e05c5c; --red-l:#3a1d1d;
+             --amber:#e8a53a; --amber-l:#3a2d13; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  .opt,.btn,.star,.seg,.tab-item,.chin,.hbtn{ touch-action:manipulation; }
+  body{ margin:0; background:var(--bg); color:var(--text); font-size:15px; padding-bottom:env(safe-area-inset-bottom);
+        font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+        transition:background .2s,color .2s; }
+  button{ font-family:inherit; }
+
+  /* ===== 顶部 ===== */
+  .topwrap{ position:sticky; top:0; z-index:20; box-shadow:0 1px 8px rgba(24,44,90,.10); }
+  .appbar{ display:flex; align-items:center; gap:10px; padding:10px 14px;
+           background:linear-gradient(135deg,#5b4bd6,#7a68f0 70%,#9083f5); color:#fff; }
+  .brand{ font-weight:800; font-size:16.5px; letter-spacing:.5px; display:flex; align-items:center; gap:7px; }
+  .brand .logo{ width:24px; height:24px; border-radius:7px; background:rgba(255,255,255,.22);
+                display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .appactions{ margin-left:auto; display:flex; gap:8px; }
+  .hbtn{ position:relative; border:none; background:rgba(255,255,255,.18); color:#fff; border-radius:10px;
+         padding:7px 11px; font-size:14px; cursor:pointer; }
+  .hbtn .bub{ background:#fff; color:var(--blue-d); border-radius:999px; font-weight:800; font-size:12px;
+              padding:0 6px; margin-left:4px; }
+  body.dark .hbtn{ color:#fff; }
+  .toolbar{ background:var(--card); padding:9px 12px 10px; transition:background .2s; }
+  .seg{ display:flex; background:var(--soft2); border-radius:11px; padding:3px; gap:2px; }
+  .seg button{ flex:1; border:none; background:transparent; padding:8px 2px; border-radius:9px;
+               font-size:14px; color:var(--muted); cursor:pointer; font-weight:600; }
+  .seg button.on{ background:var(--card); color:var(--blue-d); box-shadow:0 1px 4px rgba(24,44,90,.14); }
+  body.dark .seg button.on{ background:var(--soft); }
+  .picks{ display:flex; gap:7px; margin-top:8px; }
+  .selwrap{ position:relative; }
+  .selwrap::after{ content:'▾'; position:absolute; right:9px; top:50%; transform:translateY(-54%);
+                   color:var(--muted); font-size:12px; pointer-events:none; }
+  select{ appearance:none; -webkit-appearance:none; border:1px solid var(--line); background:var(--field);
+          border-radius:10px; padding:9px 24px 9px 10px; font-size:14px; color:var(--text); max-width:220px;
+          outline:none; }
+  select:focus{ border-color:var(--blue); }
+  .searchwrap{ flex:1; position:relative; }
+  .sic{ position:absolute; left:9px; top:50%; transform:translateY(-52%); color:var(--muted); }
+  .searchwrap input{ width:100%; border:1px solid var(--line); background:var(--field); border-radius:10px;
+                     padding:9px 10px 9px 29px; font-size:16px; color:var(--text); outline:none; min-width:0; }
+  .searchwrap input:focus{ border-color:var(--blue); }
+  .gbarw{ margin-top:9px; display:flex; align-items:center; gap:8px; }
+  .gtrack{ flex:1; height:5px; background:var(--soft2); border-radius:99px; overflow:hidden; }
+  .gbar{ height:100%; width:0; background:linear-gradient(90deg,var(--blue),var(--amber)); border-radius:99px; transition:width .25s; }
+  #gpText{ font-size:12px; color:var(--muted); white-space:nowrap; }
+
+  /* ===== 主体 ===== */
+  .wrap{ max-width:820px; margin:0 auto; padding:10px 12px calc(86px + env(safe-area-inset-bottom)); }
+  @media (min-width:641px){ .wrap{ padding-bottom:20px; } }
+  .stats{ display:flex; flex-wrap:wrap; gap:5px 6px; align-items:center; margin:2px 2px 9px;
+          color:var(--muted); font-size:13px; }
+  .statchip{ display:inline-flex; align-items:center; gap:4px; background:var(--card); border:1px solid var(--line);
+             border-radius:999px; padding:3px 10px; font-size:12.5px; color:var(--muted); }
+  .statchip b{ color:var(--text); }
+  .statchip.hero{ background:var(--blue-l); border-color:#d7e4fa; color:var(--blue-d); font-weight:600; }
+  body.dark .statchip.hero{ border-color:#2c3f68; }
+  .statchip.link{ cursor:pointer; }
+  .statchip.link:active{ border-color:var(--blue); }
+  .statchip.cta{ background:var(--blue); border-color:var(--blue); color:#fff; font-weight:700; }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px;
+         box-shadow:0 1px 3px rgba(20,40,80,.05); }
+  .meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:10px; }
+  .chin{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; }
+  .chin.bank{ background:var(--blue-l); color:var(--blue-d); font-weight:600; }
+  .chin.gray{ background:var(--soft2); color:var(--muted); }
+  .chin.fixed{ background:var(--green-l); color:var(--green); font-weight:600; }
+  .chin.warn{ background:var(--amber-l); color:var(--amber); font-weight:600; }
+  .star{ font-size:21px; cursor:pointer; background:none; border:none; padding:0 4px; line-height:1; color:#c6ccda; }
+  .star svg{ stroke:#c6ccda; }
+  .star.on{ color:#f5b301; }
+  .star.on svg{ stroke:#f5b301; fill:#f5b301; }
+  .ic{ vertical-align:-2px; }
+  .brand .logo .ic{ stroke:#fff; }
+  .verdict .ic{ vertical-align:-3px; }
+  .appbar .ic{ vertical-align:-3px; }
+  .stem{ font-weight:650; font-size:16px; line-height:1.7; white-space:pre-wrap; }
+  .opts{ display:flex; flex-direction:column; gap:9px; margin-top:14px; }
+  .opt{ display:flex; gap:10px; align-items:flex-start; padding:12px 13px; border:1.5px solid var(--line);
+        border-radius:12px; cursor:pointer; background:var(--soft); line-height:1.55; font-size:15px; text-align:left; }
+  .opt .letter{ font-weight:800; color:var(--blue-d); min-width:18px; }
+  .opt.sel{ border-color:var(--blue); background:var(--blue-l); }
+  .opt.ok{ border-color:var(--green); background:var(--green-l); } .opt.ok .letter{ color:var(--green); }
+  .opt.bad{ border-color:var(--red); background:var(--red-l); } .opt.bad .letter{ color:var(--red); }
+  .locked .opt{ cursor:default; }
+  .verdict{ margin-top:13px; padding:11px 13px; border-radius:11px; font-weight:700; }
+  .verdict.ok{ background:var(--green-l); color:var(--green); }
+  .verdict.bad{ background:var(--red-l); color:var(--red); }
+  .why{ margin-top:10px; padding:12px 14px; border-radius:11px; background:var(--soft2); color:#3a4358;
+        line-height:1.75; font-size:14px; white-space:pre-wrap; }
+  body.dark .why{ color:#c6d0e0; }
+  .multi-note{ margin-top:10px; color:var(--muted); font-size:13px; }
+  .bigcta{ width:100%; margin-top:13px; padding:13px; font-size:16px; }
+  .nav{ margin:14px 0 4px; }
+  .navbtns{ display:flex; gap:10px; }
+  .navbtns .btn{ flex:1; }
+  .jrow{ display:flex; gap:6px; align-items:center; justify-content:center; color:var(--muted);
+         font-size:13px; margin-top:10px; }
+  .nav input[type=number]{ width:74px; font-size:16px; padding:8px; border:1px solid var(--line);
+                           border-radius:10px; outline:none; background:var(--field); color:var(--text); }
+  .nav input[type=number]:focus{ border-color:var(--blue); }
+  .btn{ padding:10px 14px; border:1px solid var(--line); border-radius:11px; background:var(--card); cursor:pointer;
+        font-size:14.5px; color:var(--text); }
+  .btn:hover{ border-color:var(--blue); }
+  .btn.primary{ background:var(--blue); border-color:var(--blue); color:#fff; font-weight:650; }
+  .btn.danger{ color:var(--red); border-color:#f2caca; }
+  body.dark .btn.danger{ border-color:#4a2530; }
+  .btn:disabled{ opacity:.4; cursor:default; }
+
+  /* ===== 底部标签栏（手机） ===== */
+  .tabbar{ position:fixed; left:0; right:0; bottom:0; z-index:25; display:flex; justify-content:space-around;
+           background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-top:1px solid var(--line);
+           padding:6px 4px calc(6px + env(safe-area-inset-bottom)); }
+  body.dark .tabbar{ background:rgba(16,20,29,.96); }
+  .tab-item{ flex:1; border:none; background:none; display:flex; flex-direction:column; align-items:center;
+             gap:2px; font-size:11.5px; color:var(--muted); cursor:pointer; padding:4px 0; border-radius:10px;
+             position:relative; }
+  .tab-item .ic{ width:20px; height:20px; display:flex; align-items:center; justify-content:center; }
+  .tab-item.on{ color:var(--blue-d); font-weight:700; }
+  body.dark .tab-item.on{ color:var(--blue); }
+  .tbub{ position:absolute; top:-2px; left:calc(50% + 6px); background:var(--red); color:#fff; font-size:10.5px;
+         font-weight:800; border-radius:999px; padding:1px 5.5px; line-height:1.5; }
+  .tbub.amber{ background:var(--amber); }
+  .tbub.zero{ display:none; }
+
+  /* ===== 抽屉 ===== */
+  .mask{ position:fixed; inset:0; background:rgba(15,25,48,.48); z-index:40; display:none; }
+  .mask.open{ display:block; }
+  .panel{ position:absolute; left:0; right:0; bottom:0; max-height:88%; background:var(--bg);
+          border-radius:18px 18px 0 0; display:flex; flex-direction:column; padding-bottom:env(safe-area-inset-bottom);
+          animation:up .18s ease; }
+  @keyframes up{ from{ transform:translateY(40px); opacity:.4; } to{ transform:none; opacity:1; } }
+  .grab{ width:42px; height:4.5px; border-radius:99px; background:var(--muted); opacity:.5; margin:9px auto 2px; }
+  .phead{ display:flex; align-items:center; gap:8px; padding:6px 14px 10px; flex-wrap:wrap; }
+  .phead .ttl{ font-size:16.5px; font-weight:800; display:flex; align-items:center; gap:7px; }
+  .phead .cnt{ background:var(--blue-l); color:var(--blue-d); border-radius:999px; font-size:12.5px;
+               font-weight:800; padding:2px 9px; }
+  .phead .sp{ flex:1; }
+  .pbody{ overflow:auto; padding:2px 12px calc(14px + env(safe-area-inset-bottom)); }
+  .pgroup{ margin:10px 4px 3px; color:var(--muted); font-size:12.5px; font-weight:700;
+           display:flex; align-items:center; gap:6px; }
+  .pgroup::after{ content:''; flex:1; height:1px; background:var(--line); }
+  .item{ display:flex; gap:10px; align-items:center; background:var(--card); border:1px solid var(--line);
+         border-radius:13px; padding:12px 12px; margin:7px 1px; cursor:pointer; }
+  .item[data-kind="wrong"]{ border-left:4px solid var(--red); }
+  .item[data-kind="star"]{ border-left:4px solid var(--amber); }
+  .item .info{ flex:1; min-width:0; }
+  .item .meta{ color:var(--muted); font-size:12px; margin-bottom:3px; }
+  .item .t{ font-size:14px; line-height:1.55; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .iwbtn{ flex:none; border:none; background:var(--red-l); color:var(--red); border-radius:9px;
+          padding:7px 9px; font-size:12.5px; font-weight:700; cursor:pointer; }
+  .item[data-kind="star"] .iwbtn{ background:var(--amber-l); color:var(--amber); }
+  .two{ display:flex; gap:8px; margin-top:2px; }
+  .two .btn{ flex:1; }
+  .chips{ display:flex; flex-direction:column; gap:2px; padding:2px 4px; }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:13px 6px;
+        border-bottom:1px solid var(--line); font-size:15px; }
+  .row:last-child{ border-bottom:none; }
+  .row .hint{ display:block; color:var(--muted); font-size:12.5px; margin-top:3px; font-weight:400; }
+  .sw{ position:relative; width:46px; height:27px; flex:none; }
+  .sw input{ opacity:0; width:100%; height:100%; position:absolute; margin:0; cursor:pointer; z-index:2; }
+  .sw .kn{ position:absolute; inset:0; background:var(--muted); opacity:.65; border-radius:99px; transition:.15s; }
+  .sw .kn::after{ content:''; position:absolute; top:3px; left:3px; width:21px; height:21px; background:var(--card);
+                  border-radius:50%; transition:.15s; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+  .sw input:checked + .kn{ background:var(--green); opacity:1; }
+  .sw input:checked + .kn::after{ left:22px; }
+  .psec{ color:var(--muted); font-size:12.5px; font-weight:700; margin:12px 4px 7px; }
+  .szchips{ display:flex; gap:7px; flex-wrap:wrap; padding:0 4px; }
+  .szchips button{ border:1px solid var(--line); background:var(--card); color:var(--text); border-radius:10px;
+                   padding:8px 14px; font-size:14px; cursor:pointer; }
+  .szchips button.on{ border-color:var(--blue); background:var(--blue-l); color:var(--blue-d); font-weight:700; }
+  .statcard{ background:var(--card); border:1px solid var(--line); border-radius:13px; padding:13px 14px; margin:8px 1px; }
+  .statcard .nm{ font-weight:700; font-size:14.5px; display:flex; justify-content:space-between; }
+  .statcard .nm span{ color:var(--muted); font-weight:500; font-size:12.5px; }
+  .sbar{ height:7px; background:var(--soft2); border-radius:99px; margin-top:9px; overflow:hidden; }
+  .sbar i{ display:block; height:100%; border-radius:99px; }
+  .sbar.done i{ background:var(--blue); } .sbar.acc i{ background:var(--green); }
+  .srow{ display:flex; gap:8px; align-items:center; font-size:12px; color:var(--muted); margin-top:5px; }
+  .srow .lbl{ width:30px; flex:none; }
+  .srow .acc-t{ width:78px; flex:none; text-align:right; }
+  .srow .sbar{ flex:1; margin:0; }
+  .bchart{ display:flex; align-items:flex-end; gap:6px; height:96px; padding-top:6px; }
+  .bcol{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; }
+  .bcol .bb{ width:100%; max-width:34px; border-radius:5px 5px 2px 2px; background:var(--blue); opacity:.85; min-height:2px; }
+  .bcol .bl{ font-size:10.5px; color:var(--muted); white-space:nowrap; }
+  .bcol .bv{ font-size:11px; font-weight:700; color:var(--text); }
+  .result-card{ text-align:center; padding:8px 4px 4px; }
+  .result-big{ font-size:46px; font-weight:800; color:var(--blue-d); margin:6px 0 2px; }
+  .result-detail{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0 16px; }
+  .rd-item{ background:var(--card); border:1px solid var(--line); border-radius:11px; padding:11px 6px; }
+  .rd-item b{ display:block; font-size:19px; font-weight:700; }
+  .rd-item span{ font-size:12px; color:var(--muted); }
+  .r-ok{ color:var(--green) !important; } .r-bad{ color:var(--red) !important; }
+  .gridcells{ display:grid; grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); gap:8px; }
+  .gcell{ border:1px solid var(--line); background:var(--card); color:var(--text); border-radius:10px;
+          padding:10px 0; font-size:13.5px; font-weight:600; cursor:pointer; position:relative; }
+  .gcell.ok{ background:var(--green-l); border-color:var(--green); color:var(--green); }
+  .gcell.bad{ background:var(--red-l); border-color:var(--red); color:var(--red); }
+  .gcell.cur{ outline:2.5px solid var(--blue); outline-offset:1px; }
+  .gcell .stmark{ position:absolute; top:1px; right:3px; font-size:9px; }
+  .glegend{ display:flex; gap:13px; margin-top:12px; font-size:12px; color:var(--muted); flex-wrap:wrap; }
+  .glegend i{ display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:4px; vertical-align:-1px; }
+  .empty-big{ text-align:center; padding:44px 10px 30px; color:var(--muted); }
+  .empty-big .em{ font-size:44px; display:block; margin-bottom:10px; }
+  @media (min-width:641px){
+    .tabbar{ display:none; }
+    .wrap{ padding-bottom:20px; }
+    .panel{ left:50%; right:auto; bottom:auto; top:50%; transform:translate(-50%,-50%); width:680px;
+            max-height:84%; border-radius:16px; padding-bottom:14px; animation:pop .15s ease; }
+    @keyframes pop{ from{ transform:translate(-50%,-48%); opacity:.35; } to{ transform:translate(-50%,-50%); opacity:1; } }
+    .grab{ display:none; }
+  }
+  @media (max-width:640px){
+    .appbar{ padding:9px 12px; }
+    .toolbar{ padding:9px 10px 10px; }
+    .picks{ flex-wrap:wrap; }
+    .picks select{ max-width:none; }
+    .picks .selwrap{ flex:1 1 38%; }
+    .picks .searchwrap{ flex:1 1 100%; }
+    .stem{ font-size:16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topwrap">
+  <div class="appbar">
+    <div class="brand"><span class="logo" data-ic="book" data-ics="14"></span>信创规划管理师题库</div>
+    <div class="appactions">
+      <button class="hbtn" id="hStar"><span data-ic="star" data-ics="14"></span><span class="bub" id="hStarN">0</span></button>
+      <button class="hbtn" id="hWrong"><span data-ic="shield" data-ics="14"></span><span class="bub" id="hWrongN">0</span></button>
+      <button class="hbtn" id="hSet"><span data-ic="gear" data-ics="14"></span></button>
+    </div>
+  </div>
+  <div class="toolbar">
+    <div class="seg" id="modeSeg">
+      <button data-m="seq">顺序</button>
+      <button data-m="random">随机</button>
+      <button data-m="wrong">错题</button>
+      <button data-m="star">收藏</button>
+    </div>
+    <div class="picks">
+      <div class="selwrap"><select id="bankSel"></select></div>
+      <div class="selwrap"><select id="typeSel">
+        <option value="all">全部题型</option><option value="单选">单选题</option>
+        <option value="多选">多选题</option><option value="判断">判断题</option><option value="背诵卡">背诵卡</option>
+      </select></div>
+      <div class="searchwrap"><span class="sic" data-ic="search" data-ics="13"></span><input id="search" type="search" placeholder="搜题干 / 选项关键词"></div>
+    </div>
+    <div class="gbarw"><div class="gtrack"><div class="gbar" id="gBar"></div></div><span id="gpText"></span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="stats" id="stats"></div>
+  <div class="card" id="card"></div>
+  <div class="nav">
+    <div class="navbtns">
+      <button class="btn" id="prevBtn">← 上一题</button>
+      <button class="btn primary" id="nextBtn">下一题 →</button>
+    </div>
+    <div class="jrow">跳到第 <input type="number" id="jumpNo" min="1"> 题 <button class="btn" id="jumpBtn">跳转</button></div>
+  </div>
+</main>
+
+<nav class="tabbar" id="tabbar">
+  <button class="tab-item on" data-tab="quiz"><span class="ic" data-ic="book" data-ics="20"></span>刷题</button>
+  <button class="tab-item" data-tab="wrong"><span class="ic" data-ic="shield" data-ics="20"></span>错题本<span class="tbub" id="nWrong">0</span></button>
+  <button class="tab-item" data-tab="star"><span class="ic" data-ic="star" data-ics="20"></span>收藏集<span class="tbub amber" id="nStar">0</span></button>
+  <button class="tab-item" data-tab="set"><span class="ic" data-ic="gear" data-ics="20"></span>设置</button>
+</nav>
+
+<div class="mask" id="sheetWrong">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead">
+      <span class="ttl"><span data-ic="shield" data-ics="16"></span> 错题集 <span class="cnt" id="wHeadN">0</span></span><span class="sp"></span>
+      <button class="btn" id="wClose">✕ 关闭</button>
+    </div>
+    <div class="pbody">
+      <div class="two">
+        <button class="btn primary" id="wRetry"><span data-ic="play" data-ics="13"></span> 一键重刷全部错题</button>
+        <button class="btn danger" id="wClear"><span data-ic="trash" data-ics="13"></span> 清空错题</button>
+      </div>
+      <div id="wList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="sheetStar">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead">
+      <span class="ttl"><span data-ic="star" data-ics="16"></span> 收藏集 <span class="cnt" id="sHeadN">0</span></span><span class="sp"></span>
+      <button class="btn" id="sClose">✕ 关闭</button>
+    </div>
+    <div class="pbody">
+      <div class="two">
+        <button class="btn primary" id="sRetry"><span data-ic="play" data-ics="13"></span> 一键重刷全部收藏</button>
+        <button class="btn danger" id="sClear"><span data-ic="trash" data-ics="13"></span> 清空收藏</button>
+      </div>
+      <div id="sList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="sheetSet">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead"><span class="ttl"><span data-ic="gear" data-ics="16"></span> 设置</span><span class="sp"></span>
+      <button class="btn" id="setClose">✕ 关闭</button></div>
+    <div class="pbody">
+      <div class="psec">每组题量（刷完自动出成绩单）</div>
+      <div class="szchips" id="sizeChips">
+        <button data-s="10">10 题</button><button data-s="20">20 题</button>
+        <button data-s="30">30 题</button><button data-s="50">50 题</button>
+        <button data-s="0">不限</button>
+      </div>
+      <div class="chips" style="margin-top:10px">
+        <div class="row"><span>背题模式<span class="hint">直接显示答案与解析，不判分</span></span>
+          <label class="sw"><input type="checkbox" id="revealChk"><span class="kn"></span></label></div>
+        <div class="row"><span>答对自动下一题<span class="hint">答错时停在当前题便于看解析</span></span>
+          <label class="sw"><input type="checkbox" id="autoNext"><span class="kn"></span></label></div>
+        <div class="row"><span>暗色模式<span class="hint">跟随开关立即生效</span></span>
+          <label class="sw"><input type="checkbox" id="darkChk"><span class="kn"></span></label></div>
+      </div>
+      <div class="psec">其他题库</div>
+      <div class="szchips">
+        <button id="goQuiz">信创理论题库（竞赛）</button>
+      </div>
+      <button class="btn danger" id="resetBtn" style="width:100%;margin-top:14px;"><span data-ic="trash" data-ics="13"></span> 重置全部进度（清空答题与收藏记录）</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="sheetStats">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead"><span class="ttl"><span data-ic="bars" data-ics="16"></span> 全库统计</span><span class="sp"></span>
+      <button class="btn" id="tClose">✕ 关闭</button></div>
+    <div class="pbody">
+      <div class="statcard"><div class="nm">近 7 天练习量<span id="c7Total"></span></div>
+        <div class="bchart" id="chart7"></div></div>
+      <div class="statcard"><div class="nm">分题型正确率<span>累计 · 由答题记录统计</span></div>
+        <div id="typeAcc"></div></div>
+      <div id="statsBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="sheetDone">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead"><span class="ttl"><span data-ic="flag" data-ics="16"></span> 本组完成 <span class="cnt" id="dTag"></span></span><span class="sp"></span>
+      <button class="btn" id="dClose">✕ 关闭</button></div>
+    <div class="pbody">
+      <div class="result-card">
+        <div class="result-sub" id="dSub"></div>
+        <div class="result-big" id="dRate">—</div>
+        <div class="result-detail">
+          <div class="rd-item"><b id="dDone">0</b><span>答题</span></div>
+          <div class="rd-item"><b id="dOk" class="r-ok">0</b><span>答对</span></div>
+          <div class="rd-item"><b id="dBad" class="r-bad">0</b><span>答错</span></div>
+        </div>
+      </div>
+      <div class="two">
+        <button class="btn primary" id="dAgain"><span data-ic="play" data-ics="13"></span> 再来一组</button>
+        <button class="btn" id="dGrid"><span data-ic="grid" data-ics="13"></span> 答题卡</button>
+      </div>
+      <div class="two" style="margin-top:8px">
+        <button class="btn" id="dWrong"><span data-ic="shield" data-ics="13"></span> 查看错题</button>
+        <button class="btn" id="dHome"><span data-ic="home" data-ics="13"></span> 回自由刷题</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="sheetGrid">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead"><span class="ttl"><span data-ic="grid" data-ics="16"></span> 答题卡 <span class="cnt" id="gCnt"></span></span><span class="sp"></span>
+      <button class="btn" id="gClose">✕ 关闭</button></div>
+    <div class="pbody"><div id="gridWrap"></div></div>
+  </div>
+</div>
+
+<script>
+const RAW = [{"k": "dx", "s": 1, "t": "单选", "q": "在某省级政务项目规划中，双轨运行的含义是（）", "o": ["运行新系统并停用旧系统", "新旧系统同时运行验证稳定性", "运行旧系统暂不切换新系统", "随机切换系统运行模式"], "a": "B", "n": "双轨（并行）运行指新国产化环境与旧环境同步部署、同步运行、业务流量双向同步并实时对比运行状态，用并行期验证国产化环境稳定性（知识点总结“并行运行实施方案”）；A、C 未保持新旧系统同时运行，D 的“随机切换”没有对比验证机制。", "d": 0}, {"k": "dx", "s": 2, "t": "单选", "q": "在国产化战略推进过程中，应用市场系统应支持的国产化技术路线是（）路线。", "o": ["龙芯+麒麟", "飞腾+麒麟", "鲲鹏+UOS", "信创全适配"], "a": "D", "n": "应用市场面向全部信创终端提供应用分发与适配管理，必须对龙芯、飞腾、鲲鹏等芯片路线和麒麟、统信UOS等操作系统全适配（知识点总结“主流技术路线”）；A、B、C 只是某一固定组合，覆盖不了其他信创终端。", "d": 0}, {"k": "dx", "s": 3, "t": "单选", "q": "在某国有银行国产化产品选型评估中，国产化采购的核心要求是（）", "o": ["国产化比例", "价格最低", "进口品牌", "快速交付"], "a": "A", "n": "信创采购的核心要求是国产化比例、安全资质、适配能力、服务能力与供应链稳定（知识点总结“信创采购”）；“价格最低”是传统招标倾向，与信创自主可控导向不符，“进口品牌”更直接违背国产化要求。", "d": 0}, {"k": "dx", "s": 4, "t": "单选", "q": "在某国有银行国产化产品选型评估中，国产化需求归集后，结果分析的核心任务是（）", "o": ["需求分类排序与可行性分析", "直接进入系统设计开发", "编写用户操作手册文档", "制定硬件采购计划方案"], "a": "A", "n": "需求归集后要先分类排序并做可行性分析，据此确定适配、改造、替换的优先级与推进时序（知识点总结“可行性研究”“适配策略”）；直接开发（B）会把未经评估的需求带入建设，编写手册（C）与采购计划（D）属于后续实施阶段的产出。", "d": 0}, {"k": "dx", "s": 5, "t": "单选", "q": "在某国有银行国产化产品选型评估中，国产化系统架构中，业务架构设计的核心任务是（）", "o": ["业务域划分与核心流程梳理", "数据库表结构设计", "网络拓扑规划", "安全策略制定"], "a": "A", "n": "业务架构回答“业务如何组织”，核心是业务域划分与核心流程梳理（知识点总结“业务层规划”）；数据库表结构属数据架构，网络拓扑属技术/网络层设计，安全策略属安全架构。", "d": 0}, {"k": "dx", "s": 6, "t": "单选", "q": "在某系统建设方案设计中，安全架构设计中，纵深防御体系的核心是（）", "o": ["多层安全防护形成完整防护链", "部署单一安全防护设备", "依靠防火墙进行边界防护", "依靠入侵检测监测威胁"], "a": "A", "n": "纵深防御要求在物理、网络、主机、应用、数据等多个层面叠加防护、形成完整防护链，任一单点被突破仍有后续防线（知识点总结“安全系统基础”）；防火墙（C）、入侵检测（D）只是链上单一环节，B 更是典型的单点依赖。", "d": 0}, {"k": "dx", "s": 7, "t": "单选", "q": "在某国有银行国产化产品选型评估中，国产化项目范围基准的作用是（）", "o": ["计算项目利润", "定义工作边界和交付物", "制定人员考核标准", "确定供应商名单"], "a": "B", "n": "范围基准用来定义工作边界和交付物，是后续判断变更、衡量验收完成与否的受控基准（知识点总结“配置管理：基线”）；利润测算、人员考核、确定供应商都不是范围管理的职能。", "d": 0}, {"k": "dx", "s": 8, "t": "单选", "q": "在某系统建设方案设计中，业务能力组件化拆解的目的是（）", "o": ["减少代码行数", "降低硬件成本", "实现业务能力复用和解耦", "加快开发速度"], "a": "C", "n": "业务能力组件化拆解把业务功能封装为可复用、可独立替换的组件，实现业务与实现解耦，便于国产化适配和独立演进（知识点总结“应用层规划：拆分单体、模块化、可迭代”）；A、B 是代码与硬件层面的琐细目标，D 只是可能的副产品。", "d": 0}, {"k": "dx", "s": 9, "t": "单选", "q": "在某系统建设方案设计中，安全架构中，可信身份认证的基础是（）", "o": ["采用用户名密码进行认证", "国产密码算法和数字证书体系", "采用短信验证码进行认证", "采用指纹识别进行认证"], "a": "B", "n": "信创环境下可信身份认证的基座是国产密码算法（SM2 等）与数字证书体系构成的信任链（知识点总结“国密算法”“身份认证、数字证书”）；用户名密码、短信验证码、指纹均为强度不足的单因子辅助手段，不构成“可信”基础。", "d": 0}, {"k": "dx", "s": 10, "t": "单选", "q": "在某项目安全体系建设中，国密算法中，属于非对称加密算法的是（）", "o": ["SM2", "SM3", "SM4", "SM7"], "a": "A", "n": "SM2 是基于椭圆曲线的公钥（非对称）算法；SM3 是杂凑（哈希）算法、SM4 是分组对称算法、SM7 面向非接 IC 卡等安全芯片应用（公知国密标准事实，知识点总结“国密算法 SM2/SM3/SM4”），后三者均非非对称加密算法。", "d": 0}, {"k": "dx", "s": 11, "t": "单选", "q": "在某省级政务项目规划中，项目整体变更控制过程中，首先需要做的是（）", "o": ["变更影响分析", "提交变更申请", "变更审批", "实施变更"], "a": "B", "n": "整体变更控制流程为变更申请→影响分析→CCB审批→实施→验证→归档→更新基线，第一个动作是提交变更申请（知识点总结“整体变更控制流程”）；影响分析、审批、实施都以申请受理为前提，把影响分析放在首位颠倒了流程。", "d": 0}, {"k": "dx", "s": 12, "t": "单选", "q": "在国产化产品选型中，供应链安全管控的核心要求是（）。", "o": ["关注产品采购价格水平", "要求供应商提供产品手册", "与单一供应商建立合作", "审核资质测算国产化率识别风险"], "a": "D", "n": "供应链安全管控要求审核供应商资质、测算国产化率并识别断供与绑定风险（知识点总结“自主可控目标：供应链安全”“信创采购：供应链稳定”）；价格（A）不是安全管控要求，与单一供应商深度绑定（C）反而放大断供风险。", "d": 0}, {"k": "dx", "s": 13, "t": "单选", "q": "在某国有银行国产化产品选型评估中，国产化项目变更管理中，基线控制的作用是（）", "o": ["记录人员考勤信息", "核算项目成本支出", "确保变更经审批防止随意修改", "确定供应商名单信息"], "a": "C", "n": "基线是经过批准并纳入配置受控的状态，之后任何修改都必须履行变更审批，以防止随意修改（知识点总结“配置管理：基线、变更控制”）；考勤、成本核算、供应商名单与配置基线无关。", "d": 0}, {"k": "dx", "s": 14, "t": "单选", "q": "在某国有银行国产化产品选型评估中，国产化项目中，CCB的职责是（）", "o": ["编写代码", "采购设备", "审批变更请求", "用户培训"], "a": "C", "n": "CCB（变更控制委员会）是变更的决策机构，职责是审批变更请求（知识点总结“整体变更控制流程：变更申请→影响分析→CCB审批”）；编写代码、采购设备、用户培训都是实施侧的执行工作，不属于 CCB 职能。", "d": 0}, {"k": "dx", "s": 15, "t": "单选", "q": "在某省级政务项目规划中，可研报告中，合规性分析的核心是（）", "o": ["验证符合国产化政策和法规", "计算项目投资回报率", "确定项目开发团队", "制定项目测试计划"], "a": "A", "n": "可研报告的合规性分析核心是验证项目符合国产化政策与法规，包括国产化替代比例、等保、密评等合规要求（知识点总结“可行性研究：信创重点——适配、生态、合规可行性”“核心政策体系”）；投资回报率（B）属于经济可行性分析内容。", "d": 0}, {"k": "dx", "s": 16, "t": "单选", "q": "在某项目安全体系建设中，安全审计的核心要求是（）", "o": ["记录登录日志作为审计依据", "全面记录操作日志确保可追溯", "记录异常日志作为告警来源", "不记录任何操作日志信息"], "a": "B", "n": "安全审计的核心要求是操作全程可追溯，因此必须全面记录操作日志（知识点总结“自主可控目标：安全可审计”）；只记登录日志（A）或异常日志（C）都存在审计盲区，事后无法还原完整操作链，D 直接放弃审计能力。", "d": 0}, {"k": "dx", "s": 17, "t": "单选", "q": "在国产化战略推进过程中，当前时期，我国信创产业发展的主要问题是（）。", "o": ["技术无法跟上理论研究", "没有底层核心产品", "缺乏产业生态", "产业类型覆盖不全面"], "a": "D", "n": "我国已有鲲鹏、飞腾、龙芯等核心芯片和麒麟、统信等操作系统，全栈生态初步建立，“没有底层核心产品”与事实不符（知识点总结“国产基础软硬件生态”）；当前主要问题被概括为产业类型覆盖不全面，本卷判断题第9题亦将此表述判定为“对”。", "d": 0}, {"k": "dx", "s": 18, "t": "单选", "q": "根据信息系统等级保护安全设计，第一级的设计目标是（）。", "o": ["实现自主访问控制使用户对客体有自我保护能力", "实施以用户为基本力度的自主访问控制", "基于安全策略模型和标记的强制访问控制", "确保安全计算环境主客体具有一致标记"], "a": "A", "n": "第一级是最低保护等级，设计目标仅是实现自主访问控制、使用户对自身访问的客体具备自我保护能力；基于标记的强制访问控制与主客体一致标记是第三、四级逐步引入的递进要求（等保 2.0 各级技术要求逐级增强的公知框架）。", "d": 0}, {"k": "dx", "s": 19, "t": "单选", "q": "项目设计需求分析中，业务分析的用例建模的目的是（）。", "o": ["描述参与者与系统之间的主要交互", "定义边界与架构层间的抽象服务接口", "捕获业务流程规则和数据等内容", "执行关键操作任务的速度和性能"], "a": "A", "n": "用例建模的目的是描述参与者与系统之间的主要交互并借此划定系统边界（公知 UML 建模常识）；抽象服务接口属架构设计内容（B），流程规则与数据由流程/数据建模捕获（C），速度与性能属非功能需求（D）。", "d": 0}, {"k": "dx", "s": 20, "t": "单选", "q": "在某系统建设方案设计中，数据质量的核心维度不包括（）", "o": ["完整性", "准确性", "一致性", "随意性"], "a": "D", "n": "数据质量核心维度是完整性、准确性、一致性、及时性、唯一性、有效性（知识点总结“数据质量”）；“随意性”不是质量维度，本卷判断题第14题亦确认数据质量维度中不包括随意性。", "d": 0}, {"k": "dx", "s": 21, "t": "单选", "q": "在某系统建设方案设计中，数据安全的核心措施不包括（）", "o": ["数据加密", "数据脱敏", "权限管控", "公开明文传输"], "a": "D", "n": "数据安全核心措施包括分类分级、加密、脱敏、权限管控、审计与防泄漏（知识点总结“数据安全”）；“公开明文传输”意味着无加密、无管控，正是要被禁止的风险情形而非措施。", "d": 0}, {"k": "dx", "s": 22, "t": "单选", "q": "信创规划管理师合格人员应具备的核心能力不包括（）", "o": ["能研判政策形势与合规约束", "能编制可申报可评审的项目建议书", "能完成总体架构与建设方案设计", "能独立完成底层代码级适配调试"], "a": "D", "n": "信创规划管理师定位在规划与管理层面，能力覆盖政策研判、建议书编制直到总体架构与建设方案设计（知识点总结对应的岗位职责与成果交付），底层代码级适配调试由适配开发人员承担，不属于规划管理师须独立完成的核心能力。", "d": 0}, {"k": "dx", "s": 23, "t": "单选", "q": "在某省级政务项目规划中，国产化项目成果物清单不包括（）", "o": ["项目建议书", "可行性研究报告", "建设方案设计文档", "员工考勤表"], "a": "D", "n": "项目成果物是立项、设计、开发、验收各阶段的文档交付物，如建议书、可研报告、建设方案设计文档（知识点总结“文档分类”“成果交付：调研报告、架构方案、适配测试报告、迁移日志等”）；员工考勤表是人事管理记录，不构成项目成果物。", "d": 0}, {"k": "dx", "s": 24, "t": "单选", "q": "在某系统建设方案设计中，国产化系统总体架构设计不包括（）", "o": ["业务架构设计", "应用架构设计", "数据架构设计", "人员架构设计"], "a": "D", "n": "国产化总体架构按业务、应用、数据（及技术、安全）分层设计（知识点总结“多层国产化总体架构规划：业务层、应用层、数据层、技术层、安全层”）；“人员架构设计”不在信息化总体架构设计的范畴内。", "d": 0}, {"k": "dx", "s": 25, "t": "单选", "q": "在某系统建设方案设计中，数据架构设计的核心内容不包括（）", "o": ["数据分类分级", "数据存储", "数据共享与安全", "网络拓扑设计"], "a": "D", "n": "数据架构设计核心内容包括数据分类分级、数据存储、数据共享与安全（知识点总结“数据架构、数据治理”）；网络拓扑属于技术/网络层的规划设计内容，与数据架构并列而不相属。", "d": 0}, {"k": "dx", "s": 26, "t": "单选", "q": "在某项目安全体系建设中，安全系统中，身份认证的基础方式不包括（）", "o": ["密码认证", "生物识别", "数字证书", "随意访问"], "a": "D", "n": "身份认证的基础方式包括密码认证、生物识别、数字证书等（知识点总结“安全系统基础：身份认证”）；“随意访问”是无认证、无授权的失控状态，与“认证方式”是两个概念维度。", "d": 0}, {"k": "dx", "s": 27, "t": "单选", "q": "在某省级政务项目规划中，国产化项目建议书的编制依据不包括（）", "o": ["国家信创政策法规", "业务发展需求", "信息技术标准规范", "编制人员个人主观意愿"], "a": "D", "n": "项目建议书必须依据国家信创政策法规、业务发展需求和信息技术标准规范编制，编制依据需可核查、可追溯（知识点总结“项目建议书”的编制要求）；个人主观意愿不能作为立项申报的依据。", "d": 0}, {"k": "dx", "s": 28, "t": "单选", "q": "在某项目安全体系建设中，网络安全防护不包括（）", "o": ["防火墙", "入侵检测", "防病毒", "随意访问"], "a": "D", "n": "网络安全防护手段包括防火墙、入侵检测、防病毒、终端安全等（知识点总结“安全系统基础：防火墙、入侵检测、防病毒、终端安全”）；“随意访问”是访问失控状态，恰恰是网络安全防护要阻止的对象。", "d": 0}, {"k": "dx", "s": 29, "t": "单选", "q": "在某国有银行国产化产品选型评估中，信创云选型的核心评估维度不包括（）", "o": ["国产化能力", "安全合规", "性能可靠", "广告投放量"], "a": "D", "n": "信创云选型的核心评估维度是国产化能力、安全合规、性能可靠等（对应知识点总结“技术路线选择依据：兼容性、性能、生态、安全、成本、政策”及信创采购要求）；“广告投放量”是市场推广指标，与云平台能力无关。", "d": 0}, {"k": "dx", "s": 30, "t": "单选", "q": "等级保护要求的设计内容包括（）、安全策略制定、安全解决方案、主要软硬件设备配置。", "o": ["安全风险隐患分析、系统安全域划分、系统安全等级确定", "风险点分析、系统安全域划分、系统安全等级确定", "安全风险隐患分析、物理环境分析、系统安全等级确定", "风险点分析、物理环境分析、系统安全等级确定"], "a": "A", "n": "等级保护安全设计依次开展安全风险隐患分析、系统安全域划分、系统安全等级确定，再制定安全策略、安全解决方案与软硬件设备配置（知识点总结“等保流程”与“安全区域划分”）；B、D 用“风险点分析”，C 用“物理环境分析”替换了其中的必要组成项。", "d": 0}, {"k": "dx", "s": 31, "t": "单选", "q": "关于电子政务外网与电子政务内网、互联网之间的隔离要求，下列说法正确的是（）", "o": ["物理隔离；逻辑隔离", "逻辑隔离；逻辑隔离", "物理隔离；物理隔离", "以上都错误"], "a": "A", "n": "电子政务内网与政务外网之间实行物理隔离，政务外网与互联网之间实行逻辑隔离（公知电子政务网络隔离要求）；本卷判断题第2题把“内外网与互联网均采用物理隔离”判定为错误，可印证两者隔离强度不同。", "d": 0}, {"k": "dx", "s": 32, "t": "单选", "q": "关于维护数据安全的总体要求，下列说法正确的是（）", "o": ["国家安全观；安全治理体系；安全保障能力", "国家安全观；流程管理体系；高可用性", "国家数据观；安全治理体系；高可用性", "国家数据观；流程管理体系；安全保障能力"], "a": "A", "n": "《数据安全法》(2021) 确立的维护数据安全总体要求是坚持总体国家安全观，建立健全数据安全治理体系，提高数据安全保障能力；“流程管理体系”“高可用性”“国家数据观”均不是该法定表述。", "d": 0}, {"k": "dx", "s": 33, "t": "单选", "q": "在某国有银行国产化产品选型评估中，国产化项目业务系统适配迁移策略为（）。", "o": ["替换中间件、终端更换、替换应用服务器、替换数据库、优化", "终端更换、替换应用服务器、替换中间件、替换数据库、优化", "替换数据库、终端更换、替换应用服务器、替换中间件、优化", "替换数据库、替换中间件、终端更换、替换应用服务器、优化"], "a": "B", "n": "适配迁移遵循“先易后难、先外围后核心”：先做风险最低、依赖最少的终端更换，再替换应用服务器、中间件，最后替换承载核心数据的数据库，末尾整体优化（知识点总结“分批实施策略：先非核心后核心、先简单后复杂”）；A、C、D 先动中间件或数据库，把高风险环节前置，顺序错误。", "d": 0}, {"k": "dx", "s": 34, "t": "单选", "q": "典型的政务云架构采用“三横两纵”，“三横”自下而上分别（）。", "o": ["基础设施层即IaaS、平台支撑层即PaaS、业务应用层即SaaS", "基础设施层即IaaS、业务应用层即SaaS、平台支撑层即PaaS", "业务应用层即SaaS、基础设施层即IaaS、平台支撑层即PaaS", "平台支撑层即PaaS、基础设施层即IaaS、业务应用层即SaaS"], "a": "A", "n": "政务云“三横”自下而上为基础设施层（IaaS）、平台支撑层（PaaS）、业务应用层（SaaS）（知识点总结“云计算 IaaS/PaaS/SaaS”）；本卷判断题第27题把“SaaS 位于 PaaS 之下”的排序判定为错误，可印证 A 的自下而上顺序正确。", "d": 0}, {"k": "dx", "s": 35, "t": "单选", "q": "在某国产化项目立项申报过程中，以下不属于项目初步设计文件组成部分的是（）。", "o": ["设计说明书", "设计图纸", "工程概算书", "投资估算文件"], "a": "D", "n": "项目初步设计文件由设计说明书、设计图纸、工程概算书三部分组成（公知工程建设项目初步设计文件构成）；投资估算属于项目建议书、可研阶段的经济文件（知识点总结“项目建议书：投资估算”），不属于初步设计文件组成。", "d": 0}, {"k": "dx", "s": 36, "t": "单选", "q": "在某项目安全体系建设中，以下不属于安全技术体系架构内容的是（）。", "o": ["物理层安全", "数据层安全", "网络层安全", "人员管理安全"], "a": "D", "n": "安全技术体系按物理、网络、应用、数据等技术层面构建（知识点总结“等保2.0：技术要求（物理、网络、主机、应用、数据）＋管理要求”）；人员管理安全属于安全管理体系范畴，不是技术体系架构的内容。", "d": 0}, {"k": "dx", "s": 37, "t": "单选", "q": "国产化企业建立、实施和保持供应链安全管理体系并可申请第三方认证的标准依据是（）。", "o": ["GB/T 9001-2016", "GB/T 45001-2020", "ISO 28000:2007", "GB/T 24001-2016"], "a": "C", "n": "ISO 28000:2007 是供应链安全管理体系标准，可用于第三方认证；GB/T 45001-2020 是职业健康安全管理体系、GB/T 24001-2016 是环境管理体系，而“GB/T 9001-2016”本身是错误标准号（质量管理体系为 GB/T 19001-2016）（公知管理体系标准常识）。", "d": 0}, {"k": "dx", "s": 38, "t": "单选", "q": "关于电子政务外网及Internet接入网的安全设计与等级保护分级，下列说法正确的是（）", "o": ["等级保护；3", "网络安全法；3", "等级保护；5", "网络安全法；5"], "a": "C", "n": "电子政务外网及Internet接入网的安全设计依据等级保护制度开展，等级保护共分五个等级（知识点总结“依靠等级保护”“五个等级：第一级～第五级”）；《网络安全法》(2017) 是制度建立的法律依据，但安全设计与分级工作的直接依据是等保制度和其五级框架。", "d": 0}, {"k": "dx", "s": 39, "t": "单选", "q": "重构、改造的应用系统，系统的测试工作主要由（）承担，集成商进行内部验收。", "o": ["集成商", "厂商或开发商", "系统使用单位", "以上都错误"], "a": "B", "n": "重构、改造类系统的源代码与改造逻辑掌握在厂商或开发商手中，其功能与重构质量由厂商或开发商承担测试，集成商只负责集成联调并进行内部验收（信创改造分工的公知安排）；集成商主导测试的是其总包承建的全新集成项目。", "d": 0}, {"k": "dx", "s": 40, "t": "单选", "q": "关于软硬件特性测试与硬件试验的内容，下列说法正确的是（）", "o": ["功能性、环境适应性；可靠性、电磁兼容性", "功能性、性能；环境适应性、电磁兼容性", "功能性、性能；易用性、电磁兼容性", "功能性、可靠性；环境适应性、电磁兼容性"], "a": "C", "n": "【存疑】C 选项把“易用性”列入硬件试验一侧，与公知软件质量特性归属矛盾，B（功能性、性能；环境适应性、电磁兼容性）更符合技术事实，但因无法确定命题人的分组标准（且正确项在 B/D 间无法唯一判定），故保留原答案。\n易用性属于软件质量特性（公知软件质量模型：功能性、可靠性、易用性、效率、维护性、可移植性），选项 C 将“易用性”与“电磁兼容性”并列放在第二组，与硬件试验的常规内容（环境适应性、电磁兼容性）不完全吻合；若按“特性测试内容＋硬件试验内容”两分，B 或 D 的组合更符合技术事实，但四种分组均有瑕疵，无法唯一确定命题人的分组标准，故保留原答案。", "d": 1}, {"k": "dx", "s": 41, "t": "单选", "q": "在某省级政务项目规划中，适配OpenJDK 8时需要升级（）类库。", "o": ["Javassist动态类库", "fastjson解析库", "log4j日志库", "commons-io工具库"], "a": "A", "n": "Javassist 是直接读写字节码、依赖 JDK 内部类结构的动态类库，跨 JDK 或 CPU 架构适配时最易出现兼容问题，需要升级版本（公知 Java 生态事实）；fastjson、log4j、commons-io 属常规应用类库，一般不会因该适配而必须升级。", "d": 0}, {"k": "dx", "s": 42, "t": "单选", "q": "国家汇总并动态调整关键信息基础设施认定结果，确保重要（）纳入保护范围。", "o": ["网络设施、信息系统", "基础软硬件设备", "流式、板式软件", "以上均正确"], "a": "A", "n": "《关键信息基础设施安全保护条例》(2021) 明确保护对象是重要行业和领域的重要网络设施、信息系统，并动态调整认定结果（条例公知内容）；基础软硬件设备是国产化采购对象，流式、板式软件是文档/软件形态，均不是关基认定对象。", "d": 0}, {"k": "dx", "s": 43, "t": "单选", "q": "国家支持数据开发利用和数据安全技术研究，鼓励数据开发利用和数据安全等领域的（），培育、发展数据开发利用和数据安全产品、产业体系。", "o": ["技术创新和产业发展", "技术改革和商业价值", "技术升级和产业创新", "技术推广和商业创新"], "a": "D", "n": "《数据安全法》(2021) 原文为“国家支持数据开发利用和数据安全技术研究，鼓励数据开发利用和数据安全等领域的技术推广和商业创新，培育、发展数据开发利用和数据安全产品、产业体系”；A、B、C 的措辞均与法条表述不符。", "d": 0}, {"k": "dx", "s": 44, "t": "单选", "q": "县级以上人民政府应当将密码工作纳入本级国民经济和社会发展规划，所需经费列入（）。", "o": ["市级财政预算", "本级财政预算", "中央采购预算", "自行采购预算"], "a": "B", "n": "《密码法》(2020) 规定县级以上人民政府应当将密码工作纳入本级国民经济和社会发展规划，所需经费列入本级财政预算；市级财政预算、中央采购预算、自行采购预算均不是法条表述。", "d": 0}, {"k": "dx", "s": 45, "t": "单选", "q": "在某省级政务项目规划中，国产化工程需求调研的四大步骤的顺序为（）。", "o": ["需求分析、问题和指标设计、总体设计、分系统设计及优化", "问题和指标设计、需求分析、总体设计、分系统设计及优化", "需求分析、总体设计、问题和指标设计、分系统设计及优化", "问题和指标设计、需求分析、分系统设计及优化、总体设计"], "a": "B", "n": "需求调研先进行问题和指标设计以统一口径，再开展需求分析，随后先做总体设计、后做分系统设计及优化（先明确问题、先总体后细节的工程逻辑，对应知识点总结“现状调研→总体架构规划→分层细化”）；A、C 把需求分析前置在问题与指标设计之前，D 把分系统设计放在总体设计之前，顺序均不成立。", "d": 0}, {"k": "dx", "s": 46, "t": "单选", "q": "信息传输技术是信息技术的核心，关于信息传输模型，正确的是（）。", "o": ["信息传输模型包含信源、编码、信道、解码、信宿和噪声6个模块", "信息传输模型包含信源、编码、信道、解码、信宿5个模块", "信息传输模型包含信源、编码、信道、解码、信宿和放大6个模块", "信息传输模型包含信源、编码、信道、解码、信宿和衰减6个模块"], "a": "A", "n": "信息传输模型由信源、编码、信道、解码、信宿五个基本模块加上噪声（干扰）共 6 个要素构成（公知信息传输模型）；“放大”“衰减”只是信道上的物理现象，不是模型的组成模块，只列 5 个模块（B）则漏掉了噪声源。", "d": 0}, {"k": "dx", "s": 47, "t": "单选", "q": "在某省级政务项目规划中，运维服务体系建设的原则包括（）。", "o": ["以完善的运维制度流程为基础", "以成熟的运维管理平台为手段", "以高素质的运维队伍为保障", "以上三个方面皆是"], "a": "D", "n": "运维服务体系建设以完善的运维制度流程为基础、以成熟的运维管理平台为手段、以高素质的运维队伍为保障，三者缺一不可（对应知识点总结“信创运维体系：监控、巡检、故障处理、变更、备份恢复、安全运维”的配套建设要求）。", "d": 0}, {"k": "dx", "s": 48, "t": "单选", "q": "在某省级政务项目规划中，项目管理中，主要是对（）4个变量的控制。", "o": ["时间、成本、质量、范围", "时间、风险、质量、人力", "时间、成本、人力、风险", "时间、风险、范围、沟通"], "a": "A", "n": "项目管理主要对时间、成本、质量、范围这 4 个变量进行平衡与控制（项目约束的公知常识）；风险、人力、沟通属于项目管理知识领域或要素，不在这 4 个核心变量之列。", "d": 0}, {"k": "dx", "s": 49, "t": "单选", "q": "在信息系统运维管理体系框架中，信息系统运维管理对象的内容包括（）。", "o": ["信息系统变更管理", "信息系统问题管理", "信息系统运维管理规范", "信息系统供应商"], "a": "D", "n": "运维管理对象是运维活动所作用的实体对象：变更管理、问题管理属于运维管理流程活动，运维管理规范属于制度文件，只有信息系统供应商是管理作用的对象（对供方及其服务实施管理约束）。", "d": 0}, {"k": "dx", "s": 50, "t": "单选", "q": "以下哪一项属于国产化项目云计算系统设计的应用管理层（）。", "o": ["计算存储及在线软件平台服务", "容量规划动态部署调度监控安全", "虚拟服务器和虚拟网络资源", "物理服务器存储网络设备资源"], "a": "B", "n": "云计算系统分层设计中，物理服务器/存储/网络设备（D）属物理设备层，虚拟服务器和虚拟网络（C）属虚拟化层，“计算存储及在线软件平台服务”（A）是 IaaS/SaaS 的服务内容；容量规划、动态部署、调度、监控、安全（B）体现的正是应用管理层的管控职能。", "d": 0}, {"k": "dx", "s": 51, "t": "单选", "q": "在国产化项目实施路径设计中，系统分级的主要依据是（）。", "o": ["系统开发语言类型", "系统部署物理位置", "业务重要程度和数据敏感度", "系统上线运行时间长短"], "a": "C", "n": "系统分级依据业务重要程度和数据敏感度确定，对应等保按破坏后危害程度定级的逻辑（知识点总结“数据分类分级”与等保定级思路）；开发语言、部署位置、上线时长与系统重要程度无关。", "d": 0}, {"k": "dx", "s": 52, "t": "单选", "q": "以下关于云计算等保定级要求的描述，不正确的是（）。", "o": ["云平台承载的租户业务自行定级", "一个云平台可承载不同等级业务系统", "云平台安全保护等级不低于承载业务等级", "二级系统放三级云平台即满足三级要求"], "a": "D", "n": "云租户业务应自行（参照定级指南）定级，云平台安全保护等级不低于所承载业务的最高等级；二级系统部署在三级云平台后，其自身仍按二级要求落实保护措施，不会因平台等级高而自动满足三级要求（云等保“等级不低、责任不变”的公知要求），故 D 不正确。", "d": 0}, {"k": "dx", "s": 53, "t": "单选", "q": "以下关于服务器的子网连接方案，描述正确的是（）。", "o": ["资金充足选用子网交换机方案", "每台服务器与核心交换机相连", "服务器少时选用子网交换机", "子网交换机提供充足端口带宽"], "a": "B", "n": "服务器的子网连接方案中，“每台服务器与核心交换机相连”是正确的直连描述；是否引入子网交换机取决于服务器规模与端口/带宽需求（规模大才需要子网交换机汇聚），A“资金充足”、C“服务器少”的选择条件均颠倒，D 只是对设备能力的要求而不构成连接方案。", "d": 0}, {"k": "dx", "s": 54, "t": "单选", "q": "在某信创云平台规划建设中，云计算中心提供的虚拟主机和存储服务属于（）。", "o": ["IaaS", "PaaS", "SaaS", "DaaS"], "a": "A", "n": "虚拟主机和存储服务是向用户出租基础计算与存储资源，属于基础设施即服务 IaaS（知识点总结“云计算 IaaS/PaaS/SaaS”，本卷多选题亦以“虚拟主机、存储服务”作为 IaaS 的典型示例）；PaaS 提供开发运行平台，SaaS 提供成品软件，DaaS 是数据即服务。", "d": 0}, {"k": "dx", "s": 55, "t": "单选", "q": "维护中，改进交付后产品的性能和可维护性属于（）。", "o": ["更正性维护", "适应性维护", "完善性维护", "预防性维护"], "a": "C", "n": "完善性维护指为改进交付后产品的性能与可维护性而进行的修改（软件维护四分类的公知常识）；更正性维护修复运行中发现的错误，适应性维护应对环境变化，预防性维护提前消除潜在隐患。", "d": 0}, {"k": "dx", "s": 56, "t": "单选", "q": "国产CPU按指令集体系分类中，下列属于复杂指令集的是（）。", "o": ["X86架构", "ARM架构", "MIPS架构", "ALPHA架构"], "a": "A", "n": "x86 属于复杂指令集（CISC），ARM、MIPS、ALPHA 均为精简指令集（RISC）（公知指令集体系常识，知识点总结“芯片：X86、ARM、LoongArch、MIPS”）。", "d": 0}, {"k": "dx", "s": 57, "t": "单选", "q": "在某国有银行国产化产品选型评估中，OFD格式是那种软件使用（）", "o": ["流式", "版式", "中间件", "杀毒软件"], "a": "B", "n": "OFD 是我国自主制定的版式文档格式（固定版式呈现，定位类似 PDF），由版式软件使用；流式格式（如 Word 类）内容可编辑重排，中间件、杀毒软件与文档格式无关。", "d": 0}, {"k": "dx", "s": 58, "t": "单选", "q": "在国产化战略推进过程中，飞腾CPU终端的最新型号是（）。", "o": ["FT1500", "FT-D2000", "FT-2000", "3A5000"], "a": "B", "n": "FT-D2000 是飞腾面向桌面（终端）市场推出的较新一代处理器，型号序列晚于 FT-2000；3A5000 是龙芯的产品，与飞腾无关（知识点总结“国产CPU：鲲鹏、飞腾、龙芯、海光”）。", "d": 0}, {"k": "dx", "s": 59, "t": "单选", "q": "在某项目安全体系建设中，电子政务标准体系框架由（）组成。", "o": ["总体标准、基础设施标准、业务标准、服务标准、管理标准、安全标准", "总体标准、基础设施标准、数据标准、服务标准、管理标准、安全标准", "总体标准、基础设施标准、数据标准、业务标准、管理标准、安全标准", "总体标准、基础设施标准、数据标准、业务标准、服务标准、管理标准、安全标准"], "a": "D", "n": "电子政务标准体系框架由总体标准、基础设施标准、数据标准、业务标准、服务标准、管理标准、安全标准七类组成；A 缺“数据标准”、B 缺“业务标准”、C 缺“服务标准”，只有 D 完整含全部七类。", "d": 0}, {"k": "dx", "s": 60, "t": "单选", "q": "国家密码管理部门对采用商用密码技术从事电子政务电子认证服务的机构进行认定，会同有关部门负责政务活动中使用（）的管理。", "o": ["网络安全、数据电文", "网络安全、电子签名", "电子签名、数据电文", "电子签名、设备检测"], "a": "C", "n": "《密码法》(2020) 规定国家密码管理部门对采用商用密码技术从事电子政务电子认证服务的机构进行认定，会同有关部门负责政务活动中使用电子签名、数据电文的管理；“网络安全”“设备检测”均不在该条款表述之内。", "d": 0}, {"k": "dx", "s": 61, "t": "单选", "q": "密码工作坚持（），遵循统一领导、分级负责，创新发展、服务大局，依法治理、保障安全的原则。", "o": ["总体国家安全观", "国家安全策略", "国家保密条例", "国家信息化发展规划"], "a": "A", "n": "《密码法》(2020) 确立“密码工作坚持总体国家安全观”，并遵循统一领导、分级负责，创新发展、服务大局，依法治理、保障安全的原则；国家安全策略、国家保密条例、信息化发展规划均不是该法定表述。", "d": 0}, {"k": "dx", "s": 62, "t": "单选", "q": "按照我国《数据中心设计规范》GB 50174-2017，数据中心可根据使用性质、管理要求及其在经济和社会中的重要性划分为（）级。", "o": ["1", "2", "3", "4"], "a": "C", "n": "GB 50174-2017《数据中心设计规范》按使用性质、管理要求及在经济和社会中的重要性把数据中心划分为 A、B、C 三级（标准公知内容）；与等级保护的“五级”或机房资质的其他分级混淆即选错。", "d": 0}, {"k": "dx", "s": 63, "t": "单选", "q": "国家发展改革委审批或者核报国务院审批的政务信息化项目，以及其他有关部门按照项目审批管理的政务信息化项目，原则上包括编报（）等环节。", "o": ["规划、项目建议书、可研报告、初步设计", "需求分析、项目建议书、可研报告、初步设计", "可行性研究报告、初步设计方案", "项目建议书、可研报告、初步设计方案"], "a": "D", "n": "《国家政务信息化项目建设管理办法》(2019) 规定此类政务信息化项目原则上包括编报项目建议书、可行性研究报告、初步设计方案等审批环节；规划、需求分析属于建设单位内部工作而非报批环节，C 又少了项目建议书环节（本卷多选题对同一办法的第三项拆分亦印证三项环节）。", "d": 0}, {"k": "dx", "s": 64, "t": "单选", "q": "涉密信息系统发生涉密等级、连接范围、环境设施、主要应用和安全保密管理责任单位变更时，其建设使用单位应当及时向（）报告。", "o": ["负责项目审批的部门", "负责项目等级审核的部门", "负责审批的保密工作部门", "以上都正确"], "a": "C", "n": "涉密信息系统由保密工作部门负责审批与监管，涉密等级、连接范围、环境设施、主要应用和保密管理责任单位发生变更时，应当向负责审批的保密工作部门报告（涉密信息系统分级保护管理的公知口径）；项目审批、等级审核部门不承担涉密系统审批职能。", "d": 0}, {"k": "dx", "s": 65, "t": "单选", "q": "（）由中央网信办和中国证监会于2018年3月30日联合印发，支持符合条件的网信企业利用资本市场做大做强。", "o": ["《网络数据安全管理条例》（国务院令第790号，2025年1月1日施行）相关内容", "《关于推动资本市场服务网络强国建设的指导意见》（中国证监会、中央网信办，2018年印发）", "《互联网宗教信息服务管理办法》相关内容", "《关于加强企业环境信用体系建设的指导意见》（国家发改委、原环境保护部，2015年印发）"], "a": "B", "n": "《关于推动资本市场服务网络强国建设的指导意见》由中国证监会、中央网信办于2018年3月30日联合印发；A、D 分别是国务院（2025、2021 施行的条例）和发改委系统（2015）印发的文件，C 是宗教事务类规章，印发主体与时间均不符。", "d": 0}, {"k": "dx", "s": 66, "t": "单选", "q": "在等级保护设计中，第三级信息系统应至少每几年进行一次全面安全测评？（）", "o": ["1年", "2年", "3年", "4年"], "a": "A", "n": "【已修正答案】原答案 B；理由：公通字〔2007〕43号《信息安全等级保护管理办法》规定第三级信息系统每年至少进行一次等级测评，本卷判断题第42题亦将“每两年一次”的说法判定为错误，故应为 1 年。\n《信息安全等级保护管理办法》（公通字〔2007〕43号，2007）规定第三级信息系统应当每年至少进行一次等级测评，等保 2.0 实践中三级及以上系统同样按年度开展测评；本卷判断题第42题也已将“第三级信息系统应当每两年一次等级测评”判定为错误，因此“每 1 年”才是正确口径。", "d": 2}, {"k": "dx", "s": 67, "t": "单选", "q": "（）是我国密码领域的综合性、基础性法律，是做好新时代密码工作的根本遵循和行动指南。", "o": ["《中华人民共和国密码法》（2020年1月1日施行，全国人民代表大会常务委员会颁布）", "《中华人民共和国国家安全法》（2015年7月1日施行，全国人民代表大会常务委员会颁布）", "《中华人民共和国保守国家秘密法》（2024年5月1日修订施行，全国人民代表大会常务委员会颁布）", "《中华人民共和国网络安全法》（2017年6月1日施行，全国人民代表大会常务委员会颁布）"], "a": "A", "n": "《密码法》(2020) 是我国密码领域的综合性、基础性法律；国家安全法、保守国家秘密法、网络安全法的调整范围分别是总体国家安全、保守国家秘密和网络空间运行安全，都不是密码领域的专门基础性法律。", "d": 0}, {"k": "dx", "s": 68, "t": "单选", "q": "云平台可以细分为IaaS、Pass和SaaS三层，从下到上，这三层的排序是（）。", "o": ["IaaS → Pass → Saa", "IaaS → SaaS → Pass", "Pass → IaaS → SaaS", "Pass → SaaS → IaaS"], "a": "A", "n": "云平台三层自下而上为 IaaS（基础设施即服务）→PaaS（平台即服务，题面原文印作“Pass”，选项 A 末尾“Saa”系原卷缺字）→SaaS（软件即服务），基础设施在最底、平台居中、软件服务在最上（知识点总结“云计算 IaaS/PaaS/SaaS”）。", "d": 0}, {"k": "dx", "s": 69, "t": "单选", "q": "在某项目安全体系建设中，信息安全等级保护测评工作的正确流程是（）。", "o": ["整改、定级、备案、测评、监督检查", "备案、定级、测评、整改、监督检查", "备案、定级、整改、测评、监督检查", "定级、备案、整改、测评、监督检查"], "a": "D", "n": "等级保护工作流程为定级→备案→建设整改→等级测评→监督检查（知识点总结“流程：定级→备案→建设整改→等级测评→监督检查”）；A 先整改后定级顺序颠倒，B、C 先备案后定级与“先定级再备案”不符。", "d": 0}, {"k": "dx", "s": 70, "t": "单选", "q": "根据战略规划的一般理论，IT战略规划始于对信息技术内外部环境的现状分析，其终极任务是（）", "o": ["搞清现状与未来的差距并制定策略", "理解业务现状与未来定义目标", "通过信息系统改进业务的机会", "评估信息系统支持业务的程度"], "a": "A", "n": "IT 战略规划始于信息技术内外部环境的现状分析，终极任务是搞清现状与未来的差距并制定弥合策略（战略规划一般理论的公知内容）；理解业务定义目标（B）、发现改进机会（C）、评估支持程度（D）都是规划过程中的分析环节，而非终极任务。", "d": 0}, {"k": "dx", "s": 71, "t": "单选", "q": "在某省级政务项目规划中，在进行国产化项目需求调研时，重点对（）进行调研。", "o": ["软件层面、硬件层面", "业务需求", "办公环境", "网络环境"], "a": "A", "n": "国产化项目需求调研的重点是软件层面（开发语言、框架、组件、数据库、中间件）与硬件层面（芯片、服务器、存储、外设）的技术栈（知识点总结“全维度现状调研：业务、架构、基础设施、数据、接口、运行状态”最终落到软硬件技术栈）；办公环境、网络环境只是其中的局部场景，业务需求属立项层面而非国产化技术调研的重点维度。", "d": 0}, {"k": "dx", "s": 72, "t": "单选", "q": "根据国家档案局、国家发改委《国家电子政务工程建设项目档案管理暂行办法》中的规定，档案保管期限分为（）两种，定期又分为10年和30年两种。", "o": ["自定义和定期", "短期和定期", "每年和定期", "永久和定期"], "a": "D", "n": "《国家电子政务工程建设项目档案管理暂行办法》规定档案保管期限分为永久和定期两种，定期又分 30 年和 10 年（公知档案管理口径）；“自定义”“短期”“每年”均不是法定的保管期限分类。", "d": 0}, {"k": "dx", "s": 73, "t": "单选", "q": "国家支持（）之间在网络安全信息收集、通报、分析和应急处置等方面进行合作，提高网络运营者的安全保障能力。", "o": ["集成单位", "网络运营者", "系统运维商", "系统开发商"], "a": "B", "n": "《网络安全法》(2017) 规定国家支持网络运营者之间在网络安全信息收集、通报、分析和应急处置等方面进行合作，以提高网络运营者的安全保障能力；合作主体限定为网络运营者，与题干“提高网络运营者的安全保障能力”呼应。", "d": 0}, {"k": "dx", "s": 74, "t": "单选", "q": "已运行信息系统的运营、使用单位自公通字〔2007〕43号《信息安全等级保护管理办法》施行之日起180日内确定（）。", "o": ["信息系统的安全保护等级", "信息系统的运行维护期限", "信息系统的安全防护措施", "信息系统的安全运维环境"], "a": "A", "n": "《信息安全等级保护管理办法》（公通字〔2007〕43号，2007）要求已运行信息系统的运营、使用单位自施行之日起 180 日内确定信息系统的安全保护等级（本卷判断题第67题将“90 日内确定”判定为错误，可印证 180 日口径）；等级确定后才在规定期限内办理备案、落实防护措施。", "d": 0}, {"k": "dx", "s": 75, "t": "单选", "q": "在《网络产品和服务安全审查办法》，国家互联网信息办公室，2017年2月公开征求意见中规定：关系国家安全和公共利益的信息系统使用的重要网络产品和服务，应当经过（）。", "o": ["《关键信息基础设施安全保护条例》（国务院令第745号，2021年9月1日施行）", "《网络安全审查办法》（国家网信办等十三部门令第8号，2022年2月15日施行）", "《互联网宗教信息服务管理办法》", "《网络数据安全管理条例》（国务院令第790号，2025年1月1日施行）"], "a": "B", "n": "【已修正答案】原答案 D；理由：2017 年《网络产品和服务安全审查办法》要求重要网络产品和服务“经过网络安全审查”，对应《网络安全审查办法》；《网络数据安全管理条例》规范数据处理活动，与该审查制度无关。\n2017 年《网络产品和服务安全审查办法》及其征求意见稿规定“关系国家安全和公共利益的信息系统使用的重要网络产品和服务，应当经过网络安全审查”，承载该审查要求的规范性文件即《网络安全审查办法》（现行为国家网信办等十三部门令第8号，2022年2月15日施行）；《网络数据安全管理条例》(2025) 规范的是数据处理活动，与网络产品和服务安全审查无关，本卷第114题亦印证2017年2月公开征求意见的正是《网络产品和服务安全审查办法》。", "d": 2}, {"k": "dx", "s": 76, "t": "单选", "q": "根据2015年7月1日施行《中华人民共和国国家安全法》关于加快发展战略高新技术和核心关键技术的要求，下列表述正确的是（）", "o": ["自主可控；重要领域", "自主可控；党政机关", "信息技术应用创新；重要领域", "信息技术应用创新；党政机关"], "a": "A", "n": "《国家安全法》(2015) 对加快发展战略高新技术和核心关键技术提出提升自主可控能力、保障重要领域（网络与信息核心技术、重要领域信息系统）安全可控的要求；A 与该法口径一致，“信息技术应用创新”是产业推进术语、“党政机关”只是重点推广范围，均不是该法条的表述。", "d": 0}, {"k": "dx", "s": 77, "t": "单选", "q": "为充分保护数据来源者合法权益，推动基于知情同意或存在法定事由的数据流通使用模式，“数据二十条”提出保障数据来源者享有（）由其促成产生数据的权益。", "o": ["获取或复制转移", "复制或共享交换", "获取或共享交换", "复制或数据转移"], "a": "A", "n": "“数据二十条”(2022《中共中央 国务院关于构建数据基础制度更好发挥数据要素作用的意见》) 提出保障数据来源者享有获取或复制转移由其促成产生数据的权益，以保护数据来源者合法权益、推动基于知情同意或法定事由的数据流通使用；“共享交换”是数据流通方式，不是来源者权益的法定表述。", "d": 0}, {"k": "dx", "s": 78, "t": "单选", "q": "在某国有银行国产化产品选型评估中，项目集成实施后，主要对终端进行（）验证。", "o": ["外观完整性", "性能与稳定性、兼容性", "安全合规性", "功能正确性"], "a": "B", "n": "项目集成实施后，终端运行质量最直接体现在性能与稳定性、兼容性上（适配目标为功能、性能、安全达标，知识点总结“适配目标与测试验证”）；外观完整性属到货外观检查，安全合规性属测评范畴，功能正确性属功能测试阶段的内容。", "d": 0}, {"k": "dx", "s": 79, "t": "单选", "q": "整机产品需要提供第三方机构平均无故障运行时间测试报告，MTBF时间应（）。", "o": ["≥5000小时", "≥10000小时", "≥15000小时", "≥20000小时"], "a": "B", "n": "MTBF（平均无故障运行时间）是整机可靠性的量化指标，本套题选型口径要求不低于 10000 小时（本卷判断题第43题已将“MTBF 应≥15000 小时”的说法判定为错误，可排除 C/D 档位）；MTBF 数值越高说明可靠性越好，≥5000 小时档不满足该要求。", "d": 0}, {"k": "dx", "s": 80, "t": "单选", "q": "依据国务院令第745号《关键信息基础设施安全保护条例》，关于关键信息基础设施安全保护的责任主体，下列说法正确的是（）", "o": ["运营者负主要责任，保护工作部门负主体责任", "运营者负主体责任，保护工作部门负责指导和监督", "国家网信部门负主体责任，运营者负责配合", "国务院公安部门负主体责任，运营者负责配合"], "a": "B", "n": "《关键信息基础设施安全保护条例》(2021) 确立“运营者承担关键信息基础设施安全保护主体责任，保护工作部门负责指导和监督”的职责格局（条例公知内容，知识点总结亦强调关基安全自主可控）；网信部门、公安部门承担监管协调职责，A、C、D 都把主体责任的归属写错。", "d": 0}, {"k": "dx", "s": 81, "t": "单选", "q": "2014 年 5 月 12 日，中央国家机关政府采购中心发布一份重要通知，对入围中央机关采", "o": ["Mac OS X", "Linux Mint", "Windows XP", "Windows 8"], "a": "D", "n": "2014 年中央国家机关政府采购中心通知明确：入围政采目录的计算机类产品一律不允许安装 Windows 8（未通过安全审查、存在不可控风险）；当时 XP 已停服但本通知点名的是 Win8。", "d": 0}, {"k": "dx", "s": 82, "t": "单选", "q": "2020 年 1 月 1 日施行《中华人民共和国密码法》中规定，任何组织或者个人不得（）", "o": ["利用病毒", "利用安全漏洞", "利用密码", "利用数据"], "a": "C", "n": "《密码法》明确：任何组织或者个人不得“利用密码”从事危害国家安全、社会公共利益、他人合法权益等违法犯罪活动；A/B/D 都是偷换了手段。", "d": 0}, {"k": "dx", "s": 83, "t": "单选", "q": "在（）公安机关应当对信息系统的备案情况进行审核，对符合等级保护要求的，应当在", "o": ["项目验收前", "信息系统备案后", "应用系统建成后", "项目系统运维期间"], "a": "B", "n": "等保管理流程：信息系统备案后，由受理备案的公安机关审核，对符合要求的在收到备案材料之日起 10 个工作日内颁发备案证明；A/C/D 都不是审核时点。", "d": 0}, {"k": "dx", "s": 84, "t": "单选", "q": "在某项目安全体系建设中，密码应用安全性评估的主要依据标准是？（）", "o": ["GM/T0054-2018 密码标准", "等保 2.0 网络安全相关标准", "ISO27001 信息安全标准", "GB/T22239-2019 等保标准"], "a": "A", "n": "密评的主要依据标准是 GM/T 0054-2018（信息系统密码应用基本要求，行标）；B/D 是等保线、C 是信息安全管理体系，都不是密码应用评估的依据。", "d": 0}, {"k": "dx", "s": 85, "t": "单选", "q": "信创云应用的发展趋势中，以下哪项技术被认为是关键方向？（）", "o": ["传统单体架构", "云原生技术", "非容器化部署", "闭源软件优先"], "a": "B", "n": "信创云应用演进的关键方向是云原生（容器、微服务、DevOps）；单体架构、非容器化、闭源优先都与趋势相反。", "d": 0}, {"k": "dx", "s": 86, "t": "单选", "q": "智慧城市建设参考模型的（）利用 SOA、云计算、大数据等技术，承载智慧应用层中的", "o": ["通信网络层", "计算与存储层", "物联感知层", "数据及服务支撑层"], "a": "D", "n": "智慧城市参考模型中，利用 SOA、云计算、大数据为上层智慧应用提供服务和共享资源的是“数据及服务支撑层”；通信网络层管传输、计算与存储层管算力、物联感知层管数据采集。", "d": 0}, {"k": "dx", "s": 87, "t": "单选", "q": "面向消息中间件 MOM 通过下列哪种机制，可在分布式环境下扩展进程间通信并支撑多", "o": ["消息扩展机制", "消息共享机制", "消息传递机制", "消息处理机制"], "a": "C", "n": "MOM（面向消息中间件）靠“消息传递机制”解耦分布式进程通信，屏蔽协议、语言、应用与平台差异；扩展/共享/处理都不是其核心机制名。", "d": 0}, {"k": "dx", "s": 88, "t": "单选", "q": "2020 年 1 月 1 日施行《中华人民共和国密码法》第二十六条规定，商用密码产品检测", "o": ["《中华人民共和国网络安全法》（2017 年 6 月 1 日施行，全国人民代表大会常务委员会", "《中华人民共和国密码法》（2020 年 1 月 1 日施行，全国人民代表大会常务委员会颁布）", "《中华人民共和国国家安全法》（2015 年 7 月 1 日施行，全国人民代表大会常务委员会", "《中华人民共和国保守国家秘密法》（2024 年 5 月 1 日修订施行，全国人民代表大会常"], "a": "A", "n": "《密码法》第二十六条明确：商用密码产品检测认证适用《网络安全法》的有关规定，目的是避免重复检测认证；与密码法自身、国家安全法、保密法无关。", "d": 0}, {"k": "dx", "s": 89, "t": "单选", "q": "国产基础软硬件选型中，在电子政务内网中，（）操作系统可以安装在国产 PC 机上并且", "o": ["Linux", "Android", "IOS", "Windows"], "a": "A", "n": "电子政务内网的国产 PC 只能安装国产 Linux 系操作系统（麒麟、统信等）；Android/iOS 是移动操作系统，Windows 不符合国产化替代政策。", "d": 0}, {"k": "dx", "s": 90, "t": "单选", "q": "企业最近将现有的客户关系系统迁移至虚拟化平台，并对应用软件进行全面功能性升级。", "o": ["计算可用性指标是否达到协议", "对可用性连续性计划重新测试", "记录测试结果并产生行动计划", "评估迁移对连续性计划的影响"], "a": "A", "n": "“对可用性连续性计划重新测试、记录结果形成行动计划、评估迁移对计划的影响”都是主动保障；只核对“指标是否达到协议”是事后检查，保证不了迁移过程的可用性与连续性，属于不能保证的一项。", "d": 0}, {"k": "dx", "s": 91, "t": "单选", "q": "交换式局域网从根本上改变了“共享介质”的工作方式，它可以通过局域网交换机支持端", "o": ["服务质量", "网络监控", "存储管理", "网络拓扑"], "a": "A", "n": "交换式局域网用端口并发连接、独享带宽取代共享介质，直接带来网络带宽与性能的提升，改善的另一个维度是服务质量（QoS）；B/C/D 与交换机制无直接因果关系。", "d": 0}, {"k": "dx", "s": 92, "t": "单选", "q": "项目管理实施规划编制工作的第一步是了解相关方的要求，之后还要进行①实施编制活", "o": ["②-①-③-④", "④-②-③-①", "②-③-①-④", "③-②-①-④"], "a": "C", "n": "编制流程：了解相关方要求 → ②分析项目特点和环境条件 → ③熟悉法规和文件 → ①实施编制活动 → ④履行报批手续；先“分析+熟悉”再“编制+报批”。", "d": 0}, {"k": "dx", "s": 93, "t": "单选", "q": "实施“中国制造 2025”，促进两化深度融合，加快从制造大国转向制造强国，需要电子信", "o": ["大数据", "云计算", "智能制造", "区块链"], "a": "C", "n": "“中国制造 2025”促进两化融合的主线是加快发展智能制造和工业互联网；大数据、云计算、区块链是支撑技术，不是题干并列的“加快发展”对象。", "d": 0}, {"k": "dx", "s": 94, "t": "单选", "q": "新建第二级以上信息系统，应当在投入运行后（）内，由其运营、使用单位到所在地设", "o": ["15 日", "30 日", "45 日", "60 日"], "a": "B", "n": "等保管理办法：新建第二级以上信息系统应当在投入运行后 30 日内，到所在地设区的市级以上公安机关办理备案；注意别与“已运行系统 180 日内确定等级”混淆。", "d": 0}, {"k": "dx", "s": 95, "t": "单选", "q": "风险评估报告应当包括处理重要数据的（），开展数据处理活动的情况，面临的数据安", "o": ["种类、数量", "种类、语言", "流程、数量", "流程、语言"], "a": "A", "n": "《数据安全法》要求重要数据处理者定期开展风险评估，报告应包括处理重要数据的“种类、数量”，开展数据处理活动的情况及风险应对措施；“语言/流程”均为干扰。", "d": 0}, {"k": "dx", "s": 96, "t": "单选", "q": "网络关键设备和网络安全专用产品应当按照相关国家标准的（）要求，由具备资格的机", "o": ["强制性", "建议性", "选择性", "排他性"], "a": "A", "n": "《网络安全法》规定：网络关键设备和网络安全专用产品按相关国家标准的“强制性”要求，经安全认证合格或安全检测符合要求后方可销售或提供；建议性/选择性都错。", "d": 0}, {"k": "dx", "s": 97, "t": "单选", "q": "国发〔2016〕51 号《政务信息资源共享管理暂行办法》中提出政务信息化项目立项申", "o": ["项目建议书", "项目申报表", "项目信息资源目录", "项目信息资源共享目录"], "a": "C", "n": "国发〔2016〕51 号：政务信息化项目立项申请前应预编形成“项目信息资源目录”，作为项目审批要件；注意落选项“共享目录”是目录的共享形态，题干要的是审批要件清单名。", "d": 0}, {"k": "dx", "s": 98, "t": "单选", "q": "商用密码应用安全性评估应当与（）相衔接，避免重复评估、测评。", "o": ["关键基础设施检测评估和等级测评", "关键基础设施检测评估和第三方测试", "测评中心测试评估和等级测评", "测评中心测试评估和第三方测试"], "a": "A", "n": "商用密码应用安全性评估应当与关键信息基础设施检测评估和等级测评相衔接，避免重复评估、测评；“第三方测试”“测评中心测试”都是干扰搭配。", "d": 0}, {"k": "dx", "s": 99, "t": "单选", "q": "2024 年 5 月 1 日修订施行《中华人民共和国保守国家秘密法》增加支持保密科技创新", "o": ["自主创新", "技术升级", "技术改革", "科技创新"], "a": "A", "n": "2024 年修订《保守国家秘密法》增加保密科技创新条款，强调提升“自主创新”能力；“科技创新”是领域名词，题干要的是能力表述。", "d": 0}, {"k": "dx", "s": 100, "t": "单选", "q": "信息系统的安全保护等级第三级要求，信息系统受到破坏后，会对社会秩序和公共利", "o": ["轻微损害", "一般损害", "严重损害", "不可逆损害"], "a": "C", "n": "等保定级梯度：二级“一般损害”、三级“严重损害”、四级“特别严重损害”，三级即对社会秩序和公共利益造成严重损害或对国家安全造成损害，由国家信息安全监管部门监督检查。", "d": 0}, {"k": "dx", "s": 101, "t": "单选", "q": "根据国务院令第 745 号《关键信息基础设施安全保护条例》关于运营者采购网络产品", "o": ["安全可信；安全审查", "安全可信；等保测评", "性能最佳；安全审查", "性能最佳；等保测评"], "a": "A", "n": "关基条例规定：运营者采购网络产品和服务应确保“安全可信”，并按规定经过“安全审查”；“性能最佳”不是法定要求，“等保测评”属于等级保护线，别混。", "d": 0}, {"k": "dx", "s": 102, "t": "单选", "q": "根据等级保护对象在国家安全、经济建设、社会生活中的重要程度，以及一旦遭到破", "o": ["3", "4", "5", "6"], "a": "C", "n": "等级保护对象的安全保护等级共分 5 个级别（第一级～第五级），依据重要程度和被破坏后的损害程度定级。", "d": 0}, {"k": "dx", "s": 103, "t": "单选", "q": "2017 年 6 月 1 日施行《中华人民共和国网络安全法》中提出：国家实行网络安全等级", "o": ["网络安全法", "密码法", "等级保护", "网络安全等级保护制度"], "a": "D", "n": "《网络安全法》原文：网络运营者应当按照“网络安全等级保护制度”的要求履行安全保护义务；C“等级保护”少了定语，D 才是法条原文。", "d": 0}, {"k": "dx", "s": 104, "t": "单选", "q": "组织工具是组织论的应用手段，用图或表等形式表示各种组织关系，它包括了项目结", "o": ["项目结构图", "管理组织结构图", "工作任务分配表", "工作流程图"], "a": "D", "n": "组织工具四件套中只有“工作流程图”有动态属性（体现工作开展的先后顺序与流转）；结构图、组织结构图、分配表都是静态表达。", "d": 0}, {"k": "dx", "s": 105, "t": "单选", "q": "2023 年 12 月 26 日由财政部、工信部发布《政府采购需求标准》，财政部，2023 年印", "o": ["集中采购", "分包采购", "现货采购", "间接采购"], "a": "B", "n": "财政部、工信部 2023 年《政府采购需求标准》：软硬件产品与集成服务要尽可能“分包采购”（合理划分采购包），防止打包捆绑。", "d": 0}, {"k": "dx", "s": 106, "t": "单选", "q": "网信办 2016 年 12 月 27 日发布并实施的（）指出，将网络安全定位为国家安全的核心，", "o": ["《国民经济和社会发展十四五规划纲要》（即《中华人民共和国国民经济和社会发展第十", "《国家信息化规划纲要》（中共中央办公厅、国务院办公厅，2016 年印发）", "《国家网络空间安全战略》（国家互联网信息办公室，2016 年 12 月发布）", "《国家信息化发展战略纲要》（中共中央办公厅、国务院办公厅，2016 年 7 月印发）"], "a": "C", "n": "2016 年 12 月网信办发布的《国家网络空间安全战略》将网络安全定位为“国家安全的核心”并建立网络安全审查制度；《国家信息化发展战略纲要》是 2016 年 7 月印发，层级与内容均不符。", "d": 0}, {"k": "dx", "s": 107, "t": "单选", "q": "国办发〔2019〕57 号《国家政务信息化项目建设管理办法》中规定：项目投资规模未", "o": ["0.1", "0.12", "0.15", "0.16"], "a": "C", "n": "国办发〔2019〕57 号：投资规模未超概算批复、建设目标不变时，主要建设内容调整且资金调整数额不超过概算总投资 15%（0.15）可由建设单位调整并报审批部门备案。", "d": 0}, {"k": "dx", "s": 108, "t": "单选", "q": "在制定国产化分阶段替代路径时，通常遵循\"先易后难、先边缘后核心\"的原则。下列系", "o": ["停机影响大且改造复杂的核心交易系统", "涉及多系统耦合的核心生产管理系统", "业务影响可控、改造难度适中的办公自动化系统", "依赖专用外设驱动且暂无国产替代的行业系统"], "a": "C", "n": "试点替代遵循“先易后难、先边缘后核心”：业务影响可控、改造难度适中的办公自动化系统最合适；A/B 是核心系统、D 暂无国产替代，都不宜打头阵。", "d": 0}, {"k": "dx", "s": 109, "t": "单选", "q": "张三带领研发团队正在开发一款高性能的多功能电路板。经过设计与制作，完成了第", "o": ["结构化生命周期法", "试验原型法", "演进原型法", "面向对象方法"], "a": "C", "n": "第一版评测发现缺陷 → 修改优化 → 第二版评测通过，是在原型基础上反复迭代逼近目标，属于“演进原型法”；试验原型法只做一次性可行性验证。", "d": 0}, {"k": "dx", "s": 110, "t": "单选", "q": "中共中央办公厅、国务院办公厅 2016 年 7 月印发的《国家信息化发展战略纲要》中提", "o": ["2022", "2023", "2024", "2025"], "a": "D", "n": "《国家信息化发展战略纲要》提出：到 2025 年建成国际领先的移动通信网络，根本改变核心技术和关键设备受制于人的局面。", "d": 0}, {"k": "dx", "s": 111, "t": "单选", "q": "2018 年 7 月 13 日，中共中央总书记、国家主席、中央军委主席、中央财经委员会主", "o": ["关键核心技术是国之重器", "信息化带来千载难逢的机遇", "没有网络安全就没有国家安全", "加强党中央对网信工作领导"], "a": "A", "n": "2018 年 7 月 13 日中央财经委员会第二次会议讲话：“关键核心技术是国之重器”；B/C/D 都是网信领域常见论断，但出处不是这次会议。", "d": 0}, {"k": "dx", "s": 112, "t": "单选", "q": "大数据对产品、企业和产业有着深刻的影响。把信息技术看作是辅助或服务性的工具", "o": ["数据驱动", "信息产业", "大数据", "成本驱动"], "a": "A", "n": "大数据时代管理者要认识到信息技术的广泛影响，“数据驱动”将是未来经济社会发展的重要特征。", "d": 0}, {"k": "dx", "s": 113, "t": "单选", "q": "关键信息基础设施运营者采购网络产品和服务时，应按照国家有关规定与提供者签订", "o": ["安全保密协议；安全保密", "供货商条例；设备安全", "劳务合同；安全保密", "安全保密协议；设备安全"], "a": "A", "n": "关基条例要求：运营者采购网络产品和服务时与提供者签订“安全保密协议”，明确其技术支持和“安全保密”义务与责任；“供货商条例/劳务合同/设备安全”均为干扰。", "d": 0}, {"k": "dx", "s": 114, "t": "单选", "q": "国家互联网信息办公室起草了（），于 2017 年 2 月 4 日向社会公开征求意见。", "o": ["《网络安全审查办法》（国家网信办等十三部门令第 8 号，2022 年 2 月 15 日施行）", "《网络产品和服务安全审查办法》（国家互联网信息办公室，2017 年 2 月公开征求意见）", "《互联网宗教信息服务管理办法》（国家宗教事务局、国家网信办等部门令第 17 号，", "《网络数据安全管理条例》（国务院令第 790 号，2025 年 1 月 1 日施行）"], "a": "B", "n": "2017 年 2 月 4 日向社会公开征求意见的是《网络产品和服务安全审查办法》（2017 年 6 月施行，后演进为 2022 年修订的《网络安全审查办法》）；注意与其它年份的办法区分。", "d": 0}, {"k": "dx", "s": 115, "t": "单选", "q": "概算是在初步设计阶段，根据设计图纸、概算定额、费用定额、设备和材料预算价格、", "o": ["建设单位", "上级管理单位", "设计单位", "施工单位"], "a": "C", "n": "设计概算在初步设计阶段编制，由“设计单位”根据图纸、概算定额等资料编制；建设单位是投资方、施工单位是执行方，都不是概算编制人。", "d": 0}, {"k": "dx", "s": 116, "t": "单选", "q": "可行性研究报告是项目投资前从经济、技术、生产、供销直到社会环境、法律等各种", "o": ["报告含投资必要性和技术可行性等", "研究方法含哲学逻辑专业基础方法", "可研报告由总论和若干专题构成", "审批流程需主管主任决定批复"], "a": "B", "n": "“错误的是”选 B：可研的研究方法不包括“哲学逻辑专业基础方法”（应为调查、预测、经济与工程分析等）；A/C/D 均正确，其中“总论+若干专题”的构成在判断题 36 也考过。", "d": 0}, {"k": "dx", "s": 117, "t": "单选", "q": "落实关键信息基础设施的运营者应依照有关法律、行政法规的规定以及国家标准的强", "o": ["完整性、保密性和可用性", "完整性、可塑性和保密性", "可用性、可塑性和完整性", "可用性、实用性和完整性"], "a": "A", "n": "关基条例要求运营者采取技术保护措施，保障关基安全稳定运行，维护数据的“完整性、保密性和可用性”（CIA 三要素）；“可塑性”“实用性”都是造出来的词。", "d": 0}, {"k": "dx", "s": 118, "t": "单选", "q": "2021 年 10 月 23 日《全国人民代表大会常务委员会关于修改〈中华人民共和国审计法〉", "o": ["需积极配合", "不得拒绝", "可延期检查", "可拒绝审查"], "a": "B", "n": "《审计法》（2021 修正）：审计机关有权检查被审计单位信息系统的安全性、可靠性、经济性，被审计单位的义务是“不得拒绝”。", "d": 0}, {"k": "dx", "s": 119, "t": "单选", "q": "涉密信息系统（）应当依据涉密信息系统分级保护管理规范和技术标准，按照秘密、", "o": ["建设使用单位", "集成单位", "运维单位", "开发厂商"], "a": "A", "n": "涉密信息系统由“建设使用单位”依据分级保护管理规范和技术标准，按秘密、机密、绝密三级要求做方案设计、实施分级保护；集成/运维/开发单位都不是责任主体。", "d": 0}, {"k": "dx", "s": 120, "t": "单选", "q": "在国产化项目需求调研中，以下哪项是需求归集后结果分析的核心任务？（）", "o": ["直接进入系统编码开发", "对需求分类排序和可行性分析", "将所有需求列入建设方案", "记录需求不进行分析处理"], "a": "B", "n": "需求归集后的核心分析任务：对需求分类排序并做可行性分析（与单选 4、多选 6 同口径）；直接编码、全盘照抄、只记录不分析都是跳过分析环节。", "d": 0}, {"k": "dx", "s": 121, "t": "单选", "q": "在国产化建设方案的系统总体架构设计中，业务架构设计的核心目标是（）。", "o": ["确定技术栈选型方案", "明确业务域划分与核心流程梳理", "制定网络拓扑规划方案", "设计数据库表结构与存储"], "a": "B", "n": "业务架构设计的核心目标=明确业务域划分与核心流程梳理（与单选 5 同口径）；C/D 分别是网络架构和数据架构的内容。", "d": 0}, {"k": "dx", "s": 122, "t": "单选", "q": "国产化建设方案中，应用架构设计应遵循的核心原则是（）。", "o": ["所有应用必须一次性完成国产化迁移", "优先采用闭源商业软件以保证稳定性", "分层解耦，支持国产化组件的灵活替换与独立演进", "应用架构无需考虑与现有系统的兼容性"], "a": "C", "n": "应用架构核心原则：分层解耦，支持国产化组件灵活替换与独立演进；一次性迁移、闭源优先、不考虑兼容都违背适配路线。", "d": 0}, {"k": "dx", "s": 123, "t": "单选", "q": "在国产化项目数据架构设计中，数据分类分级的主要依据是（）。", "o": ["数据存储容量大小指标", "数据访问频率高低指标", "数据产生时间先后指标", "《中华人民共和国数据安全法》要求"], "a": "D", "n": "数据分类分级依据《数据安全法》按数据的重要程度和被破坏后的危害程度执行，与容量、访问频率、产生时间无关。", "d": 0}, {"k": "dx", "s": 124, "t": "单选", "q": "国产化建设方案中，技术架构设计中国产化技术栈组合选型的首要考量因素是（）。", "o": ["自主可控程度确保核心技术", "采购成本达到最低", "市场占有率达到最高", "部署速度达到最快"], "a": "A", "n": "国产化技术栈组合选型的首要考量是“自主可控程度”，在此基础上兼顾兼容适配与性能可靠（评估维度见多选 99）。", "d": 0}, {"k": "dx", "s": 125, "t": "单选", "q": "国产化建设方案的安全架构设计中，纵深防御安全体系的核心思想是（）", "o": ["在网络边界部署防火墙即可", "在边界主机应用数据多层部署防护", "所有安全措施集中部署应用层", "依赖单一安全产品实现全部防护"], "a": "B", "n": "纵深防御核心思想：在边界→主机→应用→数据多层部署防护，任一层被突破仍有后备防线；A/C/D 都是把宝押在单点的思路。", "d": 0}, {"k": "dx", "s": 126, "t": "单选", "q": "在业务架构设计中，业务域划分的基本原则是（）。", "o": ["按照部门组织架构划分", "按照技术实现方式划分", "遵循高内聚低耦合按业务聚合", "按照系统开发顺序划分"], "a": "C", "n": "业务域划分遵循“高内聚低耦合、按业务聚合”；按部门、按技术实现方式、按开发顺序划分都会割裂业务闭环。", "d": 0}, {"k": "dx", "s": 127, "t": "单选", "q": "业务架构设计中，业务能力组件化拆解的主要目的是（）", "o": ["减少代码编写工作量", "简化项目管理流程", "降低硬件采购成本", "封装可复用组件支持国产化替换"], "a": "D", "n": "组件化拆解的目的=把业务功能封装为可复用组件，支持按组件粒度做国产化替换（判断 89 同口径）；省代码、简化流程、降硬件都不是本质目的。", "d": 0}, {"k": "dx", "s": 128, "t": "单选", "q": "在业务场景适配过程中，对于高敏感度业务场景，应优先采用的建设模式是（）。", "o": ["国产化新建模式全面采用国产栈", "保留原有系统做界面改造", "采用开源软件直接替代", "暂不进行国产化改造"], "a": "A", "n": "高敏感度业务优先“国产化新建模式”，全面采用国产栈从零建（多选 101 同口径）；界面改造、开源直接替代、暂不改造都无法满足高敏感场景的安全可控要求。", "d": 0}, {"k": "dx", "s": 129, "t": "单选", "q": "业务架构设计中，运维与业务保障体系的建设重点是（）", "o": ["关注硬件设备的维护保障", "建立监控告警故障处置优化机制", "完全依赖原厂商提供运维服务", "在工作时间提供运维保障"], "a": "B", "n": "运维与业务保障体系的重点=建立监控告警、故障处置与持续优化机制（多选 111 同口径）；只盯硬件、全靠原厂商、只在工作时间服务都是保障短板。", "d": 0}, {"k": "dx", "s": 130, "t": "单选", "q": "在应用架构设计中，应用分层架构与组件集成的关键要求是（）。", "o": ["各层之间采用紧耦合以提高性能", "组件集成时须用同一厂商产品", "各层标准化接口交互松耦合集成", "分层架构适用于大型系统"], "a": "C", "n": "分层架构与组件集成的关键要求：各层标准化接口、松耦合集成；紧耦合提高性能、绑定单一厂商、分层只适用大型系统都违背架构原则（判断 85、92 同口径）。", "d": 0}, {"k": "dx", "s": 131, "t": "单选", "q": "应用建设模式中，对于存量系统的国产化改造，以下哪种策略风险最低？（）", "o": ["一次性全面替换所有组件", "分阶段渐进改造逐步替换验证", "更换前端界面保持后端不变", "直接废弃旧系统重新建设"], "a": "B", "n": "存量系统国产化改造风险最低的策略=分阶段渐进改造、逐步替换、逐步验证（多选 112 同口径）；一次性替换风险最大，换界面不动后端、推倒重建都不经济。", "d": 0}, {"k": "dx", "s": 132, "t": "单选", "q": "在应用适配改造中，以下哪项是应用适配改造的首要工作？（）", "o": ["进行技术栈调研与兼容性评估", "直接开始代码修改工作", "采购新的服务器硬件", "制定上线推广计划"], "a": "A", "n": "应用适配改造的首要工作=技术栈调研与兼容性评估（判断 94 同口径），先摸清依赖再动手改代码。", "d": 0}, {"k": "dx", "s": 133, "t": "单选", "q": "根据 2021 年 9 月 1 日施行《中华人民共和国数据安全法》要求，国产化项目数据架构", "o": ["制定数据安全策略", "部署数据加密工具", "建立数据访问控制列表", "梳理数据资产目录明确来源类型"], "a": "D", "n": "数据分类分级的第一步=梳理数据资产目录、明确数据来源与类型（判断 95 同口径）；加密、权限控制都是分级之后才落地的事。", "d": 0}, {"k": "dx", "s": 134, "t": "单选", "q": "在数据架构设计中，国产化数据库选型时数据存储方案应重点考虑（）。", "o": ["考虑采购成本忽视兼容性风险", "考虑数据兼容性和迁移可行性", "考虑厂商品牌知名度高低", "考虑数据库版本新旧程度"], "a": "B", "n": "国产化数据库选型时，数据存储方案应重点考虑数据兼容性和迁移可行性（多选 52 同口径）；忽视兼容性、只看品牌和版本都是选型大忌。", "d": 0}, {"k": "dx", "s": 135, "t": "单选", "q": "国产化项目中，跨系统数据共享与安全的核心保障措施是（）。", "o": ["禁止任何形式的数据共享", "通过 FTP 方式传输数据文件", "建立数据交换平台分级访问控制", "将所有数据公开存储管理"], "a": "C", "n": "跨系统数据共享安全的核心=建立数据交换平台并实施分级访问控制（多选 105 同口径）；禁止共享和公开存储都不现实，FTP 明文传输更不合规。", "d": 0}, {"k": "dx", "s": 136, "t": "单选", "q": "国产化技术架构设计中，国产化技术栈组合选型的评估维度不包括（）。", "o": ["自主可控程度", "兼容适配性", "性能可靠性", "厂商优惠政策幅度"], "a": "D", "n": "技术栈组合选型的评估维度：自主可控程度、兼容适配性、性能可靠性、生态成熟度；“厂商优惠政策幅度”不属于评估维度（与单选 124 呼应）。", "d": 0}, {"k": "dx", "s": 137, "t": "单选", "q": "国产化建设方案中，部署架构与网络拓扑规划应遵循的安全原则是（）。", "o": ["安全分区等级防护分区域部署", "所有系统部署同一网段管理", "不设置任何网络隔离措施", "依靠物理隔离保障安全"], "a": "A", "n": "部署架构与网络拓扑的安全原则=安全分区、等级防护、分区域部署，按安全等级把系统放进相应安全区域（判断 98 同口径）。", "d": 0}, {"k": "dx", "s": 138, "t": "单选", "q": "在国产化技术架构设计中，中间件集成的主要挑战是（）。", "o": ["中间件采购成本过高", "国产中间件与应用兼容性问题", "中间件厂商数量太少", "中间件安装部署过于复杂"], "a": "B", "n": "国产化中间件集成的主要挑战=国产中间件与应用的兼容性问题（API 接口差异、通信协议适配、性能差距，见多选 107）；成本、厂商数量、部署复杂度都不是主要矛盾。", "d": 0}, {"k": "dx", "s": 139, "t": "单选", "q": "安全架构设计中，纵深防御体系的最内层防线通常是（）。", "o": ["网络边界防火墙防护", "主机入侵检测系统防护", "数据安全防护包括加密脱敏审计", "物理门禁系统防护"], "a": "C", "n": "纵深防御的最内层防线=数据安全防护（加密、脱敏、审计）；网络边界防火墙和物理门禁是外层，入侵检测属主机层（多选 108、判断 100 同口径）。", "d": 0}, {"k": "dx", "s": 140, "t": "单选", "q": "安全架构中，可信身份认证与访问控制的设计应基于（）。", "o": ["单一密码认证即可满足要求", "零信任架构身份验证权限校验", "依赖网络边界防护安全", "所有用户赋予相同权限"], "a": "B", "n": "可信身份认证与访问控制应基于零信任架构：持续身份验证+权限校验；单一密码、只防边界、用户同权都违背零信任（判断 101 同口径）。", "d": 0}, {"k": "dx", "s": 141, "t": "单选", "q": "安全架构设计中，等保合规与安全管控的关系是（）。", "o": ["等保合规可以替代安全管控", "安全管控无需考虑等保要求", "两者完全独立互不影响", "等保为基线管控在其上提升"], "a": "D", "n": "等保合规是安全管控的基线要求，安全管控应在满足等保的基础上进一步提升防护能力（判断 102 同口径）；替代、无关、独立都不对。", "d": 0}, {"k": "dx", "s": 142, "t": "单选", "q": "在国产化系统总体架构设计中，以下关于业务架构与应用架构关系的描述，正确的是", "o": ["业务架构是应用架构设计基础", "应用架构先于业务架构设计", "两者可以独立设计互不影响", "业务架构和应用架构是同一概念"], "a": "A", "n": "业务架构是应用架构设计的基础和输入（判断 84 同口径），设计顺序上先业务后应用。", "d": 0}, {"k": "dx", "s": 143, "t": "单选", "q": "应用架构设计中，关于「新建、改造、迁移」三种建设模式的适用场景，以下描述正", "o": ["新建模式适用于所有场景", "改造模式适用于小型系统", "新建适用新系统改造适用存量", "三种模式可以随意混用"], "a": "C", "n": "“新建、改造、迁移”三模式的适用边界：新建适用于新系统、改造适用于存量系统（迁移适用于存量搬迁）；“适用于所有场景”“随意混用”都是错的（多选 101/112 同口径）。", "d": 0}, {"k": "dx", "s": 144, "t": "单选", "q": "数据架构设计中，关于数据存储方案的选择，以下描述错误的是（）。", "o": ["关系型数据采用国产关系型数据库如达梦、人大金仓", "非结构化数据可采用国产分布式存储方案", "不同安全等级数据应采取差异化存储策略", "所有数据统一存储在同一数据库中以降低管理成本"], "a": "D", "n": "“错误的是”选 D：不同安全等级的数据应采取差异化存储策略，统一塞进同一个数据库违背分级管控；A/B/C 描述本身正确。", "d": 0}, {"k": "dx", "s": 145, "t": "单选", "q": "在国产化技术栈组合选型中，「飞腾 CPU+麒麟 OS+达梦数据库+东方通中间件」组合", "o": ["关注采购成本忽视自主可控", "实现全国产化技术栈自主可控", "性能最优超越同类产品", "无需进行任何适配测试"], "a": "B", "n": "飞腾 CPU+麒麟 OS+达梦数据库+东方通中间件=从芯片、操作系统、数据库到中间件“全栈国产”组合，优势在于实现全国产化技术栈自主可控（多选 114 同口径）；不代表性能最优、也不等于免适配。", "d": 0}, {"k": "dx", "s": 146, "t": "单选", "q": "信创云产业政策与标准体系中，指导政务云建设的重要政策文件是（）。", "o": ["《商用密码管理条例》（国务院，2023 年 5 月修订施行）", "《国家政务信息化项目建设管理办法》（国办发〔2019〕57 号，国务院办公厅，2019 年", "《数据出境安全评估办法》（国家互联网信息办公室，2022 年 9 月 1 日施行）", "《关键信息基础设施安全保护条例》（国务院令第 745 号，2021 年 9 月 1 日施行）"], "a": "B", "n": "指导政务云建设的重要政策文件=国办发〔2019〕57 号《国家政务信息化项目建设管理办法》（判断 103 同口径）；其余文件分别管商密、数据出境、关基。", "d": 0}, {"k": "dx", "s": 147, "t": "单选", "q": "信创云建设规划的核心原则中，关于分阶段建设要求的描述，正确的是（）。", "o": ["一次性完成三层全部建设", "建设 SaaS 层即可满足需求", "先建 IaaS 再推进 PaaS 和 SaaS", "无需分阶段直接全面上线"], "a": "C", "n": "信创云分阶段建设：先建 IaaS，再推进 PaaS 和 SaaS（判断 104“一次性完成三层”为错，多选 116 同口径）；只建 SaaS 不可能。", "d": 0}, {"k": "dx", "s": 148, "t": "单选", "q": "信创云服务准入资质中，云服务商应具备的基础认证不包括（）。", "o": ["ITSS 信息技术服务标准认证", "云服务能力评估认证", "网络安全等级保护测评备案", "CMMI 软件能力成熟度认证"], "a": "D", "n": "云服务商准入的基础认证包括 ITSS、云服务能力评估、等保测评备案；CMMI 是软件研发过程成熟度认证，不属于云服务准入基础认证。", "d": 0}, {"k": "dx", "s": 149, "t": "单选", "q": "在信创云 IaaS/PaaS/SaaS 三层架构中，PaaS 层的核心能力是（）。", "o": ["提供虚拟计算存储和网络资源", "提供运行环境和开发部署平台", "提供最终用户使用的应用软件", "提供物理机房和硬件设备维护"], "a": "B", "n": "三层架构各就各位：IaaS 给虚拟计算存储和网络资源，PaaS 给运行环境与开发部署平台，SaaS 给最终应用软件。", "d": 0}, {"k": "dx", "s": 150, "t": "单选", "q": "信创云选型时，核心评估维度中关于「自主可控」的具体要求是（）。", "o": ["底层技术栈 CPU 操作系统虚拟化国产化", "云平台界面全部使用中文", "云服务商为中国境内企业", "云平台价格由国内厂商决定"], "a": "A", "n": "信创云“自主可控”的具体要求=底层技术栈（CPU、操作系统、虚拟化）国产化；界面中文、境内企业、国产定价都只是表象。", "d": 0}, {"k": "dx", "s": 151, "t": "单选", "q": "对于涉及国家秘密的政务系统，信创云部署模式应优先选择（）。", "o": ["公有云部署模式", "私有云部署确保数据可控", "混合云部署模式", "社区云部署模式"], "a": "B", "n": "涉及国家秘密的政务系统优先“私有云部署”确保数据可控（判断 106 同口径）；公有云只用于不涉密系统，混合云/社区云不是首选。", "d": 0}, {"k": "dx", "s": 152, "t": "单选", "q": "信创云计费标准中，IaaS 层资源计费通常采用的计费方式是（）。", "o": ["按应用功能模块数量计费", "按用户登录次数计费", "按资源规格时长包年包月或按量", "按数据传输总量一次性计费"], "a": "C", "n": "IaaS 层资源计费通常按“资源规格+时长”，采用包年包月或按量计费（多选 117、判断 107 同口径）。", "d": 0}, {"k": "dx", "s": 153, "t": "单选", "q": "信创云安全合规评估的主要标准依据是（）。", "o": ["GB/T22239 等保基本要求", "企业自行制定安全标准", "国际 ISO 标准无需考虑国标", "无特定标准依据不符合规范"], "a": "A", "n": "信创云安全合规评估的主要标准依据=GB/T 22239（等保基本要求）等国家/行业标准，不是企业自定标准，也离不开国标。", "d": 0}, {"k": "dx", "s": 154, "t": "单选", "q": "在云服务安全评估实操中，评估云服务商安全能力的有效方法是（）。", "o": ["查阅服务商提供的宣传材料", "结合现场审查和渗透测试", "通过电话访谈了解情况", "完全依赖第三方报告无需自行评估"], "a": "B", "n": "评估云服务商安全能力的有效方法=现场审查与渗透测试相结合（论述题一“评估方法”同口径）；宣传材料、电话访谈、纯看第三方报告都不可靠。", "d": 0}, {"k": "dx", "s": 155, "t": "单选", "q": "信创云安全合规评估发现的安全问题，整改建议的优先级排序原则是（）。", "o": ["按照发现时间先后排序", "按照整改成本从低到高排序", "按风险等级排序高危优先", "按照整改难度从易到难排序"], "a": "C", "n": "安全整改优先级按风险等级排序、高危优先（判断 109 同口径）；按发现时间、成本、难度排序都本末倒置。", "d": 0}, {"k": "dx", "s": 156, "t": "单选", "q": "国产化项目建议书编制时，项目建议书的核心内容不包括（）。", "o": ["项目建设的必要性和依据", "项目建设的初步方案和建设内容", "项目投资估算和资金筹措方案", "项目验收方案和验收标准"], "a": "D", "n": "项目建议书核心内容：建设必要性和依据、初步方案与建设内容、投资估算与资金筹措；“项目验收方案和验收标准”属于验收阶段文件，不放进建议书（判断 110 同口径）。", "d": 0}, {"k": "dx", "s": 157, "t": "单选", "q": "在国产化项目建议书中，国产化建设的核心内容应重点描述（）。", "o": ["项目团队人员简历", "国产化技术路线选型和替代路径", "办公场地租赁计划", "项目宣传推广方案"], "a": "B", "n": "建议书中国产化建设的核心内容应重点描述国产化技术路线选型与替代路径（判断 111 同口径）；人员简历、场地、宣传都不是“核心内容”。", "d": 0}, {"k": "dx", "s": 158, "t": "单选", "q": "国产化项目建议书中，初期投资测算框架的编制基础是（）。", "o": ["市场推广预算明细", "人员薪酬标准方案", "建设方案初步设计和市场价格", "历史项目平均投资额"], "a": "C", "n": "初期投资测算框架的编制基础=项目初步设计方案和国产软硬件市场价格（判断 112 同口径）。", "d": 0}, {"k": "dx", "s": 159, "t": "单选", "q": "信创专项取费中，国产软硬件溢价测算的主要依据是（）", "o": ["国产与国外产品价差及适配改造", "国产产品的绝对采购价格", "国外产品的折扣力度大小", "以预算上限为依据缺工作量分析"], "a": "A", "n": "信创专项取费中，国产软硬件溢价测算的主要依据=国产与国外产品的价差及所需适配改造（判断 113 同口径）；按绝对价格、折扣或预算上限倒推都错。", "d": 0}, {"k": "dx", "s": 160, "t": "单选", "q": "国产化项目可行性研究中，合规性分析的核心内容是（）", "o": ["分析项目盈利能力", "论证符合国产化政策法规要求", "分析项目技术先进性", "评估项目市场前景"], "a": "B", "n": "合规性分析的核心=论证项目符合国产化政策法规要求（与单选 15 同口径）；盈利能力、技术先进性、市场前景属于其它分析维度。", "d": 0}, {"k": "dxm", "s": 1, "t": "多选", "q": "在某省级政务项目规划中，信创差距分析的核心内容是（）", "o": ["技术差距即国产化程度", "合规差距即政策要求", "能力差距即运维能力", "安全差距即等保密评"], "a": "ABC", "n": "国产化差距分析要摸清技术（国产化程度）、合规（政策要求）、能力（运维能力）三方面差距，对应知识点现状调研六维度与国产化适配差距识别；D 表述以偏概全，安全合规差距除等保、密评外还包括国产化自主可控要求，不能简单等同于等保密评。", "d": 0}, {"k": "dxm", "s": 2, "t": "多选", "q": "在国产化战略推进过程中，以下属于国内数据库厂商受益于机遇的是（）。", "o": ["云厂商自研数据库逐渐崛起", "国产化战略推动国产生态体系", "云计算巨头入局打破垄断格局", "大数据需求驱动国产厂商加速"], "a": "BCD", "n": "国产化战略推动生态（B）、云计算巨头入局打破垄断（C）、大数据需求驱动加速（D）分别是政策、市场、需求层面的机遇；A 是云厂商自研数据库崛起的竞争态势描述，受益主体是云厂商自身，不作为机遇项。", "d": 0}, {"k": "dxm", "s": 3, "t": "多选", "q": "在某系统建设方案设计中，安全架构设计的原则包括（）", "o": ["事后补救", "最小权限", "单点防护", "纵深防御"], "a": "BD", "n": "最小权限限制越权访问、纵深防御层层设卡，是等保和信创安全方案的通用设计原则（知识点1.3.1 明确最小权限、纵深防御原则）；A 事后补救是被动应对，C 单点防护恰恰是安全设计要消除的短板。", "d": 0}, {"k": "dxm", "s": 4, "t": "多选", "q": "在国产化战略推进过程中，下列属于产业政策文件的有（）", "o": ["《关于推进中央企业信息技术应用创新工作的通知》（国资发科创〔2022〕79 号，国务院国资委，2022 年 9 月印发）", "《中华人民共和国公务员法》（2019 年 6 月 1 日修订施行，全国人民代表大会常务委员会颁布）相关规定", "《中华人民共和国招标投标法》（2017 年修正，全国人民代表大会常务委员会颁布）相关规定", "《国产操作系统高质量发展三年行动计划（2025-2027）》（工业和信息化部，2025 年印发）"], "a": "AD", "n": "国资委 79 号文（推进央企信创，公知文件）与工信部国产操作系统三年行动计划分别属于央企信创和基础软件领域的产业政策；B 公务员法、C 招标投标法是人大颁布的法律，调整劳动关系与招标投标秩序，均非信创产业政策。", "d": 0}, {"k": "dxm", "s": 5, "t": "多选", "q": "在某省级政务项目规划中，国产化规划中需关注的行业政策文件包括（）", "o": ["《金融科技发展规划即 2022 至 2025 年》（即《金融科技发展规划（2022-2025 年）》，中国人民银行，2022 年 1 月印发）", "《中华人民共和国劳动法》（1995 年 1 月 1 日施行，全国人民代表大会常务委员会颁布）相关规定", "《中华人民共和国食品安全法》（2021 年 12 月修订，全国人民代表大会常务委员会颁布）相关规定", "《关于银行业保险业数字化转型的指导意见》（原中国银保监会，2022 年 1 月印发）"], "a": "AD", "n": "【已修正答案】原答案 CD；理由：A 为央行印发的金融行业信创政策文件，与 D 同属需关注的行业政策，B、C 与信创无关，应为 AD。\n央行《金融科技发展规划（2022-2025 年）》与原银保监会《关于银行业保险业数字化转型的指导意见》才属金融行业信创需关注的行业政策文件；B 劳动法、C 食品安全法是人大颁布的法律且与信创行业政策无关。", "d": 2}, {"k": "dxm", "s": 6, "t": "多选", "q": "在某省级政务项目规划中，国产化需求归集后结果分析的核心任务包括（）", "o": ["需求分类与归集", "直接进入系统设计", "可行性分析", "优先级排序"], "a": "ACD", "n": "需求归集后的分析要做分类归集、可行性分析并按适配难度排出优先级（对应知识点可行性研究与“先非核心、后核心”的批次划分）；B 跳过可研论证直接进入系统设计，违反立项阶段必须完成可行性分析的要求。", "d": 0}, {"k": "dxm", "s": 7, "t": "多选", "q": "在某系统建设方案设计中，应用建设模式包括（）", "o": ["直接废弃", "改造", "迁移", "新建"], "a": "BCD", "n": "应用落地通常采取改造（适配）、迁移、新建三种模式（知识点适配策略：重新编译、适配改造、容器化、虚拟化、双轨运行、灰度切换）；A 直接废弃会中断业务并造成资产流失，不是规范的建设模式。", "d": 0}, {"k": "dxm", "s": 8, "t": "多选", "q": "在某系统建设方案设计中，数据架构设计的核心内容包括（）", "o": ["网络拓扑设计", "数据存储", "数据共享与安全", "数据分类分级"], "a": "BCD", "n": "数据架构设计围绕数据存储、数据共享与安全、数据分类分级展开（知识点2.3.3 数据层规划及数据安全条目）；A 网络拓扑设计属于网络架构设计范畴。", "d": 0}, {"k": "dxm", "s": 9, "t": "多选", "q": "在某系统建设方案设计中，数据迁移验证的内容包括（）", "o": ["数据完整性", "一致性检查", "用户培训", "功能验证"], "a": "ABD", "n": "数据迁移验证覆盖数据完整性、一致性检查以及迁移后的业务功能验证（知识点3.3.2 三级数据校验体系：字段级、条目级、业务级校验）；C 用户培训属实施保障工作，不属于迁移验证内容。", "d": 0}, {"k": "dxm", "s": 10, "t": "多选", "q": "在某项目安全体系建设中，国密算法包括（）", "o": ["SM2", "RSA", "SM4", "SM3"], "a": "ACD", "n": "SM2（非对称）、SM3（杂凑）、SM4（对称）是国家商用密码算法（知识点：国密算法 SM2/SM3/SM4）；B RSA 是国际通用算法，不属于国密。", "d": 0}, {"k": "dxm", "s": 11, "t": "多选", "q": "在某项目安全体系建设中，密评的主要内容包括（）", "o": ["密码应用合规性", "密码应用正确性", "系统性能优化", "密码应用有效性"], "a": "ABD", "n": "商用密码应用安全性评估密评围绕密码应用的合规性、正确性、有效性展开（知识点1.3.3 商用密码应用要求与5.1.4 安全测试）；C 系统性能优化与密码应用安全评估无关。", "d": 0}, {"k": "dxm", "s": 12, "t": "多选", "q": "在某项目安全体系建设中，信创身份认证方式包括（）", "o": ["密码认证", "生物识别", "数字证书", "随意访问"], "a": "ABC", "n": "信创身份认证可采用密码（口令）认证、生物识别、数字证书等方式（知识点安全系统基础之身份认证）；D 随意访问与认证和访问控制原则相悖，不是认证方式。", "d": 0}, {"k": "dxm", "s": 13, "t": "多选", "q": "在某国有银行国产化产品选型评估中，信创全过程管理要点包括（）", "o": ["规划设计阶段管控", "采购实施阶段管控", "验收运维阶段管控", "关注项目启动阶段"], "a": "ABC", "n": "全过程管理强调对规划设计、采购实施、验收运维各阶段持续管控（知识点4.1 阶段目标拆解与4.1.2 关键里程碑管控）；D 仅指向项目启动阶段的一次性动作，不构成全过程管控要点。", "d": 0}, {"k": "dxm", "s": 14, "t": "多选", "q": "在某国有银行国产化产品选型评估中，信创基础硬件包括（）", "o": ["操作系统", "存储设备", "网络设备", "服务器"], "a": "BCD", "n": "基础硬件指服务器、存储设备、网络设备等物理设备（知识点：现代化基础设施含国产 CPU 芯片、国产化服务器、国产化存储与网络安全设备）；A 操作系统属于基础软件层，不是硬件。", "d": 0}, {"k": "dxm", "s": 15, "t": "多选", "q": "在某项目安全体系建设中，信创应用软件包括（）", "o": ["办公软件", "通用工具", "防火墙", "行业业务系统"], "a": "ABD", "n": "办公软件、通用工具、行业业务系统属于应用软件层（知识点1.2.1：应用软件层含国产办公软件、国产业务系统等）；C 防火墙是网络安全设备，归类为安全产品而非应用软件。", "d": 0}, {"k": "dxm", "s": 16, "t": "多选", "q": "在某国有银行国产化产品选型评估中，国产服务器主流厂商包括（）", "o": ["Dell", "浪潮", "新华三", "华为"], "a": "BCD", "n": "浪潮、新华三、华为是国内服务器主流厂商（知识点1.2.1：硬件底层核心体系包含国产化服务器）；A Dell 为美国厂商，不属于国产阵营。", "d": 0}, {"k": "dxm", "s": 17, "t": "多选", "q": "在某信创云平台规划建设中，信创云平台多租户隔离措施包括（）", "o": ["不隔离共享所有资源", "网络隔离", "数据隔离", "逻辑隔离"], "a": "BCD", "n": "多租户隔离需在网络、数据、逻辑层面实现租户间隔离（知识点架构设计强调安全隔离）；A 不隔离共享所有资源会造成越权访问与数据泄露，与隔离目标相反。", "d": 0}, {"k": "dxm", "s": 18, "t": "多选", "q": "在某信创云平台规划建设中，信创云平台高可用性设计措施包括（）", "o": ["多节点冗余", "负载均衡", "故障转移", "单点部署"], "a": "ABC", "n": "高可用通过多节点冗余消除单点故障、负载均衡分担流量、故障转移保障服务连续（公知高可用设计三要素，知识点架构设计亦要求冗余、高可用）；D 单点部署正是高可用设计要避免的问题。", "d": 0}, {"k": "dxm", "s": 19, "t": "多选", "q": "在某信创云平台规划建设中，信创云平台微服务架构特点包括（）", "o": ["独立部署", "强依赖性", "高内聚", "松耦合"], "a": "ACD", "n": "微服务架构的特征是独立部署、高内聚、松耦合（公知微服务定义）；B 强依赖性与松耦合相反，会导致故障扩散、无法独立演进。", "d": 0}, {"k": "dxm", "s": 20, "t": "多选", "q": "在某国有银行国产化产品选型评估中，国产化项目投资需考虑的隐性成本包括（）", "o": ["供应商公关", "兼容性测试", "培训费用", "系统升级"], "a": "BCD", "n": "隐性成本指采购清单之外的兼容性测试、人员培训与后续系统升级投入（知识点4.2.2 成本管理：严控采购、适配改造、测试验收、运维服务预算）；A 供应商公关不属于合规的项目成本项，不应纳入投资测算。", "d": 0}, {"k": "dxm", "s": 21, "t": "多选", "q": "国产化项目优先级划分时，适合优先替代的系统特征包括（）", "o": ["业务影响小", "业务影响最大的核心系统", "国产化方案成熟", "技术风险低"], "a": "ACD", "n": "优先替代应选业务影响小、国产化方案成熟、技术风险低的系统（知识点3.2.1：第一批次为办公辅助类低风险系统，先非核心后核心）；B 核心业务系统影响面大、风险高，须待风险验证后再分批实施。", "d": 0}, {"k": "dxm", "s": 22, "t": "多选", "q": "在某系统建设方案设计中，应用架构设计的内容包括（）", "o": ["应用分层架构与组件集成", "网络拓扑规划设计", "应用适配改造方案", "应用建设模式包括新建改造迁移"], "a": "ACD", "n": "应用架构设计含分层架构与组件集成、适配改造方案、新建/改造/迁移建设模式的选取（知识点2.3.2 应用层规划：全面适配国产操作系统、中间件、数据库，拆分单体为微服务）；B 网络拓扑规划设计属于网络架构内容。", "d": 0}, {"k": "dxm", "s": 23, "t": "多选", "q": "在某国有银行国产化产品选型评估中，国产化技术架构设计的核心内容包括（）", "o": ["国产化技术栈组合选型", "部署架构与网络拓扑规划", "中间件集成方案", "业务流程优化"], "a": "ABC", "n": "技术架构设计的核心是国产化技术栈选型、部署架构与网络拓扑规划、中间件集成方案（知识点2.3.4 技术层规划：鲲鹏/飞腾/海光芯片加麒麟操作系统、达梦/人大金仓数据库、东方通中间件）；D 业务流程优化属于业务层内容，不属于技术架构。", "d": 0}, {"k": "dxm", "s": 24, "t": "多选", "q": "在国产化战略推进过程中，信创中间件集成时需重点验证的内容包括（）", "o": ["与国产 OS 的兼容性", "中间件品牌知名度", "性能表现与稳定性", "与国产数据库的兼容性"], "a": "ACD", "n": "中间件集成需验证与国产 OS、国产数据库的兼容性及性能与稳定性（知识点3.1.3 中间件适配：集群联动测试、接口调用测试、高可用切换测试）；B 品牌知名度是市场因素，不属于技术验证内容。", "d": 0}, {"k": "dxm", "s": 25, "t": "多选", "q": "在某系统建设方案设计中，数据分类分级的目的包括（）", "o": ["根据重要性实施差异化保护", "满足合规审查要求", "减少数据存储量", "指导数据安全策略制定"], "a": "ABD", "n": "数据分类分级用于按重要性差异化防护、满足《数据安全法》（2021）的分类分级合规要求，并据此制定数据安全策略（知识点2.3.3 落实数据分类分级）；C 分类分级是安全管理动作，不会减少数据存储量。", "d": 0}, {"k": "dxm", "s": 26, "t": "多选", "q": "在某国有银行国产化产品选型评估中，国产化采购的核心要求包括（）", "o": ["国产化比例", "安全资质", "供应链稳定", "适配能力"], "a": "ABCD", "n": "【已修正答案】原答案 ABD；理由：知识点信创采购条目明确将供应链稳定列为核心要求，C 应入选。\n国产化采购同时约束国产化比例、安全资质、供应链稳定与适配能力（知识点：信创采购：国产化比例、安全资质、适配能力、服务能力、供应链稳定），四项缺一不可。", "d": 2}, {"k": "dxm", "s": 27, "t": "多选", "q": "在某系统建设方案设计中，数据质量的核心维度包括（）", "o": ["及时性", "准确性", "一致性", "完整性"], "a": "ABCD", "n": "数据质量从完整性、准确性、一致性、及时性等维度衡量（知识点数据质量条目：完整性、准确性、一致性、及时性、唯一性、有效性），四个选项均属核心维度。", "d": 0}, {"k": "dxm", "s": 28, "t": "多选", "q": "在某国有银行产品选型评估中，信创规划管理师应具备的核心能力包括（）", "o": ["政策研判与合规分析能力", "建设方案设计能力", "国产软硬件选型评估能力", "全过程管控能力"], "a": "ABC", "n": "【存疑】原答案 ABC；D 全过程管控按知识点第4、5章信创项目全过程管控要求亦可视作岗位能力，缺少明确出处界定“核心能力”范围，保留原答案。\n政策研判与合规分析、建设方案设计、国产软硬件选型评估对应信创规划岗位的政策、设计、选型三大核心能力（知识点1.1 政策体系、1.2.2 选型适配原则、2.3 总体架构规划）；D 全过程管控能力的取舍见标记说明。", "d": 1}, {"k": "dxm", "s": 29, "t": "多选", "q": "在某系统建设方案设计中，数据安全的核心措施包括（）", "o": ["权限管控", "数据加密", "数据脱敏", "分级分类"], "a": "ABCD", "n": "【已修正答案】原答案 BCD；理由：知识点数据安全条目明确包含权限，A 权限管控应入选，应为 ABCD。\n数据安全核心措施包括分级分类、加密、脱敏与权限管控（知识点数据安全条目：分类分级、加密、脱敏、权限、审计、防泄露），原答案漏选 A。", "d": 2}, {"k": "dxm", "s": 30, "t": "多选", "q": "在国产化战略推进过程中，信创相关的基础法律包括（）", "o": ["《中华人民共和国密码法》（2020 年 1 月 1 日施行，全国人民代表大会常务委员会颁布）", "《中华人民共和国数据安全法》（2021 年 9 月 1 日施行，全国人民代表大会常务委员会颁布）", "《中华人民共和国个人信息保护法》（2021 年 11 月 1 日施行，全国人民代表大会常务委员会颁布）", "《中华人民共和国网络安全法》（2017 年 6 月 1 日施行，全国人民代表大会常务委员会颁布）"], "a": "BCD", "n": "【存疑】原答案 BCD；A 密码法施行时间正确且公知上属信创（商用密码）基础法律，原答案疑与知识点1.1.1 核心政策体系清单（网安法、数安法、个保法、关基条例，未列密码法）对应，两处依据冲突，保留原答案。\n《网络安全法》（2017-06-01 施行）、《数据安全法》（2021-09-01 施行）、《个人信息保护法》（2021-11-01 施行）均为信创合规的基础法律，各选项施行时间表述准确；A 密码法（2020-01-01 施行）同样属于信创基础法律，取舍见标记。", "d": 1}, {"k": "dxm", "s": 31, "t": "多选", "q": "在某省级政务项目规划中，国产化项目建设规划的内容包括（）", "o": ["项目质量规划", "项目进度基准", "项目成本基准", "项目范围基准"], "a": "BCD", "n": "建设规划的核心是范围、进度、成本三大基准（公知项目管理三大基准，对应知识点1.4.1 范围、工期、资金约束）；A 项目质量规划属于质量专项管理内容（知识点4.2.3 质量管理），不在建设基准之列。", "d": 0}, {"k": "dxm", "s": 32, "t": "多选", "q": "在某系统建设方案设计中，国产化系统总体架构设计包括（）", "o": ["业务架构设计", "应用架构设计", "数据架构设计", "技术架构设计"], "a": "ABCD", "n": "【已修正答案】原答案 ABC；理由：知识点2.3 明确总体架构含技术层面（2.3.4 技术层规划），D 应入选，应为 ABCD。\n国产化总体架构须覆盖业务、应用、数据、技术、安全各层面（知识点2.3：从业务、应用、数据、技术、安全五大层面搭建全栈国产化架构，设2.3.1-2.3.5 分层规划），技术架构设计应入选。", "d": 2}, {"k": "dxm", "s": 33, "t": "多选", "q": "在某系统建设方案设计中，等保 2.0 技术要求包含（）", "o": ["应用和数据安全", "网络和通信安全", "设备和计算安全", "物理和环境安全"], "a": "ABCD", "n": "等保2.0 技术要求按物理和环境、网络和通信、设备和计算（安全计算环境）、应用和数据四类安全组织（等保2.0 系列标准；知识点等保2.0：技术要求含物理、网络、主机、应用、数据），四项全选。", "d": 0}, {"k": "dxm", "s": 34, "t": "多选", "q": "在某项目安全体系建设中，等保 2.0 流程包括（）", "o": ["定级", "备案", "建设整改", "等级测评"], "a": "ABCD", "n": "等保2.0 流程为定级、备案、建设整改、等级测评（之后是监督检查）（知识点流程：定级→备案→建设整改→等级测评→监督检查），四项均为流程环节。", "d": 0}, {"k": "dxm", "s": 35, "t": "多选", "q": "在某国有银行国产化产品选型评估中，国产化项目中需要迁移适配的内容包括（）", "o": ["操作系统", "CPU 架构", "数据库", "中间件"], "a": "ABCD", "n": "迁移适配对象覆盖操作系统、CPU 架构、数据库、中间件全栈（知识点2.3 适配内容：OS、CPU、数据库、中间件、外设、接口、安全组件），四项均为适配对象。", "d": 0}, {"k": "dxm", "s": 36, "t": "多选", "q": "在某项目安全体系建设中，国产化项目质量评审维度包括（）", "o": ["合规性", "完整性", "规范性", "可行性"], "a": "ABD", "n": "【存疑】原答案 ABD；C 规范性亦常作为质量评审维度而 D 可行性偏立项论证，知识点未给出质量评审维度清单，无从裁决，保留原答案。\n质量评审围绕合规性、成果与资料的完整性及方案可行性把关（知识点5.3 阶段性检查核查阶段成果、问题整改与资料完整性，4.2.3 以功能、性能、合规为标准）；C 规范性与 D 可行性的取舍见标记。", "d": 1}, {"k": "dxm", "s": 37, "t": "多选", "q": "在某项目安全体系建设中，国产化项目验收前置条件包括（）", "o": ["用户培训完成", "文档齐备", "等保测评合格", "系统测试通过"], "a": "BCD", "n": "验收前置要求成果与合规到位：文档齐备（知识点5.3.3 归档全套验收材料）、等保测评合格（知识点5.4：未通过测评不予通过最终验收）、系统测试通过（知识点5.2 适配通过率、功能覆盖达标）；A 用户培训属实施过程工作，不列为验收前置条件。", "d": 0}, {"k": "dxm", "s": 38, "t": "多选", "q": "根据计世研究院统计数据，国产操作系统潜在用户最关注的问题包括（）。", "o": ["常用软件能否兼容运行", "提供用户程序与硬件的界面", "应用和数据能否顺利迁移", "管理计算机的系统资源"], "a": "AC", "n": "潜在用户最关注生态适配与迁移：常用软件能否兼容运行、应用和数据能否顺利迁移（国产操作系统生态成熟度是公知痛点）；B、D 是操作系统功能的理论定义，不是用户选型担忧的问题。", "d": 0}, {"k": "dxm", "s": 39, "t": "多选", "q": "在某系统建设方案设计中，中国工程体系架构框架 CGAF 包括（）", "o": ["基础设施架构层", "安全运维层", "技术架构层", "业务架构层"], "a": "AD", "n": "【存疑】原答案 AD；CGAF 层级划分在知识点总结与公知资料中均无可靠出处，无法核实 B、C 是否应计入，保留原答案。\n中国工程体系架构框架 CGAF 的层级构成在给定知识点总结中无对应条目，仅能沿用原答案保留基础设施架构层与业务架构层，排除 B 安全运维层、C 技术架构层；该考点的权威层级划分难以核实，见标记。", "d": 1}, {"k": "dxm", "s": 40, "t": "多选", "q": "在国产化项目中，可选择的数据库有以下哪几款产品（）", "o": ["达梦数据库", "Oracle 数据库", "MySQL 数据库", "神通数据库"], "a": "AD", "n": "达梦数据库、神通数据库（神舟通用）是可选的国产数据库（知识点1.2.1/3.1.2：国产数据库含达梦、人大金仓、OceanBase 等，神通亦为国产数据库）；B Oracle、C MySQL 为境外数据库，不符合国产化要求。", "d": 0}, {"k": "dxm", "s": 41, "t": "多选", "q": "信创规划管理师与软考高级证书的差异化定位体现在（）", "o": ["信创聚焦国产化自主可控专项", "信创强调政策合规与全栈选型", "两者考核范围完全相同", "信创突出存量系统分阶段替代"], "a": "ABD", "n": "信创定位差异在于聚焦国产化自主可控专项、强调政策合规与全栈选型、突出存量系统分阶段替代（知识点2.4 试点→分批→滚动的分阶段实施策略与1.2 国产化全栈技术体系）；C 两者考核范围完全相同与“差异化定位”自相矛盾。", "d": 0}, {"k": "dxm", "s": 42, "t": "多选", "q": "工业和信息化部 2019 年 9 月发布的《关于促进网络安全产业发展的指导意见》，工业和信息化部，2019 年 9 月征求意见稿指出，网络安全产业发展应遵循的基本原则包括（）", "o": ["创新驱动；协同发展", "创新驱动；协同共享", "需求引领；开放合作", "需求引领；创新合作"], "a": "AC", "n": "工信部《关于促进网络安全产业发展的指导意见（征求意见稿）》（2019 年 9 月）提出的基本原则包含“创新驱动，协同发展”与“需求引领，开放合作”；B、D 是将关键词错误搭配的干扰项。", "d": 0}, {"k": "dxm", "s": 43, "t": "多选", "q": "在某省级政务项目规划中，国产化项目实施中需要对（）方面进行管理。", "o": ["管理思路以及项目申报管理流程", "国产化项目重点、难点分析及应对措施", "国产化项目咨询设计方案的管理", "国产化项目全生命周期流程管理"], "a": "ABD", "n": "实施期管理围绕管理思路与申报管理流程、国产化重点难点及应对措施、全生命周期流程管理展开（对应知识点4.1-4.3 实施计划、全过程管控与风险管理）；C 咨询设计方案是设计咨询阶段的前期成果，实施期按已定方案执行，不属于实施过程的管理对象。", "d": 0}, {"k": "dxm", "s": 44, "t": "多选", "q": "倪光南院士在关键信息基础设施自主安全创新论坛上，宣读的自主可控 CPU 的“核心三要素”内容及其判定标准是（）。", "o": ["CPU 研制单位是否符合安全保密要求", "CPU 指令系统是否可持续自主发展", "CPU 核心源代码是否是自己编写", "CPU 核心架构是否是自己研发"], "a": "ABC", "n": "自主可控 CPU 的“核心三要素”为：研制单位符合安全保密要求、指令系统可持续自主发展、核心源代码自己编写（倪光南院士提出的自主可控评估口径，公知）；D 核心架构自己研发不属于三要素的判定标准表述。", "d": 0}, {"k": "dxm", "s": 45, "t": "多选", "q": "科学估算数据存储量、计算性能和传输性能对于（）等方面的设计至关重要。", "o": ["软件开发", "技术路线选择", "平台设计", "投资规模"], "a": "BCD", "n": "存储量、计算性能、传输性能的估算直接服务于技术路线选择、平台设计和投资规模的量化决策（知识点2.2.3 结合性能基线评估国产化环境的架构消耗与承载能力）；A 软件开发关注功能实现，不直接由这三项估算决定。", "d": 0}, {"k": "dxm", "s": 46, "t": "多选", "q": "在某国有银行国产化产品选型评估中，三大基础中间件包括（）。", "o": ["交易中间件", "集成中间件", "应用服务器中间件", "消息中间件"], "a": "ACD", "n": "三大基础中间件为交易中间件、应用服务器中间件、消息中间件（公知中间件三大类，对应境外 Tuxedo、WebLogic/WebSphere、MQ 产品线；知识点3.1.3 列明东方通、普元、金蝶天燕等国产中间件）；B 集成中间件不属于该三大类划分。", "d": 0}, {"k": "dxm", "s": 47, "t": "多选", "q": "在某省级政务项目规划中，项目建议书的主要内容应包括？（）", "o": ["项目背景与必要性", "建设内容与规模", "技术细节专利清单", "投资估算与资金筹措"], "a": "ABD", "n": "项目建议书包括项目背景与必要性、建设内容与规模、投资估算与资金筹措（知识点：项目建议书：背景、目标、范围、建设内容、投资估算、工期、效益、风险）；C 技术细节专利清单属于可研与设计文档内容，建议书不展开技术细节。", "d": 0}, {"k": "dxm", "s": 48, "t": "多选", "q": "在某省级政务项目规划中，关于运维的描述，正确的是（）", "o": ["运维是对信息系统基础环境提供技术支持和管理服务", "面向台式机及输入输出设备的运维属主机运维", "运维服务能力关键要素包括人员技术资源过程", "运维是信息系统全生命周期中内容最多的阶段"], "a": "ACD", "n": "A 正确给出运维的定义；C 对应运维服务能力四要素人员、技术、资源、过程（ITSS 公知）；D 表明运维是全生命周期中持续时间最长、内容最多的阶段；B 错误，台式机及输入输出设备属桌面（终端）运维，主机运维面向服务器等核心设备。", "d": 0}, {"k": "dxm", "s": 49, "t": "多选", "q": "在某省级政务项目规划中，应用市场产品价值有（）", "o": ["软件下载方便", "促进国产软件发布规范", "提高建设单位工作效率", "提升集成单位服务质量"], "a": "BCD", "n": "应用市场（应用商店）的价值在于促进国产软件规范发布、提高建设单位选型交付效率、提升集成单位服务质量（公知信创应用市场统一发布与供需对接定位）；A 软件下载方便只是使用层面的功能体验，不属产品价值定位。", "d": 0}, {"k": "dxm", "s": 50, "t": "多选", "q": "在某省级政务项目规划中，下列属于项目集准备阶段关键活动的是（）", "o": ["建立项目集治理结构", "开发项目集章程", "建立初始的项目集组织", "制定项目集管理计划"], "a": "ACD", "n": "项目集准备阶段的关键活动是建立治理结构、组建初始项目集组织、制定项目集管理计划（项目集管理标准的公知阶段划分）；B 开发项目集章程由发起人在项目集立项（发起）阶段完成，不属于准备阶段活动。", "d": 0}, {"k": "dxm", "s": 51, "t": "多选", "q": "在应用系统迁移方案中，NLB 能够提供的功能包括（）", "o": ["软件冗余", "数据冗余", "硬件冗余", "站点冗余"], "a": "ACD", "n": "NLB（网络负载均衡）通过流量分发在软件层面实现服务冗余，并提供服务器硬件冗余和跨站点冗余；B 数据冗余由存储副本、备份机制实现，不属于 NLB 的功能。", "d": 0}, {"k": "dxm", "s": 52, "t": "多选", "q": "在项目可行性研究报告中，需重点分析的核心内容包括（）", "o": ["国外厂商技术支持的可持续性", "项目对原有系统的兼容性改造成本", "国产软硬件技术成熟度与供应链稳定性", "国产化改造后的业务连续性保障方案"], "a": "BCD", "n": "信创可研需重点论证兼容性改造成本、国产技术成熟度与供应链稳定性、改造后业务连续性保障（对应知识点1.4.2 技术可行性、资源可行性与业务连续性约束）；A 国外厂商技术支持的可持续性与国产化替代目标相悖，不是国产化可研的论证重点。", "d": 0}, {"k": "dxm", "s": 53, "t": "多选", "q": "在国产化环境下进行信息资源规划时，需重点关注的核心要素包括（）", "o": ["国产数据库与数据标准的适配性", "跨平台数据交换接口的标准化", "国外开源工具在数据治理中的使用范围", "数据安全与国产化加密技术的融合"], "a": "ABD", "n": "国产化信息资源规划要关注国产数据库与数据标准适配、跨平台交换接口标准化、数据安全与国密加密的融合（对应知识点2.3.3 数据层规划与1.3.2 数据安全专项要求）；C 国外开源工具使用范围非规划核心要素，且信创环境倾向国产工具链。", "d": 0}, {"k": "dxm", "s": 54, "t": "多选", "q": "在方案规划中，关于技术路线选择的核心注意事项，不正确的是（）", "o": ["追求国产化率，完全排斥国外技术", "优先选择成熟度高、生态完善的国产技术栈", "关注硬件替换即可，软件兼容性适配不需考虑", "依赖单一厂商提供全栈解决方案"], "a": "ACD", "n": "问“不正确的是”：A 完全排斥国外技术、C 只重硬件不管软件适配、D 依赖单一厂商均会放大风险，属错误注意事项；B 优先成熟高、生态完善的国产技术栈符合技术路线选择依据（知识点：兼容性、性能、生态、安全、成本、政策），正确故不选。", "d": 0}, {"k": "dxm", "s": 55, "t": "多选", "q": "在某系统建设方案设计中，信创云平台按照技术可以分为（）。", "o": ["以数据存储为主的存储型云平台", "以数据处理为主的计算型云平台", "计算和存储兼顾的综合云平台", "以上三个选项均不正确"], "a": "ABC", "n": "按技术侧重，云平台分为存储型（以数据存储为主）、计算型（以数据处理为主）和存储计算兼顾的综合云平台（云计算平台公知分类）；D 以上三个选项均不正确与前三项自相矛盾，排除。", "d": 0}, {"k": "dxm", "s": 56, "t": "多选", "q": "设计项目总投资估算表中包括（）、系统集成费、其它工程和费用、项目预备费", "o": ["建筑工程费", "建成后的质保费", "软件购置费", "硬件设备购置费"], "a": "ACD", "n": "项目总投资估算由建筑工程费、软件购置费、硬件设备购置费、系统集成费、其它工程和费用、项目预备费构成（公知信息化项目投资估算科目）；B 建成后的质保费发生在运维期，不计入建设期总投资估算。", "d": 0}, {"k": "dxm", "s": 57, "t": "多选", "q": "有效的项目管理要求项目管理团队理解和利用以下专业知识领域的知识和技能（）", "o": ["项目管理知识体系", "应用领域知识、标准与规章制度", "以项目为手段对日常运作进行管理", "处理人际关系技能"], "a": "ABD", "n": "有效的项目管理要求掌握项目管理知识体系、应用领域知识/标准与规章制度以及处理人际关系技能（PMBOK 列举的专业领域，软考教材沿用）；C 以项目为手段对日常运作进行管理混淆了项目与日常运作，不在要求之列。", "d": 0}, {"k": "dxm", "s": 58, "t": "多选", "q": "在某系统建设方案设计中，信息系统性能分析主要包括（）等能力。", "o": ["数据交易能力、数据存储能力", "会话处理能力、请求相应能力", "实体交易能力、通信传输能力", "数据处理能力，数据销毁能力"], "a": "ABC", "n": "性能分析覆盖数据交易与数据存储能力、会话处理与请求响应能力、实体交易与通信传输能力各项指标；D 中的数据销毁能力属于数据生命周期与安全删除范畴，不能与性能能力并列，故排除。", "d": 0}, {"k": "dxm", "s": 59, "t": "多选", "q": "在某省级政务项目规划中，网络逻辑结构设计的内容应包括（）", "o": ["逻辑网络设计图", "IP 地址分配方案", "用户培训计划书", "具体软硬件广域网和基本服务"], "a": "ABD", "n": "【存疑】原答案 ABD；常见教材将“具体软硬件、广域网和基本服务”列为物理网络设计的内容，按该说法应仅选 AB；知识点总结未覆盖该考点，保留原答案。\n逻辑网络设计输出逻辑网络设计图、IP 地址分配方案等规划性文档（网络设计先逻辑后物理，公知）；D 具体软硬件广域网和基本服务是否属逻辑设计见标记；C 用户培训计划书与网络设计无关，排除。", "d": 1}, {"k": "dxm", "s": 60, "t": "多选", "q": "X86 与国产电脑上应用开发环境的本质差异体现在（）", "o": ["CPU 架构的差异", "指令集的差异", "程序设计语言的差异", "操作系统的差异"], "a": "ABD", "n": "X86 与国产电脑的本质差异在 CPU 架构与指令集，以及随之而来的操作系统差异（X86 为 CISC 而国产芯片为 ARM、LoongArch 等路线，知识点芯片技术路线：X86、ARM、LoongArch、MIPS）；C 高级程序设计语言本身跨平台，不构成开发环境的本质差异。", "d": 0}, {"k": "dxm", "s": 61, "t": "多选", "q": "在某系统建设方案设计中，数据校验与一致性保障方法包括（）", "o": ["记录数对比", "哈希值校验", "人工逐条核对全部数据", "关键字段抽样比对"], "a": "ABD", "n": "记录数对比、哈希值校验、关键字段抽样比对都是可量化、可快速复验的迁移一致性校验手段；人工逐条核对全部数据在数据量大时耗时长、易漏错，不能构成保障方法。对应知识点数据迁移一致性保障中的三级校验（字段级、条目级、业务级校验）。", "d": 0}, {"k": "dxm", "s": 62, "t": "多选", "q": "在某国产化项目立项申报过程中，国产化项目投资估算包含的费用包括（）", "o": ["实施费", "娱乐费", "人工费", "咨询费"], "a": "ACD", "n": "投资估算按实施费、人工费、咨询费等正规费用科目归集；娱乐费不属于信息化项目投资科目，也不符合财政资金开支规定。对应知识点立项阶段的投资估算与成本管理要求（严控无计划采购、预算超支）。", "d": 0}, {"k": "dxm", "s": 63, "t": "多选", "q": "在某系统建设方案设计中，云平台安全域划分应遵循的原则包括（）", "o": ["最小权限原则", "纵深防御原则", "最大开放原则", "业务隔离原则"], "a": "ABD", "n": "安全域划分通过最小权限、纵深防御和业务隔离来收敛攻击面、阻止横向渗透；最大开放原则扩大暴露面，与安全域隔离的目的相反。对应知识点整体安全合规要求中的最小权限、纵深防御原则。", "d": 0}, {"k": "dxm", "s": 64, "t": "多选", "q": "在某项目安全体系建设中，信创虚拟化技术的应用场景包括（）", "o": ["服务器整合", "桌面虚拟化", "网络安全防护", "存储虚拟化"], "a": "ABD", "n": "虚拟化是资源抽象整合技术，典型场景为服务器整合、桌面虚拟化、存储虚拟化（桌面云）；网络安全防护由防火墙、IPS 等安全能力承担，不属于虚拟化的应用场景。对应知识点技术层规划中云平台采用国产虚拟化、容器云。", "d": 0}, {"k": "dxm", "s": 65, "t": "多选", "q": "国产化规划路径设计中，分阶段推进方案应遵循的原则包括（）", "o": ["先易后难、先非核心后核心", "短期内全部替换", "试点先行、逐步推广", "风险可控、回退有保障"], "a": "ACD", "n": "迁移批次规划遵循风险可控、循序渐进、业务优先：先易后难、先非核心后核心，配套试点先行并保证回退有保障；短期内全部替换风险不可控，极易引发业务中断，违背分阶段推进原则。对应知识点迁移批次规划原则与分批推广阶段。", "d": 0}, {"k": "dxm", "s": 66, "t": "多选", "q": "在某省级政务项目规划中，国产化项目分阶段推进方案中试点先行的价值包括（）", "o": ["验证技术可行性", "积累迁移经验", "降低整体推广风险", "完全替代所有系统"], "a": "ABC", "n": "试点先行是在小范围选取非核心、低风险系统验证技术路线可行性、积累适配改造经验，从而降低全量推广的整体风险；试点的目的不是替代所有系统，全量替代是后续分批推广的结果。对应知识点试点验证阶段。", "d": 0}, {"k": "dxm", "s": 67, "t": "多选", "q": "在某省级政务项目规划中，国产化项目实施路径中，分阶段推进方案的策略包括（）", "o": ["系统分级", "短期内全部替换", "分阶段推进", "优先级划分"], "a": "ACD", "n": "落地分阶段推进要先把系统按核心与风险程度分级、划分实施优先级，再按批次分阶段推进；短期内全部替换与分批次策略直接冲突。对应知识点分阶段建设实施策略与迁移批次规划原则。", "d": 0}, {"k": "dxm", "s": 68, "t": "多选", "q": "商用密码认证机构应当对其认证的商用密码（）实施有效的跟踪调查，以保证通过认证的内容续符合认证要求。", "o": ["品牌", "产品", "服务", "管理体系"], "a": "BCD", "n": "认证的合格评定对象是产品、服务、管理体系（《认证认可条例》，2003），品牌不在其列；《密码法》（2020）确立商用密码检测认证制度，认证机构须对获证内容实施跟踪调查，不能持续符合认证要求的应暂停直至撤销认证证书。题干“内容续符合”系原文笔误，应为“持续符合”。", "d": 0}, {"k": "dxm", "s": 69, "t": "多选", "q": "《数据库政府采购需求标准》2023年版将数据库政府采购需求标准划分为两类，下列属于该标准划分类型的是（）", "o": ["关系型数据库", "分布式数据库", "集中式数据库", "层次数据库"], "a": "BC", "n": "财政部、工信部《数据库政府采购需求标准（2023年版）》将数据库划分为分布式数据库与集中式数据库两大类；关系型、层次是按数据模型的划分，不是该标准的分类维度。", "d": 0}, {"k": "dxm", "s": 70, "t": "多选", "q": "在某省级政务项目规划中，安全设计及测评要求中，以下哪些属于必选内容？（）", "o": ["等级保护测评", "密码应用安全性评估", "硬件性能测试", "用户体验调研"], "a": "AB", "n": "信创项目必须落实“国产化+等保+密评”三重合规，等级保护测评与密码应用安全性评估是安全设计及测评的必选项；硬件性能测试、用户体验调研属于工程性能与体验类工作，不属于安全测评必选内容。对应知识点三重合规与密评整改要求。", "d": 0}, {"k": "dxm", "s": 71, "t": "多选", "q": "在某项目安全体系建设中，工程需要开展的测评内容包括（）", "o": ["关基评估", "商密评估", "等保测评", "风险评估"], "a": "BCD", "n": "信创工程常规测评组合为等保测评、商密评估（商用密码应用安全性评估）和风险评估；关基评估只适用于经认定的关键信息基础设施运营者，一般信创工程不涉及。", "d": 0}, {"k": "dxm", "s": 72, "t": "多选", "q": "在服务目录设计中，可以通过下列哪些方式为 IT 组织和部门创造更多、更有意义的附加价值（）", "o": ["对桌面运维服务进行统一收费", "根据服务呼叫数量来确定费用", "降低服务器巡检频率、性能优化次数", "增加数据迁移服务等其他运维服务"], "a": "ABD", "n": "对桌面运维统一收费、按服务呼叫量计费能把服务量化为可见价值，增加数据迁移等新运维服务能扩大服务目录的价值面；降低巡检频率、性能优化次数是削减服务质量，不构成附加价值。", "d": 0}, {"k": "dxm", "s": 73, "t": "多选", "q": "现行项目建议书的国家收费标准中，影响定价的主要因素有（）", "o": ["项目类别行业特点及复杂程度", "项目方资料完整程度", "项目所在地物价及人工成本", "报告完整程度如简版价格降低"], "a": "ABD", "n": "项目建议书编制收费主要随项目类别与行业复杂程度、项目方资料完整程度、报告完整程度（如简版减价）浮动；现行收费口径未把项目所在地物价及人工成本作为定价因子。", "d": 0}, {"k": "dxm", "s": 74, "t": "多选", "q": "在建设方案设计中，为确保系统兼容性和可扩展性，应优先遵循的核心原则不包括（）", "o": ["单一厂商全栈技术锁定", "国产技术与国外技术完全隔离", "分层解耦架构与标准化接口", "硬件优先替换，软件后期适配"], "a": "ABD", "n": "分层解耦架构与标准化接口才是保障兼容性和可扩展性的核心原则；单一厂商全栈锁定、国内外技术完全隔离、硬件先换软件后补适配都是损害兼容性的错误做法，按“不包括”应选 A、B、D。对应知识点技术层规划（全栈国产化且可迭代、可适配）。", "d": 0}, {"k": "dxm", "s": 75, "t": "多选", "q": "项目建议书是项目建设单位向上级主管部门提交项目申请时所必需的文件，其中项目建设的必要性应包括的内容是（）", "o": ["项目建设的原则和策略", "项目提出的背景和依据", "项目建设的意义和必要性", "信息系统现存的主要问题和差距"], "a": "BCD", "n": "项目必要性从项目提出的背景和依据、项目建设的意义和必要性、信息系统现存的主要问题和差距三方面论述；建设的原则和策略属于建设方案部分的内容。对应科目一项目建议书要素（背景、目标、建设内容、投资估算等）。", "d": 0}, {"k": "dxm", "s": 76, "t": "多选", "q": "基于国产化体系的云安全架构的基础，四个安全主要指关注基础安全、平台安全、应用服务安全及数据安全（）", "o": ["安全服务", "安全管理", "协议层次", "系统单元"], "a": "ACD", "n": "该口径下云安全架构的基础体系由安全服务、协议层次、系统单元三个维度构成，基础安全、平台安全、应用服务安全、数据安全四个方面沿这些维度展开落实；安全管理属于管理活动，不列为该基础的构成维度。", "d": 0}, {"k": "dxm", "s": 77, "t": "多选", "q": "公通字〔2007〕43号《信息安全等级保护管理办法》规定，国家信息安全等级保护坚持（）的原则。", "o": ["自主备案", "自主定级", "自主保护", "自主审查"], "a": "BC", "n": "《信息安全等级保护管理办法》（公通字〔2007〕43号）规定信息安全等级保护坚持“自主定级、自主保护”原则，由单位自行确定等级并自行开展建设保护；自主备案、自主审查分别是备案和审批环节的用语，不是办法申明的原则。", "d": 0}, {"k": "dxm", "s": 78, "t": "多选", "q": "未经国家网信部门、国务院公安部门批准或者保护工作部门、运营者授权，任何个人和组织不得对关键信息基础设施实施（）等可能影响或者危害关键信息基础设施安全的活动", "o": ["黑客攻击", "病毒入侵", "漏洞探测", "渗透性测试"], "a": "CD", "n": "《关键信息基础设施安全保护条例》（2021）规定未经国家网信部门、国务院公安部门批准或保护工作部门、运营者授权，不得对关基实施漏洞探测、渗透性测试等活动；黑客攻击、病毒入侵本身就是违法行为，不属于“经批准可实施”的活动。", "d": 0}, {"k": "dxm", "s": 79, "t": "多选", "q": "中间件是介于操作系统和应用软件之间，为应用软件提供服务的软件。以下属于中间件分类的是（）", "o": ["商业中间件", "交易中间件", "应用服务器中间件", "消息中间件"], "a": "BCD", "n": "中间件按功能分为交易中间件、消息中间件、应用服务器中间件（及数据库中间件等）类型；商业中间件只是按产品商业化属性的说法，不属于技术分类。对应知识点中间件体系（东方通、金蝶天燕、宝兰德等）。", "d": 0}, {"k": "dxm", "s": 80, "t": "多选", "q": "在某系统建设方案设计中，信创访问控制的核心原则包括（）", "o": ["最小权限原则", "职责分离原则", "最大权限原则", "需知原则"], "a": "ABD", "n": "访问控制以最小权限、职责分离、需知（按需知悉）为核心原则，把权限收敛到岗位与流程必需的最小范围；最大权限原则与访问控制目标背道而驰。对应知识点最小权限、自主可控合规要求。", "d": 0}, {"k": "dxm", "s": 81, "t": "多选", "q": "在某省级政务项目规划中，重点行业信创差异化规划的专项约束包括（）", "o": ["金融行业密评强制要求", "所有行业要求完全相同", "医疗行业数据合规要求", "能源行业工控国产化要求"], "a": "ACD", "n": "差异化规划意味着在通用要求之上叠加行业专项约束：金融业的密评强制、医疗业的数据合规、能源业的工控国产化都是典型专项；“所有行业要求完全相同”与差异化规划相矛盾。对应知识点顶层战略（党政、金融、能源、交通、电信等重点行业强制国产化替代与安全可控）。", "d": 0}, {"k": "dxm", "s": 82, "t": "多选", "q": "在某国有银行国产化产品选型评估中，目前市场上主流的国产中间件厂商有（）。", "o": ["普元", "清华同方", "金蝶", "宝兰德"], "a": "ACD", "n": "当前主流国产中间件厂商包括普元、金蝶（金蝶天燕）、宝兰德以及东方通等；清华同方主营整机、安防等业务，不属于中间件主流厂商。对应知识点基础软件层中间件体系（东方通、普元、金蝶天燕、宝兰德）。", "d": 0}, {"k": "dxm", "s": 83, "t": "多选", "q": "在国产化战略推进过程中，信创云相关政策文件包括？（）", "o": ["《中国信创云发展白皮书》（中国信通院，2021年发布）", "《国家信息化发展战略纲要》（中共中央办公厅、国务院办公厅，2016年7月印发）", "《中华人民共和国网络安全法》（2017年6月1日施行，全国人民代表大会常务委员会颁布）", "《云计算服务安全评估办法》（国家网信办等四部门，2019年7月印发）"], "a": "ABD", "n": "【存疑】C 被排除的口径依据（白皮书、纲要、部令归“政策文件”而法律不归入）未见于知识点总结，且白皮书严格说属行业报告而非政策文件，此题划分口径无法核实，故保留原答案。\n《国家信息化发展战略纲要》（2016）与《云计算服务安全评估办法》（2019）是信创云建设的政策依据，信通院信创云白皮书提供行业指引；网络安全法（2017）属法律层级，题库口径未将其归入“政策文件”。", "d": 1}, {"k": "dxm", "s": 84, "t": "多选", "q": "在有线、无线通信中传递的国家秘密信息，以及存储、处理国家秘密信息的信息系统，应当依照法律、行政法规和国家有关规定使用（）进行加密保护、安全认证。", "o": ["核心密码", "普通密码", "商用密码", "商业密码"], "a": "AB", "n": "《密码法》（2020）规定核心密码、普通密码用于保护国家秘密信息，涉密信息的传递和涉密信息系统应当使用核心密码、普通密码进行加密保护、安全认证；商用密码用于保护不属于国家秘密的信息，“商业密码”不是法定用语。", "d": 0}, {"k": "dxm", "s": 85, "t": "多选", "q": "基础设施服务 IaaS 指消费者通过互联网从云计算中心获得的计算机基础设施服务，例如虚拟主机、存储服务等。以下属于基础设施资源的是（）", "o": ["计算资源", "网络资源", "存储资源", "平台资源"], "a": "ABC", "n": "IaaS 输出的基础设施资源就是计算、网络、存储三类；平台资源（数据库、中间件等运行环境）属于 PaaS 层能力，不属于 IaaS。对应知识点云计算（IaaS/PaaS/SaaS）分层能力。", "d": 0}, {"k": "dxm", "s": 86, "t": "多选", "q": "在某国产化项目立项申报过程中，国产化项目初期投资测算框架中，隐性成本包括（）", "o": ["培训费用", "兼容性测试费用", "系统升级费用", "员工旅游费"], "a": "ABC", "n": "信创项目的隐性成本体现在国产化适配带来的培训费用、兼容性测试费用和后续系统升级费用上，这类投入不直接形成功能实体但不可省略；员工旅游费与项目实施无关。对应知识点成本管理（严控采购、适配改造、测试验收、运维服务预算）。", "d": 0}, {"k": "dxm", "s": 87, "t": "多选", "q": "在某系统建设方案设计中，数据共享与安全设计中，数据脱敏适用于的场景包括（）", "o": ["开发测试环境", "生产环境数据存储", "对外数据共享", "数据分析场景"], "a": "ACD", "n": "脱敏的价值是在保留数据可用性的同时去除敏感成分，适用于开发测试、对外共享、数据分析等非生产使用场景；生产环境数据存储应通过加密、权限管控与审计保护，不做脱敏后存储。对应知识点数据安全专项要求（数据脱敏、防泄漏）。", "d": 0}, {"k": "dxm", "s": 88, "t": "多选", "q": "密码管理部门因工作需要，按照国家有关规定，可以提请（）等部门对核心密码、普通密码有关物品和人员提供免检等便利，有关部门应当予以协助。", "o": ["公安机关", "交通运输", "第三方测评", "海关"], "a": "ABD", "n": "《密码法》（2020）规定密码管理部门因工作需要，可以提请公安、交通运输、海关等部门对核心密码、普通密码有关物品和人员提供免检等便利，有关部门应当予以协助；第三方测评机构不属于该协助主体。", "d": 0}, {"k": "dxm", "s": 89, "t": "多选", "q": "《便携式计算机政府采购需求标准》2023年版中提出的一级指标包括CPU规格、内存规格、主板规格、存储设备规格、显卡规格、显示设备规格、（）等。", "o": ["外设规格", "网络设备规格", "外部接口规格", "界面设计"], "a": "ABC", "n": "该需求标准的一级指标围绕硬件规格设置，外设规格、网络设备规格、外部接口规格与CPU、内存、显卡等规格同属硬件类一级指标；界面设计不是硬件采购需求的一级指标。", "d": 0}, {"k": "dxm", "s": 90, "t": "多选", "q": "在某项目安全体系建设中，多维度测评的内容包括（）", "o": ["商密评估", "关基评估", "风险评估", "等保测评"], "a": "ACD", "n": "信创工程的多维度测评覆盖商密评估（商用密码应用安全性评估）、风险评估、等保测评；关基评估仅针对经认定的关键信息基础设施开展，一般项目不在其测评范围内。对应知识点安全测试与测评统筹要求。", "d": 0}, {"k": "dxm", "s": 91, "t": "多选", "q": "在某省级政务项目规划中，项目规划设计阶段管控要点包括（）", "o": ["直接进入实施阶段", "方案设计合规性审查", "技术路线合理性论证", "需求调研质量管控"], "a": "BCD", "n": "规划设计阶段的管控要点是方案设计合规性审查、技术路线合理性论证和需求调研质量管控，用以防止规划失真后带病进入实施；直接进入实施阶段正是该阶段要拦住的违规做法。对应知识点项目全维度过程管控。", "d": 0}, {"k": "dxm", "s": 92, "t": "多选", "q": "在某国有银行国产化产品选型评估中，国产化项目采购实施阶段管控要点包括（）", "o": ["招投标合规性管控", "技术规格书质量审查", "合同执行监督", "跳过招投标直接采购"], "a": "ABC", "n": "采购实施阶段要管住招投标合规性、技术规格书质量与合同执行三大环节；跳过招投标直接采购违反采购程序，属于被管控的违规项。", "d": 0}, {"k": "dxm", "s": 93, "t": "多选", "q": "在某项目安全体系建设中，国产化项目验收运维阶段管控要点包括（）", "o": ["验收标准执行管控", "文档归档完整性", "运维移交质量", "跳过验收直接上线"], "a": "ABC", "n": "验收运维阶段的管控要点是执行验收标准、文档归档完整、运维移交质量，保证成果可验收、可承接、可运维；跳过验收直接上线属于违规行为。对应知识点试运行验证与最终验收、运维交接流程。", "d": 0}, {"k": "dxm", "s": 94, "t": "多选", "q": "在某项目安全体系建设中，信创归档文档的审计合规要求包括（）", "o": ["保存全生命周期文档", "保管期限分为永久和定期", "确保审计可追溯性", "保存一年后可销毁"], "a": "ABC", "n": "归档审计要求保存全生命周期文档并确保可追溯，保管期限按《档案法》（2020年修订）分为永久和定期；保存一年后可销毁没有制度依据，会破坏审计链条。对应知识点文档管理要求（版本、权限、归档、可追溯、合规留存）。", "d": 0}, {"k": "dxm", "s": 95, "t": "多选", "q": "在某系统建设方案设计中，等保与密评一体化方案设计的核心要点包括（）", "o": ["同步设计等保与密评安全方案", "同步开展等保与密评测评", "同步实施等保与密评整改", "先做等保后做密评"], "a": "ABC", "n": "等保与密评一体化就是同步设计、同步测评、同步整改，与知识点“将等保测评、密评纳入整体验收计划并提前统筹”一致；先做等保后做密评的串行安排会造成重复整改、延误工期。", "d": 0}, {"k": "dxm", "s": 96, "t": "多选", "q": "国家发展改革委审批或者核报国务院审批的政务信息化项目，以及其他有关部门按照项目审批管理的政务信息化项目，原则上报告编制报下列（）环节。", "o": ["项目建议书", "可行性研究报告", "系统概要设计", "初步设计方案"], "a": "ABD", "n": "依据《国家政务信息化项目建设管理办法》（国办发〔2019〕57号），此类项目原则上按项目建议书、可行性研究报告、初步设计方案和投资概算等环节报批；系统概要设计属于建设实施阶段的设计文档，不是报批环节。", "d": 0}, {"k": "dxm", "s": 97, "t": "多选", "q": "2023年9月7日发布的 GB/T 43207-2023《信息安全技术信息系统密码应用设计指南》提出，密码支撑平台为承载在计算平台上的各类业务应用提供密码功能服务，可选择采用经认证合格的密码支撑服务产品，也可根据各类应用的密码需求、性能需求和责任主体的规划要求等，基于经认证合格的密码产品进行设计，设计的内容为（）", "o": ["密码服务机构确定接入方式策略", "提供的堡垒机设计标准", "接口和功能遵循的标准", "支持的密码体制和密码算法"], "a": "ACD", "n": "依据 GB/T 43207-2023，密码支撑平台的设计内容包括密码服务机构的接入方式策略、接口和功能遵循的标准、支持的密码体制和密码算法等；堡垒机是运维审计设备，其设计标准不在密码支撑平台设计范围内。", "d": 0}, {"k": "dxm", "s": 98, "t": "多选", "q": "在国产化系统总体架构设计中，业务架构设计的主要产出物包括（）。", "o": ["数据库ER图", "核心业务流程图", "业务能力组件清单", "业务域划分图"], "a": "BCD", "n": "业务架构回答业务如何构成、如何运转，产出业务域划分图、核心业务流程图、业务能力组件清单；数据库ER图描述数据实体关系，属于数据架构的产出物。对应知识点业务架构设计核心任务（业务域划分与核心流程梳理）。", "d": 0}, {"k": "dxm", "s": 99, "t": "多选", "q": "国产化技术架构设计中，国产化技术栈组合选型需要评估的维度包括（）。", "o": ["自主可控程度", "兼容适配性", "性能可靠性", "生态成熟度"], "a": "ABCD", "n": "国产化技术栈选型必须同时衡量自主可控程度、兼容适配性、性能可靠性和生态成熟度，任一维度缺失都会带来技术锁定、适配失败或生态断供的风险。对应知识点技术路线选择依据（兼容性、性能、生态、安全、成本、政策）与全栈国产化要求。", "d": 0}, {"k": "dxm", "s": 100, "t": "多选", "q": "在业务架构设计中，业务域划分应遵循的原则包括（）。", "o": ["高内聚低耦合原则", "业务关联度聚合原则", "可独立演化原则", "按部门人数平均分配原则"], "a": "ABC", "n": "业务域以业务本身为依据聚合，遵循高内聚低耦合、业务关联度聚合、可独立演化原则，使各业务域可独立建设演进；按部门人数平均分配与业务无关，会破坏业务完整性。", "d": 0}, {"k": "dxm", "s": 101, "t": "多选", "q": "业务场景适配中，根据业务敏感度差异，可采用的建设模式包括（）。", "o": ["高敏感度场景采用国产化新建模式", "中等敏感度场景采用适配改造模式", "低敏感度场景可采用迁移模式", "所有场景统一采用废弃重建模式"], "a": "ABC", "n": "按敏感度分级选择模式可平衡安全与成本：高敏感度场景直接国产化新建，中等敏感度对存量系统适配改造，低敏感度整体迁移；全部废弃重建的成本与风险最高，不作统一模式。", "d": 0}, {"k": "dxm", "s": 102, "t": "多选", "q": "应用架构设计中，应用分层架构通常包含的层次有（）。", "o": ["表现层即用户界面", "物理层即硬件设备", "数据访问层即数据持久化操作", "业务逻辑层即核心业务处理"], "a": "ACD", "n": "应用分层架构由表现层（用户界面）、业务逻辑层（核心业务处理）、数据访问层（数据持久化）组成；物理层（硬件设备）属于基础设施层，不在应用分层之列。", "d": 0}, {"k": "dxm", "s": 103, "t": "多选", "q": "在应用适配改造中，需要进行适配改造的典型场景包括（）。", "o": ["数据库驱动适配如Oracle到达梦", "中间件接口适配如WebLogic到东方通", "操作系统依赖适配如Windows到麒麟", "外设驱动适配如打印机、扫描仪"], "a": "ABCD", "n": "适配改造覆盖全栈场景：数据库驱动（Oracle 到达梦）、中间件接口（WebLogic 到东方通）、操作系统依赖（Windows 到麒麟）以及打印机、扫描仪等外设驱动都需要适配。对应知识点适配内容（OS、CPU、数据库、中间件、外设、接口、安全组件）。", "d": 0}, {"k": "dxm", "s": 104, "t": "多选", "q": "根据国家数据分类分级保护制度，国产化项目中数据分级通常包括的级别有（）。", "o": ["废弃数据", "内部数据", "敏感数据", "公开数据"], "a": "BCD", "n": "《数据安全法》（2021）确立数据分类分级保护制度，实务中通常把数据划分为公开数据、内部数据、敏感数据等级别并按级别差异化保护；废弃数据是待清理销毁的数据，不是分级类别。对应知识点数据分类分级与安全管控要求。", "d": 0}, {"k": "dxm", "s": 105, "t": "多选", "q": "国产化项目中，保障跨系统数据共享安全的措施包括（）。", "o": ["建立统一数据交换平台实施集中管控", "实施数据分级访问控制确保按权限访问", "采用国密算法加密传输通道保障数据传输安全", "将所有数据明文共享以提高效率"], "a": "ABC", "n": "跨系统共享安全依赖统一数据交换平台集中管控、数据分级访问控制和国密算法加密传输通道；明文共享直接违背数据安全与分级管控要求。对应知识点数据安全专项要求（加密、访问审计、防泄漏）。", "d": 0}, {"k": "dxm", "s": 106, "t": "多选", "q": "部署架构与网络拓扑规划中，安全分区设计通常包含的区域有（）。", "o": ["公共区即无需任何安全管控", "管理区即部署运维管理平台", "边界区即部署边界安全设备", "核心区即部署核心业务系统"], "a": "BCD", "n": "安全分区把不同安全等级的系统分域防护：管理区部署运维管理平台、边界区部署边界安全设备、核心区承载核心业务系统；任何区域都必须有对应的安全管控，“无需任何安全管控的公共区”表述自相矛盾。对应知识点网络规划设计（安全分区划分、边界防护）。", "d": 0}, {"k": "dxm", "s": 107, "t": "多选", "q": "在信创中间件集成中，常见的兼容性挑战包括（）。", "o": ["API接口差异即厂商API规范不同", "通信协议适配如T3与HTTP转换", "性能差异即高并发可能存在差距", "中间件外观颜色不一致"], "a": "ABC", "n": "中间件集成的兼容性挑战集中在厂商API规范差异、通信协议适配（如WebLogic的T3协议与HTTP的转换）和高并发下的性能差距；外观颜色与兼容性无关。对应知识点中间件适配（专属配置、端口映射、集群与负载均衡规则迁移）。", "d": 0}, {"k": "dxm", "s": 108, "t": "多选", "q": "安全架构设计中，纵深防御体系包含的防护层面有（）。", "o": ["网络边界防护即防火墙、IPS等", "主机安全防护即EDR、基线核查等", "应用安全防护即WAF、代码审计等", "数据安全防护即加密、脱敏、审计等"], "a": "ABCD", "n": "纵深防御要求在网络边界（防火墙、IPS）、主机（EDR、基线核查）、应用（WAF、代码审计）、数据（加密、脱敏、审计）各层面层层设防，四个选项分别对应其中一层。对应知识点安全体系六大层面（物理、网络、主机、应用、数据、管理）。", "d": 0}, {"k": "dxm", "s": 109, "t": "多选", "q": "安全架构中，可信身份认证与访问控制的设计要素包括（）。", "o": ["基于零信任架构的持续身份验证", "基于角色的细粒度访问控制即RBAC", "所有用户统一使用相同密码", "采用国密算法的身份凭证安全存储与传输"], "a": "ABD", "n": "可信身份认证与访问控制的设计要素是零信任持续验证、RBAC细粒度授权以及用国密算法保护身份凭证的存储与传输；全系统统一密码使权限不可区分、责任无法追溯，属于被禁止的做法。国密要求对应知识点商用密码应用要求（SM系列算法）。", "d": 0}, {"k": "dxm", "s": 110, "t": "多选", "q": "国产化系统总体架构设计中，安全架构设计需要统筹考虑的方面包括（）。", "o": ["物理安全即机房环境和设备安全", "网络安全即边界防护和传输加密", "数据安全即存储加密和访问控制", "人员着装安全要求"], "a": "ABC", "n": "安全架构需统筹物理安全（机房与设备）、网络安全（边界防护与传输加密）、数据安全（存储加密与访问控制）等层面；人员着装只是物理环境管理的操作细节，不构成安全架构设计内容。对应知识点安全体系六大层面（物理、网络、主机、应用、数据、管理）。", "d": 0}, {"k": "dxm", "s": 111, "t": "多选", "q": "信创运维与业务保障体系中，应建立的保障机制包括（）。", "o": ["依赖厂商远程支持无需自建运维", "分级告警与故障处置机制", "业务连续性保障含容灾和应急恢复", "全链路监控覆盖网络主机应用数据"], "a": "BCD", "n": "运维保障要自建分级告警与故障处置机制、业务连续性保障（容灾与应急恢复）和覆盖网络、主机、应用、数据的全链路监控；完全依赖厂商远程支持会丧失自主运维能力，与自主可控要求冲突。对应知识点业务连续性保障措施与信创运维体系（监控、巡检、故障处理、备份恢复）。", "d": 0}, {"k": "dxm", "s": 112, "t": "多选", "q": "应用建设模式中，选择「改造模式」的适用条件包括（）。", "o": ["存量系统业务逻辑成熟稳定", "现有技术栈可适配国产组件", "改造成本低于重建且连续性高", "系统已完全废弃无人使用"], "a": "ABC", "n": "改造模式的前提是存量系统业务逻辑成熟稳定、现有技术栈能适配国产组件，且改造成本低于重建并要求业务连续；系统已完全废弃无人使用时应直接下线，改造没有意义。", "d": 0}, {"k": "dxm", "s": 113, "t": "多选", "q": "在数据架构设计中，数据资产梳理应涵盖的信息包括（）。", "o": ["数据来源与产生方式", "数据类型与格式规范", "数据存储位置与访问方式", "数据管理员的个人喜好"], "a": "ABC", "n": "数据资产梳理登记的是数据来源与产生方式、类型与格式规范、存储位置与访问方式等客观属性，为迁移适配和治理提供依据；数据管理员的个人喜好不是资产信息。对应知识点数据资源现状评估（数据总量、类型、存储位置、备份方式、流转链路）。", "d": 0}, {"k": "dxm", "s": 114, "t": "多选", "q": "当前国产化项目中常见的国产化技术栈推荐组合包括（）。", "o": ["飞腾CPU+麒麟+达梦+东方通", "鲲鹏CPU+统信+金仓+宝兰德", "龙芯CPU+麒麟+瀚高+金蝶", "英特尔+Win+甲骨文+WebLogic"], "a": "ABC", "n": "前三个组合都是“国产CPU+国产操作系统+国产数据库+国产中间件”的全国产栈，符合选型要求；英特尔+Win+甲骨文+WebLogic是典型境外技术栈，正是国产化要替换的对象。对应知识点国产化软硬件核心体系（鲲鹏/飞腾/龙芯，麒麟/统信，达梦/金仓/瀚高，东方通/普元/金蝶天燕/宝兰德）。", "d": 0}, {"k": "dxm", "s": 115, "t": "多选", "q": "安全架构设计中，等保合规与安全管控的协同要点包括（）。", "o": ["以等保要求为安全建设基线", "在等保基础上叠加国产化管控", "完全放弃等保按国产化标准建设", "等保密评同步规划降低合规成本"], "a": "ABD", "n": "协同要点是以等保要求为安全建设基线、在其上叠加国产化管控、等保与密评同步规划以降低合规成本；完全放弃等保违反“国产化+等保+密评”三重合规底线。对应知识点三重合规要求。", "d": 0}, {"k": "dxm", "s": 116, "t": "多选", "q": "信创云建设规划的核心原则包括（）。", "o": ["成本最低优先，不考虑安全因素", "分阶段推进，先IaaS后PaaS再SaaS", "安全合规底线，满足等保和密评要求", "自主可控优先，确保底层技术栈国产化"], "a": "BCD", "n": "信创云建设原则的核心是分阶段推进（先IaaS、后PaaS、再SaaS）、安全合规底线（满足等保、密评）和自主可控优先（底层技术栈国产化）；成本最低且不考虑安全违背底线要求。对应知识点三重合规与技术层规划。", "d": 0}, {"k": "dxm", "s": 117, "t": "多选", "q": "信创云 IaaS/PaaS/SaaS 三层架构中，各层提供的主要能力包括（）。", "o": ["IaaS层提供虚拟计算存储网络", "物理层提供机房空调门禁管理", "SaaS层提供最终用户应用软件", "PaaS层提供数据库中间件框架"], "a": "ACD", "n": "三层服务能力各有边界：IaaS 提供虚拟化的计算、存储、网络资源，PaaS 提供数据库、中间件、框架，SaaS 提供面向最终用户的应用软件；机房空调门禁属于物理设施，不属于三层中任何一层的服务能力。对应知识点云计算（IaaS/PaaS/SaaS）分层能力。", "d": 0}, {"k": "dxm", "s": 118, "t": "多选", "q": "信创云选型的核心评估维度包括（）。", "o": ["云平台界面颜色美观度", "安全合规能力即等保和密评达标", "性能可靠性即可用性和响应时间", "自主可控程度即底层技术栈国产化"], "a": "BCD", "n": "云选型的核心维度是安全合规能力（等保、密评达标）、性能可靠性（可用性、响应时间）和自主可控程度（底层技术栈国产化）；界面颜色美观度属于外观体验，不是决策维度。对应知识点平台建设验收指标与三重合规要求。", "d": 0}, {"k": "dxm", "s": 119, "t": "多选", "q": "信创云部署模式选型时，需要考虑的因素包括（）。", "o": ["数据敏感度等级涉密选私有云", "成本预算约束私有云成本高", "云平台厂商的品牌偏好", "运维团队规模公有云成本低"], "a": "ABD", "n": "部署模式选型的决定因素是数据敏感度（涉密或高敏感选私有云）、成本预算（私有云成本高）和运维团队规模（公有云门槛与成本低）；厂商品牌偏好不构成选型依据。", "d": 0}, {"k": "dxm", "s": 120, "t": "多选", "q": "信创云计费标准中，常见的计费方式包括（）。", "o": ["包年包月即适合长期稳定使用", "免费使用即所有资源均免费", "预留实例即适合预留资源保障场景", "按量计费即适合弹性伸缩场景"], "a": "ACD", "n": "常见计费方式为包年包月（长期稳定负载）、预留实例（保障预留资源场景）和按量计费（弹性伸缩负载）；所有资源免费不是现实中存在的商业计费方式。", "d": 0}, {"k": "pd", "s": 1, "t": "判断", "q": "SaaS 的含义是软件即服务。", "o": ["正确", "错误"], "a": "A", "n": "SaaS（Software as a Service）即软件即服务，是云计算 IaaS/PaaS/SaaS 三种服务模式之一，与知识点总结中“云计算（IaaS/PaaS/SaaS）”一致。", "d": 0}, {"k": "pd", "s": 2, "t": "判断", "q": "电子政务外网与电子政务内网之间、互联网之间都采用物理隔离方式。", "o": ["正确", "错误"], "a": "B", "n": "政务外网与互联网之间通常采用逻辑隔离（安全隔离设备、防火墙等），政务内网与外网、互联网之间才要求物理隔离，“都采用物理隔离”不成立。", "d": 0}, {"k": "pd", "s": 3, "t": "判断", "q": "业务架构设计的核心任务是业务域划分与核心流程梳理。", "o": ["正确", "错误"], "a": "A", "n": "业务架构设计的核心任务正是业务域划分与核心业务流程梳理，它是应用架构、数据架构设计的基础和输入。", "d": 0}, {"k": "pd", "s": 4, "t": "判断", "q": "国产化技术架构设计的核心是国产化技术栈组合选型与部署架构规划。", "o": ["正确", "错误"], "a": "A", "n": "国产化技术架构设计的核心就是完成国产化技术栈的组合选型并做好部署架构规划，对应知识点 2.3.4 技术层规划（全栈国产化技术路线）。", "d": 0}, {"k": "pd", "s": 5, "t": "判断", "q": "信创产业是以数据安全、网络安全为基础的新基建重要组成部分。", "o": ["正确", "错误"], "a": "A", "n": "按课程口径，信创产业以网络安全、数据安全为基础、以自主研发为核心，是新基建的重要组成部分（知识点：信创新基建、产业背景）。", "d": 0}, {"k": "pd", "s": 6, "t": "判断", "q": "号称基础软件“三驾马车”的是操作系统、数据库、中间件。", "o": ["正确", "错误"], "a": "A", "n": "操作系统、数据库、中间件同为基础软件核心，业内并称基础软件“三驾马车”，与知识点中桌面/服务器 OS、数据库、中间件三类国产基础软件对应。", "d": 0}, {"k": "pd", "s": 7, "t": "判断", "q": "华为是国产服务器主流厂商之一。", "o": ["正确", "错误"], "a": "A", "n": "华为（鲲鹏、泰山系列服务器）是国产服务器主流厂商之一，同类主流厂商还有浪潮、中科曙光等（知识点：国产化服务器）。", "d": 0}, {"k": "pd", "s": 8, "t": "判断", "q": "数据质量核心维度包括完整性、准确性、一致性和及时性。", "o": ["正确", "错误"], "a": "A", "n": "数据质量核心维度即完整性、准确性、一致性、及时性（知识点还列出唯一性、有效性），题干列举属实。", "d": 0}, {"k": "pd", "s": 9, "t": "判断", "q": "当前时期，我国信创产业发展的主要问题是产业类型覆盖不全面。", "o": ["正确", "错误"], "a": "A", "n": "【存疑】公开权威资料常将信创发展的主要问题归纳为核心技术受制于人等，“产业类型覆盖不全面”疑为讲义专用表述，无法从公知常识完全证实，保留原答案。\n我国信创产业仍处培育期，部分细分领域的产品与类型覆盖不全，说法与课程资料口径一致。", "d": 1}, {"k": "pd", "s": 10, "t": "判断", "q": "国产操作系统高质量发展三年行动计划的实施周期是 2025-2027 年。", "o": ["正确", "错误"], "a": "A", "n": "【存疑】公开渠道无法核实“国产操作系统高质量发展三年行动计划”文件及其具体周期，仅能凭原答案与内部资料认定，保留原答案。\n按题给答案与内部资料口径，该三年行动计划的实施周期为 2025-2027 年。", "d": 1}, {"k": "pd", "s": 11, "t": "判断", "q": "信创产业生态中，安全软件和应用软件是同一分类。", "o": ["正确", "错误"], "a": "B", "n": "二者是不同分类：知识点将应用软件（办公软件、业务系统等）与安全产品（网络安全设备、商用密码等）分列，安全软件属于安全产业分支。", "d": 0}, {"k": "pd", "s": 12, "t": "判断", "q": "安全体系建设的背景是应对日益严峻的网络安全威胁和自主可控需求。", "o": ["正确", "错误"], "a": "A", "n": "安全体系建设的背景正是应对日益严峻的网络安全威胁与自主可控需求，与信创“自主可控、安全可信”内核一致（知识点：信息系统安全管理）。", "d": 0}, {"k": "pd", "s": 13, "t": "判断", "q": "国产化产品选型中，自主可控要求核心技术自主、供应链可控。", "o": ["正确", "错误"], "a": "A", "n": "自主可控的核心要求就是核心技术自主、供应链可控，与知识点“自主可控目标：供应链安全、技术自主、产品可控、服务可及、安全可审计”一致。", "d": 0}, {"k": "pd", "s": 14, "t": "判断", "q": "数据质量核心维度包括随意性。", "o": ["正确", "错误"], "a": "B", "n": "“随意性”不是数据质量维度，正确维度为完整性、准确性、一致性、及时性、唯一性、有效性（见知识点数据质量条目）。", "d": 0}, {"k": "pd", "s": 15, "t": "判断", "q": "Windows 11 属于国产桌面操作系统。", "o": ["正确", "错误"], "a": "B", "n": "Windows 11 是美国微软公司的闭源桌面操作系统，属境外产品；国产桌面操作系统为统信 UOS、麒麟等（知识点：桌面/服务器 OS：麒麟、统信等）。", "d": 0}, {"k": "pd", "s": 16, "t": "判断", "q": "Oracle 属于国产数据库主流厂商。", "o": ["正确", "错误"], "a": "B", "n": "Oracle 是美国数据库厂商，属境外产品；国产数据库主流厂商为达梦、人大金仓、OceanBase、GaussDB 等（知识点 1.1.1、3.1.2）。", "d": 0}, {"k": "pd", "s": 17, "t": "判断", "q": "国产化项目成果物清单包括项目建议书、可研报告和设计方案等。", "o": ["正确", "错误"], "a": "A", "n": "国产化项目成果物涵盖项目建议书、可研报告、设计方案等，且立项到验收全流程资料须留档备查（知识点 1.1.3：需完整留存全流程资料）。", "d": 0}, {"k": "pd", "s": 18, "t": "判断", "q": "任何个人和组织不得从事非法侵入他人网络、干扰他人网络正常功能、窃取网络数据等危害网络安全的活动。", "o": ["正确", "错误"], "a": "A", "n": "该表述与《网络安全法》第二十七条一致：任何个人和组织不得从事非法侵入他人网络、干扰正常功能、窃取网络数据等危害网络安全的活动。", "d": 0}, {"k": "pd", "s": 19, "t": "判断", "q": "信创涉密计算机终端需要安装专门的安全保密产品，即涉密计算机及移动存储介质保密管理系统，简称“三合一”。", "o": ["正确", "错误"], "a": "A", "n": "涉密信创终端须安装“三合一”（涉密计算机及移动存储介质保密管理系统），符合涉密信息系统保密管理要求。", "d": 0}, {"k": "pd", "s": 20, "t": "判断", "q": "国办发〔2019〕57 号《国家政务信息化项目建设管理办法》的文号是国办发〔2019〕57 号。", "o": ["正确", "错误"], "a": "A", "n": "《国家政务信息化项目建设管理办法》的文号即国办发〔2019〕57 号，文号与文件名对应一致。", "d": 0}, {"k": "pd", "s": 21, "t": "判断", "q": "国资发科创〔2022〕79 号《关于推进中央企业信息技术应用创新工作的通知》的文号是国资发科创〔2022〕79 号。", "o": ["正确", "错误"], "a": "A", "n": "《关于推进中央企业信息技术应用创新工作的通知》的文号即国资发科创〔2022〕79 号，文号与文件名对应一致。", "d": 0}, {"k": "pd", "s": 22, "t": "判断", "q": "选型评估维度中，品牌知名度是核心评估维度。", "o": ["正确", "错误"], "a": "B", "n": "选型的核心评估维度是自主可控程度、兼容适配性、性能可靠性与生态服务能力等，品牌知名度不是核心评估维度。", "d": 0}, {"k": "pd", "s": 23, "t": "判断", "q": "信创访问控制的核心原则是最小权限原则。", "o": ["正确", "错误"], "a": "A", "n": "访问控制的核心原则是最小权限原则，即仅授予完成任务所必需的权限（知识点 1.3.1：系统架构需满足最小权限原则）。", "d": 0}, {"k": "pd", "s": 24, "t": "判断", "q": "项目测试的主要依据包括建设方案、招标文件、深化设计方案、需求规格说明等。", "o": ["正确", "错误"], "a": "A", "n": "项目测试应以建设方案、招标文件、深化设计方案、需求规格说明等项目文档为依据开展，说法符合课程口径。", "d": 0}, {"k": "pd", "s": 25, "t": "判断", "q": "国产化项目各阶段的工作必须严格按照时间轴来进行，不可以并行。", "o": ["正确", "错误"], "a": "B", "n": "各阶段工作可以并行、迭代推进（知识点 2.4：试点验证、分批推广、滚动优化本就交替衔接），“必须严格串行”不成立。", "d": 0}, {"k": "pd", "s": 26, "t": "判断", "q": "测试相关资源主要包括测试环境、测试组织、测试工具等方面。", "o": ["正确", "错误"], "a": "A", "n": "测试相关资源主要包括测试环境、测试组织（人员）与测试工具等方面，说法完整。", "d": 0}, {"k": "pd", "s": 27, "t": "判断", "q": "典型的政务云架构采用\"三横两纵\"，\"三横\"自下而上分别为基础设施层即 IaaS、业务应用层即 SaaS、平台支撑层即 PaaS。", "o": ["正确", "错误"], "a": "B", "n": "政务云“三横”自下而上应为基础设施层（IaaS）→平台支撑层（PaaS）→业务应用层（SaaS），题干把 SaaS 与 PaaS 的位置写反了。", "d": 0}, {"k": "pd", "s": 28, "t": "判断", "q": "在信息安全管理中，确保信息在需要时能够正常访问和使用，属于可控性属性。", "o": ["正确", "错误"], "a": "B", "n": "“确保信息在需要时能够正常访问和使用”对应的是可用性属性，而非可控性。", "d": 0}, {"k": "pd", "s": 29, "t": "判断", "q": "在信创产业链中游环节中，数据库产品是连接硬件与最终用户应用的桥梁。", "o": ["正确", "错误"], "a": "B", "n": "产业链中游承上启下、连接硬件平台与最终用户应用的是中间件（如东方通、金蝶天燕、宝兰德，见知识点），数据库主要负责数据的存储与管理。", "d": 0}, {"k": "pd", "s": 30, "t": "判断", "q": "任何项目的可交付成果都需要企业高层和项目给付方进行评审与验收。", "o": ["正确", "错误"], "a": "B", "n": "评审与验收的范围和层级由项目契约及管理规定确定，可由相应干系人按阶段完成，并非“任何”交付成果都必须经企业高层和出资方评审验收。", "d": 0}, {"k": "pd", "s": 31, "t": "判断", "q": "信息安全的基本属性包括完整性、可用性、保密性、可控性、可靠性 5 个方面。", "o": ["正确", "错误"], "a": "A", "n": "按课程口径，信息安全的基本属性为完整性、可用性、保密性、可控性、可靠性五个方面，题干列举一致。", "d": 0}, {"k": "pd", "s": 32, "t": "判断", "q": "在一个总体设计范围内，经济上独立核算的各个工程项目，编制统一的项目建议书。", "o": ["正确", "错误"], "a": "B", "n": "同一总体设计范围内、经济上独立核算的各工程项目应分别编制各自的项目建议书，“编制统一的”不正确，统一编报仅适用于同一核算单位的项目。", "d": 0}, {"k": "pd", "s": 33, "t": "判断", "q": "直接工程费=直接费+其他工程费+其他直接费+现场经费。", "o": ["正确", "错误"], "a": "A", "n": "【存疑】不同行业造价定额体系对“直接工程费”构成的口径不一致（常见口径含直接费、其他直接费、现场经费等），该四项公式疑为课程专用口径，保留原答案。\n按题给答案及课程采用的工程费用口径，直接工程费由直接费、其他工程费、其他直接费和现场经费四部分构成。", "d": 1}, {"k": "pd", "s": 34, "t": "判断", "q": "操作系统是信创应用生态中最核心、技术复杂度最高的领域。", "o": ["正确", "错误"], "a": "B", "n": "【存疑】题干“错”的判据无法唯一确定——“技术复杂度最高”的正确主体可能是芯片/CPU，也可能错在“应用生态”应为“基础软件生态”，保留原答案。\n按原答案判“错”，说明课程口径并不认定操作系统是“信创应用生态”中技术复杂度最高的领域；业内更常见口径为芯片/CPU 技术复杂度最高，或操作系统是“基础软件”中最核心的环节，题干主体与限定词至少有一处错位。", "d": 1}, {"k": "pd", "s": 35, "t": "判断", "q": "任何组织和个人都可以使用商用密码产品。", "o": ["正确", "错误"], "a": "B", "n": "商用密码用于保护不属于国家秘密的信息，组织和个人应依法使用；保护国家秘密必须使用核心密码、普通密码（知识点 1.3.3），故“任何组织和个人都可以随意使用”的表述错误。", "d": 0}, {"k": "pd", "s": 36, "t": "判断", "q": "可行性研究报告一般由一个总论和几个专题构成。", "o": ["正确", "错误"], "a": "A", "n": "可行性研究报告通常由一个总论（概述）加市场、技术、财务等数个专题章节构成，说法成立。", "d": 0}, {"k": "pd", "s": 37, "t": "判断", "q": "国家大力发展信创产业的目标是实现自主可控和信息安全。", "o": ["正确", "错误"], "a": "A", "n": "国家大力发展信创产业的目标正是实现核心技术自主可控和信息安全（知识点：信创核心是自主可控、安全可信、国产化替代）。", "d": 0}, {"k": "pd", "s": 38, "t": "判断", "q": "可行性研究报告可以作为建设招标的依据。", "o": ["正确", "错误"], "a": "B", "n": "【存疑】部分教材口径认为经批复的可研报告可作为编制招标文件的依据，与原答案“错”存在口径冲突，课程出处无法核实，保留原答案。\n按题给答案，可行性研究报告属于立项决策与投资估算的依据，不能直接作为建设招标的依据，招标应以批复文件和相应设计文件等为依据。", "d": 1}, {"k": "pd", "s": 39, "t": "判断", "q": "国产化工程必须选用国产芯片的交换机路由器产品。", "o": ["正确", "错误"], "a": "B", "n": "国产化工程按场景与适配要求选型，网络设备优先国产化替代，但“必须全部选用国产芯片产品”过于绝对（知识点：信创采购关注国产化比例、安全资质与适配能力，非一刀切）。", "d": 0}, {"k": "pd", "s": 40, "t": "判断", "q": "企业在进行信息化规划过程中，应首先分析企业信息化现状。", "o": ["正确", "错误"], "a": "A", "n": "信息化规划第一步是分析企业信息化现状，再确定目标与方案，与知识点 2.1“全维度现状调研与评估先行”一致。", "d": 0}, {"k": "pd", "s": 41, "t": "判断", "q": "适配验证是项目规划和实施过程中必不可少的环节。", "o": ["正确", "错误"], "a": "A", "n": "适配验证是信创项目必不可少的环节，规划与实施各阶段均须开展，适配测试报告还是必备留档资料（知识点 1.1.3、2.1）。", "d": 0}, {"k": "pd", "s": 42, "t": "判断", "q": "根据信息安全技术网络安全管理办法的要求，第三级信息系统应当每两年一次进行一次等级测评。", "o": ["正确", "错误"], "a": "B", "n": "依据等级保护管理规定，第三级信息系统应当每年至少进行一次等级测评，而非每两年一次。", "d": 0}, {"k": "pd", "s": 43, "t": "判断", "q": "整机产品需要提供第三方机构平均无故障运行时间测试报告，MTBF 时间应≥15000 小时。", "o": ["正确", "错误"], "a": "B", "n": "信创整机 MTBF（平均无故障时间）常见要求远高于 15000 小时，通常要求不低于 10 万小时，题中指标明显偏低、不符合信创整机的通用要求。", "d": 0}, {"k": "pd", "s": 44, "t": "判断", "q": "第三方测试单位通常由测评机构承担，测试对象为应用系统。", "o": ["正确", "错误"], "a": "A", "n": "第三方测试通常由具备相应资质的测评机构承担，测试对象为（信息系统的）应用系统，说法符合课程口径。", "d": 0}, {"k": "pd", "s": 45, "t": "判断", "q": "文件要求进行为期 3 个月的试运行来验证系统的功能和性能，但进行了 1 个月后没有出现任何问题，试运行可以提前结束。", "o": ["正确", "错误"], "a": "B", "n": "试运行期限是规定的验证时限，即使期间未出现问题也必须满 3 个月并完成验证后方可结束，不能提前结束。", "d": 0}, {"k": "pd", "s": 46, "t": "判断", "q": "信创计算机终端必须安装三合一、主机审计、打印刻录、身份鉴别和防病毒软件。", "o": ["正确", "错误"], "a": "B", "n": "“三合一”是涉密终端的保密专用配置（见第 19 题），题目未限定“涉密”，对一般信创计算机终端而言并非都必须安装三合一等保密专用产品。", "d": 0}, {"k": "pd", "s": 47, "t": "判断", "q": "信息系统运营单位初步确定定级对象的安全保护等级，并起草《网络安全等级保护定级报告》，公安部制定，定级结论必须进行专家评审。", "o": ["正确", "错误"], "a": "B", "n": "定级流程应为运营使用单位自主定级并起草定级报告，经专家评审、主管部门审核后报公安机关备案审查，定级结论并非“公安部制定”，题干流程表述错误。", "d": 0}, {"k": "pd", "s": 48, "t": "判断", "q": "核心密码、普通密码属于国家秘密。密码管理部门依照 2020 年 1 月 1 日施行《中华人民共和国密码法》和有关法律、行政法规、国家有关规定对核心密码、普通密码实行严格统一管理。", "o": ["正确", "错误"], "a": "A", "n": "依据《密码法》（2020 年 1 月 1 日施行），核心密码、普通密码用于保护国家秘密、属于国家秘密，由密码管理部门实行严格统一管理，题干一致。", "d": 0}, {"k": "pd", "s": 49, "t": "判断", "q": "国产企业信息化在实施过程中，通过引入先进的供应链管理系统可以提高企业的市场竞争力。", "o": ["正确", "错误"], "a": "A", "n": "引入先进的供应链管理系统可优化采购、库存与协同，从而提升企业市场竞争力，说法成立。", "d": 0}, {"k": "pd", "s": 50, "t": "判断", "q": "国产化项目涉及基础硬件、基础软件、应用软件等多个方面，包括智能交通信息化项目中的路由器、核心交换机、服务器、防火墙等。", "o": ["正确", "错误"], "a": "A", "n": "国产化覆盖基础硬件、基础软件、应用软件全栈（知识点：芯片—服务器—OS—数据库—中间件—应用—安全全栈），智能交通项目中的路由器、核心交换机、服务器、防火墙等均在国产化范围内。", "d": 0}, {"k": "pd", "s": 51, "t": "判断", "q": "过程要素部署实施的工作内容包括：过程与制度发布、过程电子化管理和数据初始化、体系试运行。", "o": ["正确", "错误"], "a": "A", "n": "与 ITSS 对过程要素部署实施的要求一致：过程与制度发布、过程电子化管理和数据初始化、体系试运行。", "d": 0}, {"k": "pd", "s": 52, "t": "判断", "q": "本质上讲，国产化项目和其他信息化项目一样都是为了创造独特的产品服务或者是成果进行的一项临时性的工作。", "o": ["正确", "错误"], "a": "A", "n": "符合项目定义：为创造独特的产品、服务或成果而进行的临时性工作，国产化项目同样具有一次性、临时性等特征。", "d": 0}, {"k": "pd", "s": 53, "t": "判断", "q": "在后台服务器架构的设计中，一个典型的架构设计应该分为接入层、逻辑层、存储层和应用层。", "o": ["正确", "错误"], "a": "B", "n": "典型的后台服务器架构一般为接入层、逻辑层（应用层）、存储层的层次划分，将“逻辑层”与“应用层”并列为两个独立层的说法不符合典型分层。", "d": 0}, {"k": "pd", "s": 54, "t": "判断", "q": "对于国标 GB8567—88GB/T 8567-2006《计算机软件产品开发文件编制指南》所建议的条款并不是都可以扩展，以进一步细分适应需要。", "o": ["正确", "错误"], "a": "B", "n": "《计算机软件产品开发文件编制指南》（GB 8567-88、GB/T 8567-2006）所建议的文档条款均可根据项目需要扩展细分以适应需要，题干“并不是都可以扩展”与原意相反。", "d": 0}, {"k": "pd", "s": 55, "t": "判断", "q": "依据风险级别与影响度范围进行决策，以决定工具部署上线是否采用阶段式部署。", "o": ["正确", "错误"], "a": "A", "n": "依据 ITSS 要求，按风险级别与影响范围进行决策，以决定工具部署上线是否采用阶段式（分步试点）部署，说法一致。", "d": 0}, {"k": "pd", "s": 56, "t": "判断", "q": "信息系统受到破坏后，会对社会秩序和公共利益造成严重损害，或者对国家安全造成损害，属于信息系统安全等级保护的二级要求。", "o": ["正确", "错误"], "a": "B", "n": "“对社会秩序和公共利益造成严重损害，或对国家安全造成损害”是第三级的定级条件；二级的损害程度为“对社会秩序和公共利益造成损害，但不损害国家安全”，题干说成二级错误。", "d": 0}, {"k": "pd", "s": 57, "t": "判断", "q": "TCP/IP 协议族中定义的 TCP 和 UDP 协议，实现了 OSI 七层模型中网络层的主要功能。", "o": ["正确", "错误"], "a": "B", "n": "TCP 和 UDP 是传输层协议，实现的是 OSI 模型传输层的主要功能，不是网络层（网络层对应 IP 协议）。", "d": 0}, {"k": "pd", "s": 58, "t": "判断", "q": "公司信息化存在的最大问题是公司分散的、独立运行的业务系统较多，系统间缺乏数据交换和数据共享，即所谓的信息孤岛。", "o": ["正确", "错误"], "a": "A", "n": "业务系统分散独立运行、缺乏数据交换与共享即形成“信息孤岛”，这正是企业信息化面临的典型最大问题，说法成立。", "d": 0}, {"k": "pd", "s": 59, "t": "判断", "q": "虽然不同的操作系统可能支持不同的浏览器产品，但这些浏览器都支持 HTTP 协议。", "o": ["正确", "错误"], "a": "A", "n": "HTTP 是 Web 访问的标准协议（知识点：核心协议含 HTTP/HTTPS），各操作系统上的浏览器产品均须支持 HTTP 才能访问网页，说法成立。", "d": 0}, {"k": "pd", "s": 60, "t": "判断", "q": "IT 服务质量评价模型定义了服务质量的安全性、可靠性、有形性、响应性、友好性。", "o": ["正确", "错误"], "a": "A", "n": "ITSS 的 IT 服务质量评价模型以安全性、可靠性、有形性、响应性、友好性五个特性衡量服务质量，题干列举一致。", "d": 0}, {"k": "pd", "s": 61, "t": "判断", "q": "判断一个产品是否属于国产化产品的核心标准，是看它是否在国内开发和生产的。", "o": ["正确", "错误"], "a": "B", "n": "判断国产化的核心标准是核心技术自主可控、知识产权自主，而非仅看是否在国内开发和生产（贴牌代工不等于国产化）。", "d": 0}, {"k": "pd", "s": 62, "t": "判断", "q": "在国产化项目差距分析中，仅需对比技术层面差距，无需考虑合规差距和能力差距。", "o": ["正确", "错误"], "a": "B", "n": "差距分析是全维度的，除技术层面外还须对比合规差距和能力差距（对应知识点 2.1 六维度调研、2.2 差距识别与迁移难度评估）。", "d": 0}, {"k": "pd", "s": 63, "t": "判断", "q": "按优先级或等级排列的风险清单属于风险定量分析的输出。", "o": ["正确", "错误"], "a": "B", "n": "按优先级或等级排列的风险清单是定性风险分析的输出；定量风险分析的输出是量化结果（如 EMV、敏感性分析、决策树等）。", "d": 0}, {"k": "pd", "s": 64, "t": "判断", "q": "在开展信创类工程规划时，网络设备、安全设备、存储设备设备应全部利旧。", "o": ["正确", "错误"], "a": "B", "n": "信创工程规划须先评估设备兼容性与性能，区分可利旧改造设备、需替换的境外设备与需新增的国产设备（知识点 2.1.3 基础设施现状评估），并非“应全部利旧”。", "d": 0}, {"k": "pd", "s": 65, "t": "判断", "q": "商用密码应用安全性评估简称密评，是指在采用商用密码技术、产品和服务集成建设的网络和信息系统中，对其密码应用的合规性、正确性和有效性进行评估。", "o": ["正确", "错误"], "a": "A", "n": "该定义与 GB/T 39786 及《商用密码应用安全性评估管理办法》口径一致：对密码应用的合规性、正确性、有效性进行评估，简称密评（知识点 1.3.3、5.1.4）。", "d": 0}, {"k": "pd", "s": 66, "t": "判断", "q": "已运营或新建的第二级以上信息系统，应当在安全保护等级确定后 60 日内，由其运营、使用单位到所在地设区的市级以上公安机关办理备案手续。", "o": ["正确", "错误"], "a": "B", "n": "依据《信息安全等级保护管理办法》（公通字〔2007〕43 号），第二级以上信息系统应在安全保护等级确定后 30 日内（而非 60 日）由运营、使用单位到所在地设区的市级以上公安机关办理备案手续。", "d": 0}, {"k": "pd", "s": 67, "t": "判断", "q": "已运行信息系统的运营、使用单位自公通字〔2007〕43 号《信息安全等级保护管理办法》施行之日起 90 日内确定信息系统的安全保护等级。", "o": ["正确", "错误"], "a": "B", "n": "【存疑】无法核实 43 号文对“已运行信息系统”确定安全保护等级时限的原文表述，错误点可能在“90 日”数字或适用范围（是否仅限第二级以上系统），保留原答案。\n按题给答案，该时限与 43 号文的规定不符，43 号文对第二级以上信息系统实行定级后限期备案管理。", "d": 1}, {"k": "pd", "s": 68, "t": "判断", "q": "信创云平台仅支持私有云部署模式。", "o": ["正确", "错误"], "a": "B", "n": "信创云支持公有云、私有云、混合云等多种部署模式，按涉密要求、合规约束与业务场景选择，并非仅支持私有云。", "d": 0}, {"k": "pd", "s": 69, "t": "判断", "q": "加强政府数据共享统筹，是提供政府部门治理能力、推动经济发展转型的重要路径和关键手段。政府数据共享是数字政府建设的基础性工作。", "o": ["正确", "错误"], "a": "A", "n": "加强政府数据共享统筹是提升政府部门治理能力、推动经济转型的重要路径，政府数据共享是数字政府建设的基础性工作，说法成立（知识点：数字政务、数据开放共享）。", "d": 0}, {"k": "pd", "s": 70, "t": "判断", "q": "金山 wps 软件安装包：wps-office_11.8_arm64.deb 可以安装在中标龙芯终端上。", "o": ["正确", "错误"], "a": "B", "n": "该 deb 包为 arm64（ARM 架构）格式，而中标麒麟+龙芯终端采用 MIPS/LoongArch 自主指令集（知识点：芯片路线含 LoongArch），架构不匹配无法安装。", "d": 0}, {"k": "pd", "s": 71, "t": "判断", "q": "国产化环境下，我国国内主流的桌面和服务器计算机操作系统均源于开源 Linux 操作系统。", "o": ["正确", "错误"], "a": "A", "n": "统信 UOS、麒麟等国内主流桌面与服务器操作系统均基于开源 Linux 内核构建（知识点：桌面/服务器 OS：麒麟、统信等），说法成立。", "d": 0}, {"k": "pd", "s": 72, "t": "判断", "q": "密评的基本工作流程可归纳为确定评估对象、开展测评工作、输出密码测评报告、密评结果上报四个阶段。", "o": ["正确", "错误"], "a": "A", "n": "按课程口径，密评基本流程即确定评估对象、开展测评、输出密码测评报告、密评结果上报四个阶段（对应 GB/T 39786 语境下的测评准备、方案编制、现场测评、分析与报告编制活动）。", "d": 0}, {"k": "pd", "s": 73, "t": "判断", "q": "在有线、无线通信中传递的国家秘密信息，以及存储、处理国家秘密信息的信息系统，应当依照法律、行政法规和国家有关规定使用核心密码、普通密码进行加密保护、安全认证。", "o": ["正确", "错误"], "a": "A", "n": "依据《密码法》，有线/无线通信中传递的国家秘密信息及存储、处理国家秘密信息的信息系统，应依法使用核心密码、普通密码进行加密保护和安全认证，题干一致。", "d": 0}, {"k": "pd", "s": 74, "t": "判断", "q": "实施标准化对于提高产品和服务的质量、促进技术创新和进步、增强市场竞争力以及保障安全和健康等方面具有重要意义。降低生产成本是实施标准化的意义。", "o": ["正确", "错误"], "a": "B", "n": "实施标准化的意义包括提高产品和服务质量、促进技术创新与进步、增强市场竞争力、保障安全健康等，课程口径中不含“降低生产成本”一项。", "d": 0}, {"k": "pd", "s": 75, "t": "判断", "q": "国际标准是指“国际标准化组织即 ISO、国际电工委员会即 IEC 和国际电信联盟即 ITU，以及 ISO 确认并公布的其他组织”制定的标准。", "o": ["正确", "错误"], "a": "A", "n": "与公知的国际标准定义一致：由 ISO、IEC、ITU 以及 ISO 确认并公布的其他组织制定的标准。", "d": 0}, {"k": "pd", "s": 76, "t": "判断", "q": "信创设计总体架构分为“五层三翼”，其中的“三翼”包括：标准规范体系、安全保密体系、应用支撑体系。", "o": ["正确", "错误"], "a": "B", "n": "【存疑】“五层三翼”为课程专用架构口径且知识点总结未收录，“三翼”的准确组成无法从公知常识核实，保留原答案。\n按原答案判“错”：“应用支撑体系”更可能属于总体架构的支撑层级而非“三翼”，“三翼”应为标准规范体系、安全保密体系等配套保障类体系。", "d": 1}, {"k": "pd", "s": 77, "t": "判断", "q": "分析与调研，网络的或传统的方式，都是把相关的数据汇总、排列并转化成信息。如果你的调研目标只是简单的为数据库收集数据，你就不用对数据进行分析。", "o": ["正确", "错误"], "a": "A", "n": "分析与调研的目的是把数据汇总、排列并转化为信息；若调研目标仅为数据库收集数据，自然无须再对数据进行分析，判断成立。", "d": 0}, {"k": "pd", "s": 78, "t": "判断", "q": "2015 年，我国以修改采用的方式发布了 ISO/IEC 20000 的国家推荐标准即 GB/T 24405.1《信息技术 服务管理 第 1 部分：规范》《GB/T 24405.1 信息技术服务管理第一部分：规范》。", "o": ["正确", "错误"], "a": "B", "n": "GB/T 24405.1《信息技术 服务管理 第 1 部分：规范》是我国 2009 年发布、等同采用（idt）ISO/IEC 20000-1:2005 的国家标准，并非“2015 年以修改采用方式发布”。", "d": 0}, {"k": "pd", "s": 79, "t": "判断", "q": "微服务是当前流行的一种技术框架，通过服务的小型化、原子化以及分布式架构的弹性伸缩和高可用性，可以实现业务之间的松耦合、业务的灵活调整组合以及系统的高可用性，为业务创新和业务持续提供了一个良好的基础平台。", "o": ["正确", "错误"], "a": "A", "n": "题干与微服务架构的公认特征一致：服务小型化、原子化、弹性伸缩，实现松耦合、灵活调整与高可用（知识点：容器、微服务、分布式架构）。", "d": 0}, {"k": "pd", "s": 80, "t": "判断", "q": "数据库设计即 Database Design 是指对于一个给定的应用环境，构造最优的数据库模式，建立数据库及其应用系统，使之能够有效地存储数据，满足各种用户的应用需求。按照规范设计，我们将数据库的设计过程分为六个阶段：系统需求分析阶段、概念结构设计阶段、逻辑结构设计阶段、物理结构设计阶段、数据库实施阶段、数据库运行与维护阶段。", "o": ["正确", "错误"], "a": "A", "n": "数据库设计六阶段（需求分析、概念结构、逻辑结构、物理结构、实施、运行与维护）是数据库设计的通行规范划分，题干表述完整一致。", "d": 0}, {"k": "pd", "s": 81, "t": "判断", "q": "信息安全管理体系 ISMS 是组织整体管理体系的一个部分，是基于风险评估建立、实施、运行、监视、评审、保持和持续改进信息安全等一系列的管理活动，是组织在整体或特定范围内建立信息安全方针和目标，以及完成这些目标所用的方法的体系。", "o": ["正确", "错误"], "a": "A", "n": "与 GB/T 22080/ISO/IEC 27001 对 ISMS 的定义一致：基于风险评估建立、实施、运行、监视、评审、保持和持续改进的信息安全管理活动体系。", "d": 0}, {"k": "pd", "s": 82, "t": "判断", "q": "根据《商用密码管理条例》（国务院，2023 年 5 月修订施行），国产化项目中使用商用密码产品应当选择经国家密码管理部门审批通过的国产密码产品。", "o": ["正确", "错误"], "a": "A", "n": "依据修订后的《商用密码管理条例》与信创密评要求（知识点 1.3.3：全程使用国产商用密码算法并通过密评），国产化项目应选用经国家密码管理部门审批通过的国产商用密码产品。", "d": 0}, {"k": "pd", "s": 83, "t": "判断", "q": "根据 GB/T 22239-2019《信息安全技术 网络安全等级保护基本要求》与国家密码管理局令第 3 号《商用密码应用安全性评估管理办法》的要求，国产化项目中等级保护测评和商用密码应用安全性评估即密评可以分别独立实施，无需统筹规划同步推进。", "o": ["正确", "错误"], "a": "B", "n": "等保测评与密评必须统筹规划、同步推进并纳入项目整体验收计划（知识点 5.4：等保测评、密评纳入整体验收计划，提前统筹），不能各自独立实施、互不衔接。", "d": 0}, {"k": "pd", "s": 84, "t": "判断", "q": "在国产化系统总体架构设计中，业务架构设计是应用架构和数据架构设计的基础和输入。", "o": ["正确", "错误"], "a": "A", "n": "业务架构是总体架构设计的基础，应用架构与数据架构以业务架构为输入展开设计，说法成立。", "d": 0}, {"k": "pd", "s": 85, "t": "判断", "q": "应用架构设计中，各层之间应采用紧耦合方式以提高系统整体性能。", "o": ["正确", "错误"], "a": "B", "n": "应用架构各层之间应采用松（低）耦合方式，以保证系统的灵活性、可扩展性与可维护性；紧耦合会降低系统弹性与可适应性，并非应有的设计方式。", "d": 0}, {"k": "pd", "s": 86, "t": "判断", "q": "根据《中华人民共和国数据安全法》（2021 年 9 月 1 日施行，全国人民代表大会常务委员会颁布）的要求，国产化项目中的数据分类分级仅需按照数据容量大小进行划分即可。", "o": ["正确", "错误"], "a": "B", "n": "《数据安全法》要求依据数据的重要程度及遭篡改、破坏、泄露或非法获取、非法利用后的危害程度实行分类分级（知识点：数据分级分类、加密脱敏），并非按数据容量大小划分。", "d": 0}, {"k": "pd", "s": 87, "t": "判断", "q": "国产化技术栈组合选型时，自主可控程度是首要考量因素，同时需兼顾兼容适配性和性能可靠性。", "o": ["正确", "错误"], "a": "A", "n": "技术栈组合选型以自主可控程度为首要考量，同时兼顾兼容适配性与性能可靠性（知识点：技术路线选择依据为兼容性、性能、生态、安全、成本、政策）。", "d": 0}, {"k": "pd", "s": 88, "t": "判断", "q": "业务架构设计中，业务域划分应遵循高内聚低耦合原则，确保同一业务域内功能高度内聚。", "o": ["正确", "错误"], "a": "A", "n": "业务域划分应遵循高内聚低耦合原则，保证域内功能高度内聚、域间保持低耦合，说法成立。", "d": 0}, {"k": "pd", "s": 89, "t": "判断", "q": "业务能力组件化拆解的目的是将业务功能封装为可复用组件，支持按组件粒度进行国产化替换。", "o": ["正确", "错误"], "a": "A", "n": "组件化拆解将业务功能封装为可复用组件，从而支持按组件粒度实施国产化替换与验证，说法一致。", "d": 0}, {"k": "pd", "s": 90, "t": "判断", "q": "对于高敏感度业务场景，国产化改造应优先采用分阶段渐进式改造策略以降低风险。", "o": ["正确", "错误"], "a": "B", "n": "参照知识点“先非核心、后核心，先简单、后复杂”的分批推进原则（2.4.2/3.2.1），分阶段渐进式主要面向非核心、低风险系统；高敏感（核心）业务应并行双轨运行、充分验证后择机割接并配套应急回退（3.2.2/3.2.3/3.4），不宜“优先”渐进改造。", "d": 0}, {"k": "pd", "s": 91, "t": "判断", "q": "信创运维与业务保障体系应建立覆盖国产化环境的全链路监控、分级告警和故障处置机制。", "o": ["正确", "错误"], "a": "A", "n": "与知识点信创运维体系一致：建立涵盖监控、巡检、故障处理、变更、备份恢复、安全运维的运维体系，全链路监控、分级告警、故障处置是其应有内容。", "d": 0}, {"k": "pd", "s": 92, "t": "判断", "q": "应用架构设计中，组件集成应遵循紧耦合原则以确保系统性能最优。", "o": ["正确", "错误"], "a": "B", "n": "组件集成应遵循松耦合原则；紧耦合会牺牲系统的灵活性、可维护性与容错能力，不能确保“性能最优”。", "d": 0}, {"k": "pd", "s": 93, "t": "判断", "q": "应用建设模式中，存量系统的国产化改造应采用分阶段渐进式策略，先非核心后核心，逐步替换并验证。", "o": ["正确", "错误"], "a": "A", "n": "存量系统国产化改造应采用分阶段渐进式策略，先非核心后核心、逐步替换并验证，与知识点 2.4.2 分批推广、3.2.1 迁移批次规划一致。", "d": 0}, {"k": "pd", "s": 94, "t": "判断", "q": "应用适配改造的首要工作是直接开始代码修改，无需进行技术栈调研。", "o": ["正确", "错误"], "a": "B", "n": "适配改造的首要工作是开展技术栈与依赖项的现状调研评估，形成兼容性评估报告后再实施代码修改（知识点 2.1 现状评估、2.2 适配差距分析先行），题干说法错误。", "d": 0}, {"k": "pd", "s": 95, "t": "判断", "q": "国产化项目数据分类分级的第一步是梳理数据资产目录，明确数据的来源、类型和存储位置。", "o": ["正确", "错误"], "a": "A", "n": "数据分类分级应先梳理数据资产目录，明确数据来源、类型与存储位置，再进行分级和安全管控，说法成立。", "d": 0}, {"k": "pd", "s": 96, "t": "判断", "q": "国产化项目中跨系统数据共享无需考虑安全防护，直接开放数据接口即可。", "o": ["正确", "错误"], "a": "B", "n": "跨系统数据共享必须同步落实分类分级、加密脱敏、权限管控与访问审计（知识点 2.3.3 数据安全专项、数据应用要求），“直接开放接口”错误。", "d": 0}, {"k": "pd", "s": 97, "t": "判断", "q": "国产化技术栈组合选型仅需考虑采购成本，无需评估自主可控程度和兼容适配性。", "o": ["正确", "错误"], "a": "B", "n": "技术栈选型的核心是自主可控程度、兼容适配性（知识点：技术路线选择依据兼容性、性能、生态、安全、成本、政策），采购成本不是唯一考量，题干以偏概全。", "d": 0}, {"k": "pd", "s": 98, "t": "判断", "q": "部署架构与网络拓扑规划应遵循安全分区、等级防护原则，将不同安全等级的系统部署在相应安全区域。", "o": ["正确", "错误"], "a": "A", "n": "部署架构与网络拓扑应遵循安全分区、边界防护与等级保护要求（知识点：网络安全规划设计安全区域划分、等保合规），将不同安全等级系统部署于相应安全区域，说法一致。", "d": 0}, {"k": "pd", "s": 99, "t": "判断", "q": "信创中间件集成中，国产中间件与现有应用系统的兼容性问题仅包括 API 接口差异。", "o": ["正确", "错误"], "a": "B", "n": "兼容性问题除 API 接口差异外，还包括 Oracle/Windows 等境外产品专属语法与组件、x86 专有驱动、中间件专属配置等（知识点 2.2.2 常见兼容性问题），“仅包括”错误。", "d": 0}, {"k": "pd", "s": 100, "t": "判断", "q": "安全架构中，纵深防御体系的最内层防线是数据安全防护，包括数据加密、脱敏和访问审计。", "o": ["正确", "错误"], "a": "A", "n": "纵深防御由外到内分层设防，最内层防线即最终被保护对象——数据的安全防护（加密、脱敏、访问审计等），说法成立。", "d": 0}, {"k": "pd", "s": 101, "t": "判断", "q": "信创可信身份认证与访问控制应基于零信任架构理念，对每次访问进行身份验证和权限校验。", "o": ["正确", "错误"], "a": "A", "n": "零信任的核心理念是“从不信任、始终验证”，对每次访问都进行身份验证与权限校验，说法一致。", "d": 0}, {"k": "pd", "s": 102, "t": "判断", "q": "安全架构设计中，等保合规是安全管控的基线要求，安全管控应在满足等保合规基础上进一步提升防护能力。", "o": ["正确", "错误"], "a": "A", "n": "等保合规是安全管控的基线（知识点 1.3.1：国产化+等保+密评三重合规为底线要求），应在此基础上叠加增强防护能力，说法一致。", "d": 0}, {"k": "pd", "s": 103, "t": "判断", "q": "根据国办发〔2019〕57 号《国家政务信息化项目建设管理办法》，该文件是指导政务云建设的重要政策文件之一。", "o": ["正确", "错误"], "a": "A", "n": "国办发〔2019〕57 号文是我国政务信息化项目管理的核心政策文件，也是指导政务云建设的重要政策依据之一，说法成立。", "d": 0}, {"k": "pd", "s": 104, "t": "判断", "q": "信创云建设应一次性完成 IaaS、PaaS、SaaS 三层全部建设，以确保系统完整性。", "o": ["正确", "错误"], "a": "B", "n": "信创云建设应遵循分阶段实施策略（知识点 2.4：试点验证、分批推广、滚动优化），按需分层演进，一次性完成三层全部建设不符合实施原则。", "d": 0}, {"k": "pd", "s": 105, "t": "判断", "q": "信创云选型时，自主可控程度是核心评估维度之一，要求底层技术栈实现国产化。", "o": ["正确", "错误"], "a": "A", "n": "自主可控程度是信创云选型的核心评估维度之一，要求底层技术栈国产化（知识点 2.3.4：云平台采用国产虚拟化/容器云，全栈国产化），说法一致。", "d": 0}, {"k": "pd", "s": 106, "t": "判断", "q": "涉及国家秘密的政务系统可以选择公有云部署模式以降低成本。", "o": ["正确", "错误"], "a": "B", "n": "涉及国家秘密的政务系统必须部署在符合保密要求的专用涉密环境，严禁使用公有云，题干说法错误。", "d": 0}, {"k": "pd", "s": 107, "t": "判断", "q": "信创云 IaaS 层资源通常采用按资源规格和使用时长的计费方式，包括包年包月和按量计费两种方式。", "o": ["正确", "错误"], "a": "A", "n": "IaaS 层按资源规格和使用时长计费，常见包年包月（适合长期稳定使用）与按量计费（适合弹性伸缩场景）两种方式，与云计费考点一致。", "d": 0}, {"k": "pd", "s": 108, "t": "判断", "q": "信创云安全合规评估仅需依据企业自行制定的安全标准即可，无需参考国家标准。", "o": ["正确", "错误"], "a": "B", "n": "信创云安全合规评估必须以《网络安全法》、等保 2.0、密码法规等国家标准和行业规范为依据，企业自定标准不能替代国家标准（知识点 1.2 国产化核心技术标准规范）。", "d": 0}, {"k": "pd", "s": 109, "t": "判断", "q": "信创云安全合规评估发现的问题，应按照风险等级排序进行整改，高危风险优先处理。", "o": ["正确", "错误"], "a": "A", "n": "评估发现的问题应按风险等级排序整改、高危优先处理，符合风险管理与知识点 5.4“评估报告完成闭环整改”的要求。", "d": 0}, {"k": "pd", "s": 110, "t": "判断", "q": "国产化项目建议书的核心内容包括项目建设的必要性和依据、初步方案和投资估算。", "o": ["正确", "错误"], "a": "A", "n": "项目建议书核心内容包括建设必要性、依据、初步方案与投资估算等（知识点：项目建议书：背景、目标、范围、建设内容、投资估算、工期、效益、风险），题干涵盖其核心。", "d": 0}, {"k": "pd", "s": 111, "t": "判断", "q": "国产化项目建议书中，国产化建设核心内容仅需描述采购的国产产品清单即可，无需说明技术路线选型方案。", "o": ["正确", "错误"], "a": "B", "n": "项目建议书必须明确国产化替代范围与软硬件选型、技术路线方案（知识点 1.1.3：立项阶段明确国产化替代范围、软硬件选型清单、合规建设目标），仅列采购清单不完整。", "d": 0}, {"k": "pd", "s": 112, "t": "判断", "q": "国产化项目初期投资测算框架以建设方案初步设计和国产化软硬件市场价格为基础进行编制。", "o": ["正确", "错误"], "a": "A", "n": "初期投资测算以建设方案初步设计和国产化软硬件市场价格为基础编制，符合课程对投资测算口径的要求。", "d": 0}, {"k": "pd", "s": 113, "t": "判断", "q": "信创专项取费中，国产软硬件溢价测算仅需计算国产产品的绝对采购价格即可。", "o": ["正确", "错误"], "a": "B", "n": "“溢价”测算应对比国产产品与原有（境外）同类产品的价格差及全生命周期成本，仅计算国产产品的绝对采购价格无法体现“溢价”，题干错误。", "d": 0}, {"k": "pd", "s": 114, "t": "判断", "q": "国产化项目可行性研究中，合规性分析的核心是论证项目符合国家国产化政策法规要求。", "o": ["正确", "错误"], "a": "A", "n": "可行性研究中合规性分析的核心正是论证项目符合国家国产化政策法规（国产化+等保+密评等要求，知识点 1.3、1.4.2 合规可行性），说法成立。", "d": 0}, {"k": "pd", "s": 115, "t": "判断", "q": "可研报告中，技术可行性分析无需包含回退策略，仅需论证正向迁移方案即可。", "o": ["正确", "错误"], "a": "B", "n": "技术可行性分析必须包含回退策略与应急回退方案（知识点 3.4 业务连续性与应急回退方案），保证迁移失败时可快速回退，“无需包含”错误。", "d": 0}, {"k": "pd", "s": 116, "t": "判断", "q": "国产化项目建设实施与进度计划应遵循分阶段推进、先易后难的原则，每阶段预留充足测试验证时间。", "o": ["正确", "错误"], "a": "A", "n": "实施与进度计划应分阶段推进、先易后难，每阶段预留充足测试验证时间，与知识点 2.4 分批推广、4.1 里程碑管控、5.3 阶段性检查要求一致。", "d": 0}, {"k": "pd", "s": 117, "t": "判断", "q": "国产化项目效益评价仅需计算经济效益即投资回报率，无需考虑社会效益和战略效益。", "o": ["正确", "错误"], "a": "B", "n": "效益评价应同时考虑经济效益、社会效益和战略效益（自主可控、安全、产业带动等，对应知识点立项申报的效益与风险要素），“无需考虑”错误。", "d": 0}, {"k": "pd", "s": 118, "t": "判断", "q": "国产化项目风险评估应重点识别技术风险、进度风险、成本风险和安全风险等类型。", "o": ["正确", "错误"], "a": "A", "n": "风险评估应重点识别技术适配、进度、成本、安全合规等风险类型（知识点 4.3：技术适配风险、工期与资金风险、安全合规与数据风险等），题干列举一致。", "d": 0}, {"k": "pd", "s": 119, "t": "判断", "q": "国产化项目申报文档的基本质量要求是内容真实准确、格式规范统一、数据翔实可查。", "o": ["正确", "错误"], "a": "A", "n": "内容真实准确、格式规范统一、数据翔实可查正是申报文档的基本质量要求，说法成立。", "d": 0}, {"k": "pd", "s": 120, "t": "判断", "q": "国产化项目申报文档审查中，文档排版不够美观是常见的退件原因之一。", "o": ["正确", "错误"], "a": "B", "n": "申报审查退件主要因内容不真实不完整、数据不可靠、依据不足等实质性问题；排版不够美观属可整改的形式瑕疵，通常不构成退件事由。", "d": 0}, {"k": "card", "s": 1, "t": "背诵卡", "q": "【案例分析一 · 商业银行核心交易系统国产化】问题 1（10 分）：请结合本案例的实际情况，分析数据库选型需重点考量的若干关键方面，逐一说明各关键方面的具体评估要点及在本项目中的特殊性考量，并在此基础上给出推荐选型方案及理由。", "o": [], "a": "", "n": "⚡ 答题框架：选型类题目先列评估维度（政策合规、兼容、性能、生态、运维、自主可控、成本）再逐项回扣案例数字，推荐“主库+备选”双方案加处置路径；POC 题按“场景—指标—标准”表格化作答并勿漏招标评分转化机制（权重≥30%）；风险题必须有类有策，回退机制记住“偏差率＞0.01%/通过率＜99%/低于基线 80% 触发、15 分钟启动、30 分钟验证、2 次演练”。\n\n参考答案要点：\n· 选型关键考量共 7 个方面：政策合规性、技术兼容性、性能可靠性、生态成熟度、运维保障能力、自主可控程度、成本控制，须结合本项目约束逐项分析。\n· 政策合规性：候选数据库须在国家信创目录范围内、通过安全可靠测评，且具备金融行业合规经验（等保四级/密评三级通过案例）；本行为城商行，须满足监管考核 2027 年底前完成替代的硬性要求。\n· 技术兼容性：重点关注对 Oracle 语法、PL/SQL 存储过程、数据类型的兼容度；本案 8 套系统含 2 万行 PL/SQL 深度绑定，兼容度直接影响迁移成本与工期。\n· 性能可靠性：TPS 峰值须≥8000，全年停机≤53 分钟（99.99% 可用性），对性能和可靠性要求极为严苛。\n· 生态成熟度：金融行业落地案例数量与规模是关键，案例丰富的产品可降低实施风险。\n· 运维保障能力：行内 3 名 DBA 仅具 Oracle 经验，国产数据库运维转型的可行性与周期是关键考量。\n· 自主可控程度：评估核心代码自主率、供应链安全风险评估，金融核心系统须确保长期自主可控。\n· 成本控制：总预算 8000 万元、分两期拨付，须在预算约束内完成全栈替代。\n· 推荐选型方案：达梦 DM8 作为主数据库，GaussDB 作为分析型/分布式扩展备选，形成“交易用达梦、分析用 GaussDB”的混合架构。\n· 推荐理由：①达梦 DM8 对 Oracle 语法、PL/SQL 存储过程兼容度最高，本案 8 套 Oracle 存储过程深度绑定的系统迁移改造成本最低；②已有城商行、农商行核心系统落地案例，具备等保四级、密评三级合规通过经验；③行内 Oracle DBA 可在 1-2 个月内完成达梦运维培训；④达梦已通过鲲鹏、飞腾平台完整适配认证；⑤高并发分布式分析场景可采用 GaussDB 分布式扩展。\n· 闭源无源码系统处置方案：短期通过数据库通用代理网关实现 Oracle 到达梦的协议转换，使闭源系统无需修改代码即可连接国产数据库；中期启动业务需求梳理，通过新建信创系统替代闭源系统功能；长期在替代系统稳定运行 6 个月后制定闭源系统退休计划。", "d": 0}, {"k": "card", "s": 2, "t": "背诵卡", "q": "【案例分析一 · 商业银行核心交易系统国产化】问题 2（10 分）：请针对本案例设计 POC（概念验证）验证方案，明确验证场景、核心测试指标、通过标准，并说明验证结论向采购决策转化的机制。", "o": [], "a": "", "n": "⚡ 答题框架：选型类题目先列评估维度（政策合规、兼容、性能、生态、运维、自主可控、成本）再逐项回扣案例数字，推荐“主库+备选”双方案加处置路径；POC 题按“场景—指标—标准”表格化作答并勿漏招标评分转化机制（权重≥30%）；风险题必须有类有策，回退机制记住“偏差率＞0.01%/通过率＜99%/低于基线 80% 触发、15 分钟启动、30 分钟验证、2 次演练”。\n\n参考答案要点：\n· POC 验证方案设计应覆盖 5 个核心场景，每个场景给出“核心测试指标—通过标准”。\n· 功能兼容性验证：指标为 SQL 兼容率、存储过程兼容率；通过标准为 SQL 兼容率≥95%，存储过程改造率≤5%。\n· 性能压力验证：指标为 TPS 峰值、响应时间 P99；通过标准为 TPS≥8000（不低于原系统 120%），P99≤50ms。\n· 高可用验证：指标为故障切换时间、数据零丢失；通过标准为主备切换≤30 秒，数据零丢失。\n· 迁移工具链验证：指标为迁移成功率、迁移耗时；通过标准为全量迁移成功率≥99.99%，迁移时长可接受。\n· 安全合规验证：指标为等保/密评基线符合度；通过标准为网络安全等级保护第四级技术项全部通过，商用密码应用安全性评估三级密码项全部合规。\n· POC 实施流程三阶段：准备阶段（第 1-2 周）搭建鲲鹏服务器+麒麟 OS+达梦 DM8 的 POC 测试环境，准备脱敏生产数据与测试脚本；执行阶段（第 3-6 周）按 5 个模块依次执行验证，每个模块结束后输出阶段性验证报告；评估阶段（第 7-8 周）汇总验证数据，组织行内技术委员会与外部专家联合评审，形成 POC 验证结论报告。\n· 验证结论向采购决策转化：POC 验证结论报告作为技术评分核心依据纳入招标文件技术评分项（权重不低于 30%），POC 验证排名最高的产品在技术评分中获得满分。\n· 未通过处理：任一模块未通过须分析原因并决定是否补充验证或调整选型方案；若候选产品均存在不可接受风险，应启动备选方案并在 2 周内完成补充 POC 验证。", "d": 0}, {"k": "card", "s": 3, "t": "背诵卡", "q": "【案例分析一 · 商业银行核心交易系统国产化】问题 3（10 分）：请识别本项目数据库迁移替代过程中的核心风险（至少 6 类），针对每类风险给出应对措施，并设计风险发生时的回退保障机制。", "o": [], "a": "", "n": "⚡ 答题框架：选型类题目先列评估维度（政策合规、兼容、性能、生态、运维、自主可控、成本）再逐项回扣案例数字，推荐“主库+备选”双方案加处置路径；POC 题按“场景—指标—标准”表格化作答并勿漏招标评分转化机制（权重≥30%）；风险题必须有类有策，回退机制记住“偏差率＞0.01%/通过率＜99%/低于基线 80% 触发、15 分钟启动、30 分钟验证、2 次演练”。\n\n参考答案要点：\n· 审题要求：识别至少 6 类核心风险（如技术兼容、性能、数据一致性、高可用、安全合规、运维人员、供应链等）并逐类给出应对措施；本资料参考答案“核心风险识别与应对措施”部分未展开风险清单，实际照录内容为回退保障机制三要素。\n· 回退触发条件：数据一致性偏差率＞0.01%、核心功能测试通过率＜99%、性能指标低于基线的 80%。\n· 回退流程：触发后 15 分钟内启动，由项目经理和行领导联合审批，运维团队按预演流程执行，完成后 30 分钟内完成验证。\n· 回退演练：正式割接前至少完成 2 次全流程回退演练。", "d": 0}, {"k": "card", "s": 4, "t": "背诵卡", "q": "【案例分析二 · 政务部门信创项目建设】问题 1：结合项目背景，作为项目规划师，在编制项目建议书时，应重点明确哪些核心内容以满足信创政策要求和业务需求？", "o": [], "a": "", "n": "⚡ 答题框架：项目建议书题按“政策依据—现状必要性—实现路径—云平台对接—安全合规—投资估算—交付物清单”逐条罗列；迁移题按“准备—数据迁移—应用适配—上线验证”四步走，务必写出 ETL“增量+全量”、灰度发布与 1 个月过渡期；安全题等保与密评分开各答一条线。\n\n参考答案要点：\n· 项目建设的政策依据及信创适配目标。\n· 现有系统现状分析及替换必要性。\n· 核心业务功能（政务审批、数据共享）的信创实现路径。\n· 与省级政务云平台的对接方案。\n· 安全合规（等级保护、密码测评）的实现思路。\n· 项目投资估算及分阶段实施计划。\n· 成果交付物清单（含设计文档、测试报告）。", "d": 0}, {"k": "card", "s": 5, "t": "背诵卡", "q": "【案例分析二 · 政务部门信创项目建设】问题 2：针对现有系统开发语言多样、历史数据量大的问题，实操中应如何设计迁移适配流程，确保业务不中断、数据不丢失？", "o": [], "a": "", "n": "⚡ 答题框架：项目建议书题按“政策依据—现状必要性—实现路径—云平台对接—安全合规—投资估算—交付物清单”逐条罗列；迁移题按“准备—数据迁移—应用适配—上线验证”四步走，务必写出 ETL“增量+全量”、灰度发布与 1 个月过渡期；安全题等保与密评分开各答一条线。\n\n参考答案要点：\n· 前期准备：梳理各系统开发语言特性，搭建多语言兼容的信创测试环境，制定分模块迁移优先级（核心审批业务优先）。\n· 数据迁移：采用“抽取-转换-加载（ETL）”工具，按“增量+全量”结合的方式迁移数据；迁移前进行数据清洗，迁移中实时校验，迁移后开展全量数据一致性比对。\n· 应用适配：对 Java、.NET 系统采用重构适配，Python 脚本进行信创环境兼容性改造；对第三方非信创支付组件，替换为合规信创支付产品并完成接口联调。\n· 上线验证：先进行灰度发布，在测试环境验证业务流程完整性，再逐步切换生产环境，设置 1 个月过渡期保障业务连续性。", "d": 0}, {"k": "card", "s": 6, "t": "背诵卡", "q": "【案例分析二 · 政务部门信创项目建设】问题 3：该项目需与省级政务云平台对接，在安全体系建设实操中，需完成哪些具体工作以通过等级保护和密码测评？", "o": [], "a": "", "n": "⚡ 答题框架：项目建议书题按“政策依据—现状必要性—实现路径—云平台对接—安全合规—投资估算—交付物清单”逐条罗列；迁移题按“准备—数据迁移—应用适配—上线验证”四步走，务必写出 ETL“增量+全量”、灰度发布与 1 个月过渡期；安全题等保与密评分开各答一条线。\n\n参考答案要点：\n· 等级保护方面：按二级及以上等级保护要求，划分网络安全区域（办公区、业务区、数据区）。\n· 部署信创防火墙、入侵检测系统；配置账号权限分级管理，启用操作日志审计功能。\n· 密码测评方面：选用合规信创密码产品（含加密机、签名服务器），对核心业务数据（如审批记录、用户信息）进行加密存储。\n· 实现登录密码、传输数据的加密验证；完成密码应用合规性测试。\n· 编制密码测评报告及安全管理制度。", "d": 0}, {"k": "card", "s": 7, "t": "背诵卡", "q": "【方案编制 · 电力公司核心信息系统全栈信创升级】第 1 方面：结合能源行业信创监管要求，简述本项目政策合规适配方案。", "o": [], "a": "", "n": "⚡ 答题框架：方案编制题严格按题目给定的 7 个方面逐项成段作答，每方面“先机制、后指标”；把 18 个月里程碑、≤50ms、年停机≤5 分钟（99.999%）、8000 万元、2025 年底 100% 国产化、2027 年央企全面替代等硬指标嵌进对应方案，贯穿“合规+自主可控”主线。\n\n参考答案要点：\n· 政策背景研判：电力行业属于《关键信息基础设施安全保护条例》明确的重点行业；根据国资委相关要求，央企国企须在 2027 年前完成信创全面替代；国家能源集团明确要求 2025 年底网络基础设施信创替代不低于 50%，综合办公类替代 100%，生产运营类替代不低于 30%；部分核心系统要求 2025 年底完成 100% 全栈国产化。\n· 2025 年 12 月，国家能源局正式印发《能源行业数据安全管理办法（试行）》，对电力调度控制系统在等保 2.0 基础上进一步提出行业性通信传输安全要求。\n· 全栈国产化认证：openGauss 数据库须通过国家能源行业信创适配认证；东方通中间件须完成与 openGauss 及国产工控平台的深度适配；国产工控平台须持有国家级工控安全测评认证。\n· 等保与密码合规：电网调度监控系统须满足等保 2.0 三级及以上要求；涉及用户隐私和电网运行敏感数据的全链路加密存储与传输，密码由电力公司自主管理，通过商用密码应用安全性评估。\n· 数据安全合规：严格遵循《能源行业数据安全管理办法（试行）》要求，对电网运行数据、用户用电数据实施分类分级保护，建立全链路审计机制。\n· 监管报送与验收：每季度向省级能源主管部门报送《项目合规进展简报》；重大变更提前报备；投产前须通过能源行业信创适配验证测试。\n· 合规治理机制：设立合规专班（公司法务、安全、技术部门联合组成），对接国家能源局及省级能源主管部门最新政策动态，实行“政策解读—差距分析—合规整改—验收归档”闭环管理。", "d": 0}, {"k": "card", "s": 8, "t": "背诵卡", "q": "【方案编制 · 电力公司核心信息系统全栈信创升级】第 2 方面：针对国产软硬件替代场景（openGauss+东方通+国产工控平台），制定本项目全栈技术适配优化方案。", "o": [], "a": "", "n": "⚡ 答题框架：方案编制题严格按题目给定的 7 个方面逐项成段作答，每方面“先机制、后指标”；把 18 个月里程碑、≤50ms、年停机≤5 分钟（99.999%）、8000 万元、2025 年底 100% 国产化、2027 年央企全面替代等硬指标嵌进对应方案，贯穿“合规+自主可控”主线。\n\n参考答案要点：\n· 数据库层 SQL 兼容性改造：使用 openGauss 配套迁移评估工具全面扫描存量 Oracle PL/SQL 代码；针对不兼容项分类处置——自动转换约 70%、手工重写约 20%、通过定制函数模拟约 10%，行业实践中 SQL 语法兼容率可达 95% 以上。\n· 数据库层性能调优：针对电网调度毫秒级响应优化执行计划、关闭全表扫描；针对百万级智能电表高并发写入充分发挥 openGauss 分布式架构优势；shared_buffers 建议设为物理内存 25%，定期执行 ANALYZE 更新统计信息；同等算力配置下，openGauss 性能较传统部署提升 2-3 倍。\n· 数据库层高可用架构：构建多节点读写分离集群，确保单点故障不影响整体服务，RTO\u003c30 秒、RPO\u003c10 秒。\n· 中间件层适配（东方通）：完成与 openGauss 数据库的 JDBC 驱动深度适配与连接池优化；针对电网调度高频交易场景优化线程池配置与会话管理策略；实现与原有 IBM WebLogic 应用的无缝迁移对接。\n· 工控平台层适配：针对国产工控平台硬件驱动适配覆盖率仅 60% 的问题，组织原厂与集成商联合攻关，逐类完成剩余 40% 硬件的驱动开发与适配验证；优化实时任务调度机制，确保中断响应延迟满足电力调度标准；构建双机热备与故障秒级切换机制。\n· 全链路压测调优：搭建与生产 1:1 配置的压测环境，模拟百万级智能电表并发数据上报场景与电网调度峰值负载；持续调优直至智能电表数据处理延迟稳定在 50ms 以内，电网调度指令响应满足毫秒级标准。", "d": 0}, {"k": "card", "s": 9, "t": "背诵卡", "q": "【方案编制 · 电力公司核心信息系统全栈信创升级】第 3 方面：围绕三大核心模块迁移，说明项目应用改造方法、部署调试及全流程验证内容。", "o": [], "a": "", "n": "⚡ 答题框架：方案编制题严格按题目给定的 7 个方面逐项成段作答，每方面“先机制、后指标”；把 18 个月里程碑、≤50ms、年停机≤5 分钟（99.999%）、8000 万元、2025 年底 100% 国产化、2027 年央企全面替代等硬指标嵌进对应方案，贯穿“合规+自主可控”主线。\n\n参考答案要点：\n· 精准评估：使用数据库迁移评估工具对三大模块（电网调度监控、设备资产管理、用户服务）全面扫描，自动分析 SQL 语法、存储过程及对象依赖关系，生成兼容性评估报告与改造清单。\n· 代码改造：针对不兼容项分类处置——自动转换、手工改写、临时绕过，重点处理 Oracle 特有语法；保留原 Oracle 环境作为回退保障。\n· 数据迁移：创新实施“冷热数据独立迁移+高并发分片迁移”组合方案，全量数据迁移采用并行分片导出导入，增量数据同步采用数据复制服务（DRS）、延迟控制在秒级以内；针对百万级智能电表历史数据采用冷热分离策略——热数据优先迁移、冷数据后台渐进迁移。\n· 数据校验：逐表比对主键、索引、行数，并对关键业务表进行字段级校验。\n· 部署调试：搭建四级环境——开发环境（功能联调）→SIT 环境（集成测试）→UAT 环境（用户验收）→预生产环境（全量演练）；调试策略为 SIT 阶段每日构建，UAT 阶段按场景（调度监控、设备管理、用户服务）逐项通过验证。\n· 全流程验证：功能验证覆盖全部业务场景、确保业务逻辑与原系统一致；性能验证模拟真实生产压力，验证智能电表数据处理延迟≤50ms、电网调度响应毫秒级达标；高可用验证主动模拟服务器宕机、网络分区，验证系统年停机时间≤5 分钟（可用性≥99.999%）、故障秒级告警；安全验证通过等保 2.0 三级测评与商用密码应用安全性评估。\n· 灰度割接与回退机制：分阶段割接——先选取用户服务系统试点切换→设备资产管理平台→电网调度监控系统（核心）；新旧系统双轨并行，新系统先承载非核心流量，待持续稳定运行达标后逐步扩大；回退保障——若故障率连续超阈值或核心指标不达标，5 分钟内将流量全量切回原系统。", "d": 0}, {"k": "card", "s": 10, "t": "背诵卡", "q": "【方案编制 · 电力公司核心信息系统全栈信创升级】第 4 方面：针对项目现行技术、供应链、合规、人员四大风险，制定包含规避、减轻、转移策略的全方位风险应对方案。", "o": [], "a": "", "n": "⚡ 答题框架：方案编制题严格按题目给定的 7 个方面逐项成段作答，每方面“先机制、后指标”；把 18 个月里程碑、≤50ms、年停机≤5 分钟（99.999%）、8000 万元、2025 年底 100% 国产化、2027 年央企全面替代等硬指标嵌进对应方案，贯穿“合规+自主可控”主线。\n\n参考答案要点：\n· 技术风险（openGauss 与原有业务逻辑兼容性不足）：规避——上线前完成全量 SQL 兼容性扫描与语法转换验证；减轻——建立代码改造清单与应急修复机制、建立实时性能看板；转移/应急——与华为签订 SLA，要求原厂专家驻场保障至稳定运行 3 个月。\n· 技术风险（国产工控平台硬件驱动适配率仅 60%）：规避——提前完成全部硬件驱动适配测试与验证；减轻——建立硬件兼容性清单与分级适配方案；转移/应急——要求工控平台原厂提供驻场技术支持与驱动开发保障。\n· 技术风险（百万级电表数据实时处理延迟超标）：规避——提前进行全链路压测与性能调优；减轻——建立性能基线（≤50ms）与分级告警；转移/应急——引入 openGauss 原厂性能优化专家团队。\n· 供应链风险（国产硬件及工控设备供货延期）：规避——提前锁定 6 个月安全库存；减轻——建立备选供应商名录与快速切换预案；转移/应急——合同中约定延期交付罚款条款（每天 0.5% 合同额）。\n· 合规风险（数据安全不满足能源行业监管要求）：规避——邀请测评机构前置参与架构评审；减轻——部署统一密码服务平台、加密操作全流程留痕；转移/应急——委托国家能源行业信创测评机构独立评估。\n· 人员风险（运维人员对国产技术栈操作不熟悉）：规避——关键岗位 AB 角、知识文档 100% 沉淀；减轻——实施“信创专项激励基金”，稳定核心团队；转移/应急——与集成商约定人员锁定，核心成员更换须电力公司书面批准。\n· 应急总体原则：建立“风险识别—预警—处置—复盘”闭环机制，重大风险 30 分钟内上报公司管理层。", "d": 0}, {"k": "card", "s": 11, "t": "背诵卡", "q": "【方案编制 · 电力公司核心信息系统全栈信创升级】第 5 方面：明确本项目建设单位、集成商、测评机构、财政审计四方主体的协同分工机制。", "o": [], "a": "", "n": "⚡ 答题框架：方案编制题严格按题目给定的 7 个方面逐项成段作答，每方面“先机制、后指标”；把 18 个月里程碑、≤50ms、年停机≤5 分钟（99.999%）、8000 万元、2025 年底 100% 国产化、2027 年央企全面替代等硬指标嵌进对应方案，贯穿“合规+自主可控”主线。\n\n参考答案要点：\n· 建设单位（电力公司）：核心职责为需求确认、资源拨付、合规决策、验收决策；关键产出物为《业务需求规格书》《验收确认书》；协同接口为每周项目评审会。\n· 集成商：核心职责为软硬件部署、应用改造、数据迁移实施、性能调优、工控平台适配；关键产出物为《实施方案》《迁移脚本》《调优报告》《驱动适配报告》；协同接口为每日晨会通报进度。\n· 测评机构：核心职责为信创适配验证、等保测评、密码测评、第三方验收测试；关键产出物为《适配测试报告》等测评报告；协同接口为按里程碑节点独立介入。\n· 财政审计方：核心职责为预算执行审计、采购合规审查、资金使用效率评估；关键产出物为《阶段性审计报告》《竣工验收审计报告》；协同接口为按月审查支出明细。\n· 协同流程：集成商向电力公司报送方案→电力公司组织测评机构预审→财政审计旁听关键招标与技术评审→重大变更须四方联席会议签字方生效。\n· 建立“信创-安全联合评估工作组”，由 IT、信息安全、合规、采购及内控审计人员共同参与。", "d": 0}, {"k": "card", "s": 12, "t": "背诵卡", "q": "【方案编制 · 电力公司核心信息系统全栈信创升级】第 6 方面：结合项目推进中可能出现的进度滞后与质量风险，制定项目进度与质量管控优化方案。", "o": [], "a": "", "n": "⚡ 答题框架：方案编制题严格按题目给定的 7 个方面逐项成段作答，每方面“先机制、后指标”；把 18 个月里程碑、≤50ms、年停机≤5 分钟（99.999%）、8000 万元、2025 年底 100% 国产化、2027 年央企全面替代等硬指标嵌进对应方案，贯穿“合规+自主可控”主线。\n\n参考答案要点：\n· 里程碑切分（18 个月）：第 1-3 月（规划期）——需求分析、方案设计、软硬件选型与采购、合规前置审查；第 4-9 月（攻坚期）——集中原厂与集成商核心力量，优先攻克电网调度监控模块适配，完成全部硬件驱动适配开发，关键路径任务并行推进；第 10-12 月（集成期）——完成三大模块 SIT 测试与 UAT 验收。\n· 里程碑切分（续）：第 13-15 月（验证期）——全链路压测、混沌演练、合规测评并行推进；第 16-17 月（割接期）——分三批次灰度切换（用户服务→设备管理→调度监控）；第 18 月（收官期）——全量切换后稳定运营、项目验收及审计。\n· 进度监控：实施“日站会+周报+月评审”机制，实时跟踪任务完成率；偏差超过 5% 即启动纠偏；关键路径任务实行红黄绿灯预警。\n· 测试体系强化：建立“单元测试—集成测试—系统测试—验收测试”四级测试体系；引入自动化测试工具，提升测试覆盖率与效率。\n· 性能基线管理：建立核心业务性能基线（电表数据处理≤50ms、调度响应毫秒级、年停机≤5 分钟），持续监控与预警。\n· 质量门禁：每个阶段设置质量门禁，不达标不得进入下一阶段——门禁指标包括测试通过率≥95%、性能达标率 100%、缺陷修复率≥90%。\n· 变更管控：所有代码与配置变更须经变更控制委员会（CCB）审批，重大变更须安排在业务低峰期并提前公告。", "d": 0}, {"k": "card", "s": 13, "t": "背诵卡", "q": "【方案编制 · 电力公司核心信息系统全栈信创升级】第 7 方面：针对行内人员对国产技术栈能力不足、外部资源不稳定问题，制定人才保障与资源稳定保障方案。", "o": [], "a": "", "n": "⚡ 答题框架：方案编制题严格按题目给定的 7 个方面逐项成段作答，每方面“先机制、后指标”；把 18 个月里程碑、≤50ms、年停机≤5 分钟（99.999%）、8000 万元、2025 年底 100% 国产化、2027 年央企全面替代等硬指标嵌进对应方案，贯穿“合规+自主可控”主线。\n\n参考答案要点：\n· 现状分析：运维团队长期依赖 Oracle、WebLogic 等国外技术栈，对 openGauss、东方通、国产工控平台等国产技术栈能力不足。\n· 分级认证培训：L1（全员）通识培训——了解信创政策与 openGauss 基础 SQL、东方通基础操作（2 周内完成）；L2（骨干）——openGauss HCIP 认证掌握性能调优与运维（30 人取证）、东方通中间件专项认证（15 人）；L3（专家）——选拔 8 人参加 openGauss HCIE 高端培训及国产工控平台深度培训，掌握内核源码级排错能力。\n· 实战练兵：在 SIT 环境中设立“故障演练日”，每月模拟一次数据库宕机、中间件故障或工控平台异常场景，由运维团队独立完成恢复并计时考核。\n· 激励机制：设置“信创技术津贴”，持证人员每月额外补贴；项目验收后评选“信创标兵”，给予晋升优先权。\n· 核心供应商锁定：与华为签署《战略资源保障协议》明确 openGauss 数据库技术支持与备件保障；与东方通签署《中间件专项服务协议》要求原厂专家驻场至系统稳定运行 3 个月；与国产工控平台厂商签署《驱动适配与长期运维保障协议》。\n· 人员锁定：要求集成商项目经理及核心架构师（不少于 6 人）签署《人员锁定函》，未经电力公司书面同意不得更换。\n· 备选资源池：建立“二供”名单，若主供应商业绩考核连续两个月不达标，触发切换程序。\n· 统一运维平台：建设“信创资源统一运维管理平台”，将 openGauss、东方通、国产工控平台统一纳管、监控与调度，降低运维复杂度。", "d": 0}, {"k": "card", "s": 14, "t": "背诵卡", "q": "【结构化论述一 · 信创云平台安全合规评估】1. 信创云平台安全合规评估框架设计（5 分）", "o": [], "a": "", "n": "⚡ 答题框架：背熟“一基三柱”：四部法律打底，等保 2.0（GB/T 22239-2019）、密评（GB/T 39786-2021）、数据安全与个保合规三柱，并点出“同步原则”；八个评估维度逐条列检查项，方法四件套加“准备—差距—整改—测评—确认”流程；改进机制记“年复测、季演练、半年渗透、7×24 监控、闭环归档”。\n\n参考答案要点：\n· 总体框架：构建“法律基座与合规支柱”评估框架，即“一基三柱”。\n· 一基（基础底座）：以国家法律法规为基——依据《中华人民共和国网络安全法》《中华人民共和国数据安全法》《中华人民共和国密码法》《中华人民共和国个人信息保护法》四部基础性法律构建合规底线。\n· 三柱（三大合规支柱）第一柱：网络安全等级保护合规（网络安全等级保护 2.0，依据 GB/T 22239-2019《信息安全技术 网络安全等级保护基本要求》）——确保云平台满足相应等级安全要求。\n· 三柱第二柱：商用密码应用安全性评估（密评，依据 GB/T 39786-2021《信息安全技术 信息系统密码应用基本要求》）——确保密码应用合规有效。\n· 三柱第三柱：数据安全与个人信息保护合规（依据《中华人民共和国数据安全法》《中华人民共和国个人信息保护法》）——确保数据分类分级保护到位。\n· 评估框架须实现“同步原则”：安全方案与云平台架构同步设计，等保与密评同步开展测评，发现差距同步整改落实。", "d": 0}, {"k": "card", "s": 15, "t": "背诵卡", "q": "【结构化论述一 · 信创云平台安全合规评估】2. 核心评估维度及其关键检查项（8 分）", "o": [], "a": "", "n": "⚡ 答题框架：背熟“一基三柱”：四部法律打底，等保 2.0（GB/T 22239-2019）、密评（GB/T 39786-2021）、数据安全与个保合规三柱，并点出“同步原则”；八个评估维度逐条列检查项，方法四件套加“准备—差距—整改—测评—确认”流程；改进机制记“年复测、季演练、半年渗透、7×24 监控、闭环归档”。\n\n参考答案要点：\n· 物理安全：机房选址与访问控制、温湿度/电力/消防保障、设备防盗防破坏措施、介质管理。\n· 网络安全：网络架构安全（分区/隔离/VLAN）、边界防护（NGFW/IDS/IPS）、通信加密（国密 SSL VPN/IPSEC）、DDoS 防护。\n· 主机安全：操作系统安全加固（基线配置/最小安装/补丁管理）、恶意代码防护、主机入侵检测（HIDS）、可信验证。\n· 应用安全：身份鉴别（多因素认证）、访问控制（RBAC 细粒度授权）、安全审计（全操作日志）、Web 安全（WAF/防 SQL 注入/XSS）。\n· 数据安全：数据分类分级保护、数据加密传输（TLS 1.2+/国密 TLCP）、数据加密存储（SM4）、数据脱敏、数据备份恢复、数据销毁。\n· 密码应用：身份认证密码合规（SM2 数字签名/证书）、数据传输加密（SM2/SM4）、数据存储加密（SM4）、完整性校验（SM3）、密钥管理（KMS）。\n· 安全管理：安全管理制度体系、安全管理机构与岗位、安全人员管理、安全建设管理、安全运维管理。\n· 供应链安全：信创产品安全可靠测评证书核验、供应链风险评估、供应商安全承诺、开源组件漏洞管理。", "d": 0}, {"k": "card", "s": 16, "t": "背诵卡", "q": "【结构化论述一 · 信创云平台安全合规评估】3. 评估方法与实施流程（4 分）", "o": [], "a": "", "n": "⚡ 答题框架：背熟“一基三柱”：四部法律打底，等保 2.0（GB/T 22239-2019）、密评（GB/T 39786-2021）、数据安全与个保合规三柱，并点出“同步原则”；八个评估维度逐条列检查项，方法四件套加“准备—差距—整改—测评—确认”流程；改进机制记“年复测、季演练、半年渗透、7×24 监控、闭环归档”。\n\n参考答案要点：\n· 评估方法四种：文档审查——审查云平台安全设计方案、安全配置基线、管理制度文档；技术测试——漏洞扫描、渗透测试、配置核查、密码应用验证；现场核查——实地核查机房物理安全、设备部署、网络隔离情况；人员访谈——访谈云平台运维人员、安全管理人员，验证制度执行情况。\n· 实施流程主线：评估准备→差距分析→整改落实→正式测评→结论确认。\n· 评估准备：确定评估范围、组建评估组、制定评估方案。\n· 差距分析：对照合规标准识别差距，出具差距分析报告。\n· 整改落实：云服务商根据差距报告限期整改，建设方跟踪验证。\n· 正式测评：第三方测评机构执行网络安全等级保护测评与商用密码应用安全性评估，出具测评报告。\n· 结论确认：评估结论作为云平台上线运行的前置条件，不通过不得正式投入使用。", "d": 0}, {"k": "card", "s": 17, "t": "背诵卡", "q": "【结构化论述一 · 信创云平台安全合规评估】4. 持续改进与动态监控机制（3 分）", "o": [], "a": "", "n": "⚡ 答题框架：背熟“一基三柱”：四部法律打底，等保 2.0（GB/T 22239-2019）、密评（GB/T 39786-2021）、数据安全与个保合规三柱，并点出“同步原则”；八个评估维度逐条列检查项，方法四件套加“准备—差距—整改—测评—确认”流程；改进机制记“年复测、季演练、半年渗透、7×24 监控、闭环归档”。\n\n参考答案要点：\n· 定期复测：网络安全等级保护第三级每年复测一次，密评每年评估一次，确保安全态势持续合规。\n· 持续监控：部署安全运营中心（SOC），7×24 小时监控安全事件，实时告警异常行为。\n· 渗透测试：每半年组织一次第三方渗透测试，发现并修复安全漏洞。\n· 应急演练：每季度组织安全应急演练，验证应急预案有效性并持续优化。\n· 合规跟踪：持续跟踪法律法规与标准更新（如 GB/T 22239 修订），及时调整安全策略。\n· 改进闭环：建立“发现→整改→验证→归档”的安全改进闭环机制，确保每个安全问题有始有终。", "d": 0}, {"k": "card", "s": 18, "t": "背诵卡", "q": "【结构化论述二 · 信创项目全流程规范化管控】1. 简述信创项目全生命周期三阶段（规划设计、采购实施、验收运维）的核心管控要点（5 分）", "o": [], "a": "", "n": "⚡ 答题框架：严格按“三阶段管控（5 分）—设计转化与变更（4 分）—招投标要点与风险防控（3 分）—实施验收与需求变更/版本基线（8 分）”结构展开，每段先亮观点再落实操动作，总篇幅不少于 800 字。\n\n参考答案要点：\n· 信创项目规范化管控需依托全流程统筹体系，覆盖设计、招投标、实施验收、变更管理全环节，贴合国产化、适配性、安全性核心要求，保障项目合规落地、稳定运维。\n· 项目全生命周期三大阶段统筹管控是基础。\n· 规划设计阶段：锚定信创国产化标准，结合业务需求确定技术架构、软硬件适配方案。\n· 采购实施阶段：聚焦合规性与适配性，严格把控采购物资的信创资质与兼容性。\n· 验收运维阶段：以国产化适配达标、系统安全稳定运行为核心，完成全维度验收并建立常态化运维机制。", "d": 0}, {"k": "card", "s": 19, "t": "背诵卡", "q": "【结构化论述二 · 信创项目全流程规范化管控】2. 说明信创项目从可研到详细设计的转化逻辑及设计变更管控措施（4 分）", "o": [], "a": "", "n": "⚡ 答题框架：严格按“三阶段管控（5 分）—设计转化与变更（4 分）—招投标要点与风险防控（3 分）—实施验收与需求变更/版本基线（8 分）”结构展开，每段先亮观点再落实操动作，总篇幅不少于 800 字。\n\n参考答案要点：\n· 深化设计是信创项目落地的关键。\n· 可研向初步设计转化：承接可研核心目标，明确信创软硬件选型、系统架构、安全合规等核心指标，形成初步设计方案。\n· 初设向详细设计转化：细化技术参数、适配流程、部署方案，匹配实际业务场景。\n· 设计变更管控：建立设计变更评审机制，所有变更必须开展技术适配、安全、成本影响评估，经层级审批后方可执行，杜绝随意变更导致的信创适配偏差。", "d": 0}, {"k": "card", "s": 20, "t": "背诵卡", "q": "【结构化论述二 · 信创项目全流程规范化管控】3. 阐述信创项目招投标实操核心要点及风险防控方式（3 分）", "o": [], "a": "", "n": "⚡ 答题框架：严格按“三阶段管控（5 分）—设计转化与变更（4 分）—招投标要点与风险防控（3 分）—实施验收与需求变更/版本基线（8 分）”结构展开，每段先亮观点再落实操动作，总篇幅不少于 800 字。\n\n参考答案要点：\n· 招投标实操管控保障项目合规与国产化落地。\n· 技术规格书：明确信创适配、国产化替代、安全合规等硬性指标，细化软硬件参数、性能标准。\n· 评标方法：侧重国产化适配能力、技术落地实力、运维服务水平，增设国产化权重条款。\n· 风险防控：重点防控资质造假、参数不符、招标流程不规范等风险，通过前置资质审核、参数校核、全流程留痕实现风险闭环。", "d": 0}, {"k": "card", "s": 21, "t": "背诵卡", "q": "【结构化论述二 · 信创项目全流程规范化管控】4. 说明信创项目实施验收管控及需求变更、版本基线管理的实操方法（8 分）", "o": [], "a": "", "n": "⚡ 答题框架：严格按“三阶段管控（5 分）—设计转化与变更（4 分）—招投标要点与风险防控（3 分）—实施验收与需求变更/版本基线（8 分）”结构展开，每段先亮观点再落实操动作，总篇幅不少于 800 字。\n\n参考答案要点：\n· 实施验收与需求变更管控是项目提质增效的核心。\n· 实施验收管控：建立进度、质量双向管控机制，依据国产化落地目标制定阶段性施工计划；紧盯软硬件适配、系统集成、安全加固等关键节点，定期开展质量巡检、进度复盘，及时整改兼容适配、性能不达标等问题。\n· 常态化风险识别：针对信创替代适配不足、技术迭代不匹配、工期滞后等核心风险，提前制定应对预案。\n· 验收组织：分阶段开展初验、试运行、终验，严格检查国产化率、系统稳定性、安全合规性。\n· 资料归档：同步整理归档实施方案、测试报告、适配证明、运维手册等全套项目资料，确保验收流程合规、资料完整可追溯。\n· 需求变更第一步：开展全面变更影响评估，重点核查变更对国产化适配、系统架构、成本及网络安全的影响，杜绝盲目变更引发适配失效。\n· 分级审批流程：根据变更影响范围、风险等级划分审批权限——小额常规变更由项目组审批，重大架构、功能变更需组织专家评审、甲方及监理联合审批。\n· 基线与版本管理：锁定项目需求、设计、系统版本基线，所有变更完成后及时更新版本迭代记录、统一归档版本资料，严格管控版本一致性，杜绝版本混乱、基线失控问题，实现变更全程可追溯、可管控，保障信创项目落地质量与长期运行稳定性。", "d": 0}];
+const BANKS = [
+  {k:'all', n:'全部题目'},
+  {k:'dx', n:'科目一 · 单选'},
+  {k:'dxm', n:'科目一 · 多选'},
+  {k:'pd', n:'科目一 · 判断'},
+  {k:'card', n:'科目二 · 背诵卡'},
+];
+const TYPE_NAME = {'单选':'单选题','多选':'多选题','判断':'判断题','背诵卡':'背诵卡'};
+const LS = 'ghq_v1';
+const LT = 'ABCDEF';
+/* 统一线条图标集（Feather 风格内联 SVG） */
+const PB = {
+  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 11.5l2 2 4-4.5"/>',
+  star:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01z"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  bars:'<path d="M6 20v-5"/><path d="M12 20V9"/><path d="M18 20V4"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  zap:'<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>',
+  ccok:'<circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5.5"/>',
+  ccbad:'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>',
+  play:'<path d="M6 4l14 8-14 8z"/>',
+  home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+  trash:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/>',
+  spark:'<path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/><path d="M19 15l.9 2.6L22 18.5l-2.1 1L19 22l-.9-2.5-2.1-1 2.1-.9z"/>',
+  edit:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/>'
+};
+const IC = (n, s=16) => `<svg class="ic" viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${PB[n]}</svg>`;
+const ICF = (n, s=20) => `<svg class="ic" viewBox="0 0 24 24" width="${s}" height="${s}" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${PB[n]}</svg>`;
+let S = {answered:{}, starred:{}, autoNext:true, reveal:false, dark:false, size:20, log:[], pos:{}};
+try{ const saved = JSON.parse(localStorage.getItem(LS)||'{}'); S = Object.assign(S, saved); }catch(e){}
+const save = () => localStorage.setItem(LS, JSON.stringify(S));
+const qid = q => q.k + ':' + q.s;
+
+const GZ = { log: [] }; // 本组答题记录（会话级，出成绩单用）
+const st = { bank:'all', type:'all', mode:'random', search:'', list:[], idx:0, sel:new Set(), graded:null, revealed:false };
+
+const QMAP = {}; RAW.forEach(q => QMAP[qid(q)] = q);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const shuffled = a => { const x=a.slice(); for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; };
+const wrongIds = () => Object.keys(S.answered).filter(id => S.answered[id] === 0);
+const starIds  = () => Object.keys(S.starred).filter(id => S.starred[id]);
+const dstr = dt => { const p=n=>String(n).padStart(2,'0'); return dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate()); };
+const today = () => dstr(new Date());
+
+function buildBankSel(){
+  const counts = {};
+  RAW.forEach(q => counts[q.k] = (counts[q.k]||0)+1);
+  BANKS.forEach(b => b.total = b.k==='all' ? RAW.length : (counts[b.k]||0));
+  const sel = document.getElementById('bankSel');
+  sel.innerHTML = BANKS.map(b=>`<option value="${b.k}">${b.n}（${b.total}）</option>`).join('');
+  sel.value = st.bank;
+}
+function setMode(m){
+  st.mode = m;
+  document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+  rebuild();
+}
+function baseList(){
+  let xs = RAW.filter(q => (st.bank==='all'||q.k===st.bank) && (st.type==='all'||q.t===st.type));
+  const kw = st.search.trim().toLowerCase();
+  if(kw) xs = xs.filter(q => (q.q+' '+q.o.join(' ')).toLowerCase().includes(kw));
+  return xs;
+}
+function scopeKey(){ return st.bank+'|'+st.type+'|'+st.search; }
+function rebuild(keepIdx){
+  let xs = baseList();
+  if(st.mode==='wrong') xs = xs.filter(q => S.answered[qid(q)] === 0);
+  else if(st.mode==='star') xs = xs.filter(q => S.starred[qid(q)]);
+  else if(st.mode==='random'){
+    // 洗牌 + 未刷过的排前面：不会因为顺序固定而只刷到开头几题
+    const un = xs.filter(q => !(qid(q) in S.answered));
+    const dn = xs.filter(q => (qid(q) in S.answered));
+    xs = shuffled(un).concat(shuffled(dn));
+  }
+  const eff = GZ.quick || (S.size||0);
+  if(eff>0 && st.mode!=='seq') xs = xs.slice(0, eff);
+  st.list = xs;
+  GZ.log = []; // 每次重建即开启新的一组
+  st.revealed = false;
+  if(keepIdx) st.idx = Math.min(st.idx, Math.max(xs.length-1,0));
+  else if(st.mode==='seq') st.idx = Math.min((S.pos && S.pos[scopeKey()+'|seq'])||0, Math.max(xs.length-1,0));
+  else st.idx = 0;
+  save();
+  render();
+}
+function cur(){ return st.list[st.idx]; }
+const bankName = k => BANKS.find(b=>b.k===k).n;
+function scopedStats(){
+  const ids = st.list.map(qid);
+  const done = ids.filter(id => id in S.answered);
+  const ok = done.filter(id => S.answered[id] === 1).length;
+  return {total:st.list.length, done:done.length, ok, rate: done.length?Math.round(100*ok/done.length):null};
+}
+const MODE_TAG = {seq:'顺序模式', random:'随机模式', wrong:'错题重刷', star:'收藏重刷'};
+function renderStats(){
+  const s = scopedStats();
+  const eff = st.mode==='seq' ? 0 : (GZ.quick || (S.size||0));
+  let bits = [`<span class="statchip hero"><b>${bankName(st.bank)}</b></span>`,
+              st.type!=='all'?`<span class="statchip">${TYPE_NAME[st.type]}</span>`:'',
+              `<span class="statchip">${MODE_TAG[st.mode]} · 已刷 <b>${s.done}</b>/${s.total}${eff?'（每组 '+eff+' 题）':''} · 答对 <b>${s.ok}</b>${s.rate!==null?' · 正确率 <b>'+s.rate+'%</b>':''}</span>`];
+  if(st.search.trim()) bits.push(`<button class="statchip link" id="clearKw">「${esc(st.search.trim())}」✕</button>`);
+  bits.push(`<span class="statchip link" id="toGrid">${IC('grid',13)} 答题卡</span>`);
+  bits.push(`<span class="statchip link" id="toStats">${IC('bars',13)} 全库统计 ›</span>`);
+  bits.push(`<span class="statchip cta link" id="quick10">${GZ.quick===10?IC('zap',13)+' 本组 10 题训练中':IC('zap',13)+' 快速来一组'}</span>`);
+  document.getElementById('stats').innerHTML = bits.filter(Boolean).join(' ');
+  // 组内进度条
+  const pct = s.total ? Math.round(100*s.done/s.total) : 0;
+  document.getElementById('gBar').style.width = pct+'%';
+  document.getElementById('gpText').textContent = s.done+'/'+s.total;
+  document.getElementById('quick10').onclick = () => {
+    GZ.quick = 10; st.mode='random'; st.idx=0; st.sel=new Set(); st.graded=null; st.revealed=false;
+    document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m==='random'));
+    rebuild(); window.scrollTo({top:0});
+  };
+  document.getElementById('toGrid').onclick = () => { renderGrid(); openSheet('sheetGrid'); };
+  document.getElementById('toStats').onclick = () => { renderStatsSheet(); openSheet('sheetStats'); };
+}
+function render(){
+  renderStats();
+  refreshCounts();
+  const card = document.getElementById('card');
+  const q = cur();
+  if(!q){
+    const msg = st.mode==='wrong' ? ['spark','错题本是空的，太棒了！']
+              : st.mode==='star'  ? ['star','还没有收藏的题目，刷题时点题目旁的 ☆ 收藏。']
+              : ['search','没有匹配的题目。'];
+    card.innerHTML = `<div class="empty-big"><span class="em">${IC(msg[0],44)}</span>${msg[1]}</div>`;
+    document.getElementById('prevBtn').disabled = true;
+    document.getElementById('nextBtn').disabled = true;
+    return;
+  }
+  const aid = qid(q), shown = S.reveal;
+  const picked = [...st.sel];
+  const graded = st.graded;
+  const isLast = st.idx >= st.list.length-1;
+  if(q.t==='背诵卡'){
+    const seen = S.reveal || st.revealed;
+    let h = `<div class="meta"><span class="chin bank">${bankName(q.k)}</span>
+      <span class="chin gray">第 ${q.s} 卡</span><span class="chin gray">背诵卡</span>
+      ${q.d===1?'<span class="chin warn">存疑 · 看解析</span>':''}
+      <button class="star ${S.starred[aid]?'on':''}" id="starNow">${IC('star',20)}</button></div>
+      <div class="stem">${esc(q.q)}</div>`;
+    if(seen){
+      h += `<div class="why">${IC('edit',13)} ${esc(q.n)||'（暂无参考答案）'}</div>
+        <button class="btn primary bigcta" id="ctaNext">下一卡 →</button>`;
+    } else {
+      h += `<div class="multi-note">先自己想框架不看提示，再对照答案，记得更牢。</div>
+        <button class="btn primary bigcta" id="showAns">${IC('play',14)} 显示参考答案</button>`;
+    }
+    card.innerHTML = h;
+    card.classList.toggle('locked', seen);
+    const noListC = st.list.length===0;
+    document.getElementById('prevBtn').disabled = noListC || st.idx<=0;
+    document.getElementById('nextBtn').disabled = noListC || isLast;
+    document.getElementById('jumpNo').value = q.s;
+    document.getElementById('starNow').onclick = toggleStar;
+    const ctaC = document.getElementById('ctaNext');
+    if(ctaC) ctaC.onclick = () => step(1);
+    const saC = document.getElementById('showAns');
+    if(saC) saC.onclick = () => {
+      if(!S.answered[aid]){
+        S.answered[aid] = 1;
+        S.log.push({d: today(), t: '背诵卡', ok: 1});
+        if(S.log.length>20000) S.log.splice(0, S.log.length-20000);
+        save();
+      }
+      st.revealed = true; render();
+    };
+    return;
+  }
+  let h = `<div class="meta"><span class="chin bank">${bankName(q.k)}</span>
+    <span class="chin gray">第 ${q.s} 题</span><span class="chin gray">${TYPE_NAME[q.t]}</span>
+    ${q.d===2?'<span class="chin fixed">已修正 · 原答案有误</span>':q.d===1?'<span class="chin warn">存疑题 · 看解析</span>':''}
+    <button class="star ${S.starred[aid]?'on':''}" id="starNow">${IC('star',20)}</button></div>
+    <div class="stem">${esc(q.q)}</div><div class="opts">`;
+  const ansSet = new Set(q.a.split(''));
+  q.o.forEach((t,i)=>{
+    const L = LT[i];
+    let cls = 'opt';
+    if(!graded && !shown && picked.includes(L)) cls += ' sel';
+    if(graded || shown){
+      if(ansSet.has(L)) cls += ' ok';
+      else if(picked.includes(L)) cls += ' bad';
+    }
+    h += `<div class="${cls}" data-l="${L}"><span class="letter">${L}.</span><span>${esc(t)}</span></div>`;
+  });
+  h += '</div>';
+  if(q.t==='多选' && !graded && !shown && picked.length)
+    h += `<div class="multi-note">已选 ${picked.join('、')}（<button class="btn primary" id="submitBtn">提交答案</button>）</div>`;
+  if(graded){
+    const right = graded === 'ok';
+    h += `<div class="verdict ${right?'ok':'bad'}">${right?IC('ccok',15)+' 回答正确':IC('ccbad',15)+' 回答错误'}　正确答案：${q.a.split('').join('、')}</div>`;
+    h += `<div class="why">${IC('edit',13)} ${esc(q.n)||'（本题暂无解析）'}</div>`;
+    const allDone = st.list.length && st.list.every(x => qid(x) in S.answered);
+    const label = (isLast || allDone) ? IC('flag',14)+' 交卷 · 看本组成绩' : '下一题 →';
+    h += `<button class="btn primary bigcta" id="ctaNext">${label}</button>`;
+  } else if(shown){
+    h += `<div class="why">${IC('book',14)} 答案：${q.a.split('').join('、')}　${IC('edit',13)} ${esc(q.n)||'（本题暂无解析）'}</div>`;
+  } else if(q.t==='多选'){
+    h += `<div class="multi-note">多选题：点选后提交</div>`;
+  }
+  card.innerHTML = h;
+  card.classList.toggle('locked', !!graded || shown);
+  const noList = st.list.length===0;
+  document.getElementById('prevBtn').disabled = noList || st.idx<=0;
+  document.getElementById('nextBtn').disabled = noList || isLast;
+  document.getElementById('jumpNo').value = q.s;
+  document.getElementById('starNow').onclick = toggleStar;
+  const cta = document.getElementById('ctaNext');
+  if(cta) cta.onclick = () => { if(cta.textContent.includes('交卷')) finishGroup(); else step(1); };
+  const sb = document.getElementById('submitBtn');
+  if(sb) sb.onclick = gradeMulti;
+  if(graded==='ok' && !isLast && document.getElementById('autoNext').checked){
+    setTimeout(()=>{ if(st.graded==='ok') step(1); }, 700);
+  }
+  if(!graded && !shown){
+    card.querySelectorAll('.opt').forEach(el => el.onclick = ()=>{
+      const L = el.dataset.l;
+      if(q.t==='多选'){ toggleSel(L); render(); } else { gradeSingle(L); }
+    });
+  } else {
+    card.querySelectorAll('.opt').forEach(el => el.onclick = null);
+  }
+}
+function toggleSel(L){ if(st.sel.has(L)) st.sel.delete(L); else st.sel.add(L); }
+function gradeSingle(L){ const q = cur(); if(!q) return; st.sel = new Set([L]); finishGrade(); }
+function gradeMulti(){ const q = cur(); if(!q || !st.sel.size) return; finishGrade(); }
+function finishGrade(){
+  const q = cur(); if(!q) return;
+  const picked = [...st.sel].sort().join('');
+  const right = picked === q.a.split('').sort().join('');
+  st.graded = right ? 'ok' : 'bad';
+  S.answered[qid(q)] = right ? 1 : 0;
+  const rec = {d: today(), t: q.t, ok: right?1:0};
+  S.log.push(rec); if(S.log.length>20000) S.log.splice(0, S.log.length-20000);
+  GZ.log.push({id: qid(q), ok: rec.ok});
+  if(!right){ try{ navigator.vibrate && navigator.vibrate(70); }catch(e){} }
+  save(); render();
+  // 本组全部答完 → 自动弹出成绩单
+  if(st.list.length && st.list.every(x => qid(x) in S.answered) && st.mode!=='seq' && (GZ.quick || (S.size||0)>0)){
+    setTimeout(()=>{ if(st.list.length && st.list.every(x => qid(x) in S.answered)) finishGroup(); }, 900);
+  }
+}
+function step(d){
+  const ni = st.idx + d;
+  if(ni<0 || ni>=st.list.length) return;
+  st.idx = ni; st.sel = new Set(); st.graded = null; st.revealed = false;
+  S.pos = S.pos || {}; S.pos[scopeKey()+'|'+st.mode] = st.idx; save();
+  window.scrollTo({top:0});
+  render();
+}
+function jumpTo(no){
+  const i = st.list.findIndex(q=>q.s===no);
+  if(i>=0) jumpIdx(i);
+}
+function jumpIdx(i){
+  if(i<0 || i>=st.list.length) return;
+  st.idx = i; st.sel = new Set(); st.graded = null; st.revealed = false;
+  S.pos = S.pos || {}; S.pos[scopeKey()+'|'+st.mode] = st.idx; save();
+  window.scrollTo({top:0}); render();
+}
+function toggleStar(){
+  const q = cur(); if(!q) return;
+  const id = qid(q);
+  if(S.starred[id]) delete S.starred[id]; else S.starred[id]=1;
+  save(); render();
+}
+function refreshCounts(){
+  const nw = wrongIds().length, ns = starIds().length;
+  document.getElementById('nWrong').textContent = nw; document.getElementById('nWrong').classList.toggle('zero', !nw);
+  document.getElementById('hWrongN').textContent = nw;
+  document.getElementById('nStar').textContent = ns; document.getElementById('nStar').classList.toggle('zero', !ns);
+  document.getElementById('hStarN').textContent = ns;
+  document.getElementById('wHeadN').textContent = nw;
+  document.getElementById('sHeadN').textContent = ns;
+}
+/* ===== 抽屉 ===== */
+const openSheet  = id => document.getElementById(id).classList.add('open');
+const closeSheet = id => document.getElementById(id).classList.remove('open');
+function renderBook(kind){
+  const ids = kind==='wrong' ? wrongIds() : starIds();
+  const el = document.getElementById(kind==='wrong' ? 'wList' : 'sList');
+  const emptyTxt = kind==='wrong' ? '错题本是空的，太棒了！' : '还没有收藏的题目，刷题时点题目旁的 ☆ 收藏。';
+  if(!ids.length){ el.innerHTML = `<div class="empty-big"><span class="em">${IC(kind==='wrong'?'spark':'star',44)}</span>${emptyTxt}</div>`; return; }
+  const byBank = {};
+  ids.forEach(id => { const q = QMAP[id]; if(q){ (byBank[q.k] = byBank[q.k] || []).push(q); } });
+  el.innerHTML = BANKS.filter(b=>byBank[b.k]).map(b =>
+    `<div class="pgroup">${b.n}（${byBank[b.k].length}）</div>` +
+    byBank[b.k].map(q => `
+      <div class="item" data-jump="${qid(q)}" data-kind="${kind}">
+        <div class="info"><div class="meta">${q.t==='背诵卡'?'第 '+q.s+' 卡':'第 '+q.s+' 题'} · ${TYPE_NAME[q.t]}${q.t==='背诵卡'?'':(' · 答案 '+q.a)}${q.d===2?' · 已修正':q.d===1?' · 存疑':''}</div>
+          <div class="t">${esc(q.q)}</div></div>
+        <span class="go">›</span>
+        <button class="iwbtn" data-rm="${qid(q)}" data-kind="${kind}">${kind==='wrong'?'移出':'✕'}</button>
+      </div>`).join('')
+  ).join('');
+}
+function stripJump(id, mode){
+  const q = QMAP[id]; if(!q) return;
+  GZ.quick = null;
+  st.bank = q.k; st.type = q.t; st.mode = mode; st.search = '';
+  document.getElementById('bankSel').value = st.bank;
+  document.getElementById('typeSel').value = st.type;
+  document.getElementById('search').value = '';
+  document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === mode));
+  st.sel = new Set(); st.graded = null; st.revealed = false; st.idx = 0;
+  rebuild(false);
+  const i = st.list.findIndex(x => qid(x) === id);
+  if(i>=0){ st.idx = i; S.pos = S.pos || {}; S.pos[scopeKey()+'|'+st.mode] = st.idx; save(); }
+  window.scrollTo({top:0}); render();
+}
+function renderStatsSheet(){
+  // 分库卡片
+  const per = BANKS.filter(b=>b.k!=='all').map(b => {
+    const qs = RAW.filter(q=>q.k===b.k);
+    const done = qs.filter(q => qid(q) in S.answered);
+    const ok = done.filter(q => S.answered[qid(q)]===1).length;
+    return {n:b.n, total:qs.length, done:done.length, ok, acc: done.length?Math.round(100*ok/done.length):null};
+  });
+  const ALL = per.reduce((a,x)=>({done:a.done+x.done, ok:a.ok+x.ok}), {done:0,ok:0});
+  const all = {n:'全部题库', total:RAW.length, done:ALL.done, ok:ALL.ok, acc: ALL.done?Math.round(100*ALL.ok/ALL.done):null};
+  const card = x => `
+    <div class="statcard">
+      <div class="nm">${x.n}<span>${x.done}/${x.total} 题 · 正确率 ${x.acc===null?'—':x.acc+'%'}</span></div>
+      <div class="srow"><span class="lbl">已刷</span><div class="sbar done"><i style="width:${x.total?Math.round(100*x.done/x.total):0}%"></i></div></div>
+      <div class="srow"><span class="lbl">正确</span><div class="sbar acc"><i style="width:${x.acc===null?0:x.acc}%"></i></div></div>
+    </div>`;
+  document.getElementById('statsBody').innerHTML = card(all) + per.map(card).join('');
+  // 近 7 天练习量
+  const days = []; for(let i=6;i>=0;i--) days.push(dstr(new Date(Date.now()-i*864e5)));
+  const cnt = days.map(d => S.log.filter(r=>r.d===d).length);
+  document.getElementById('c7Total').textContent = '近7天共 ' + cnt.reduce((a,b)=>a+b,0) + ' 题';
+  const max = Math.max(...cnt, 1);
+  document.getElementById('chart7').innerHTML = days.map((d,i) => {
+    const lbl = i===6?'今天' : i===5?'昨天' : d.slice(5).replace('-','/');
+    return `<div class="bcol"><span class="bv">${cnt[i]||''}</span><div class="bb" style="height:${Math.max( cnt[i]/max*100, cnt[i]?4:2 )}%;${cnt[i]?'':'opacity:.3'}"></div><span class="bl">${lbl}</span></div>`;
+  }).join('');
+  // 分题型正确率
+  document.getElementById('typeAcc').innerHTML = ['单选','多选','判断'].map(t => {
+    const recs = S.log.filter(r=>r.t===t);
+    const ok = recs.filter(r=>r.ok===1).length;
+    const acc = recs.length? Math.round(100*ok/recs.length)+ '%' : '—';
+    return `<div class="srow"><span class="lbl">${t}</span><div class="sbar acc"><i style="width:${recs.length?Math.round(100*ok/recs.length):0}%"></i></div><span class="acc-t">${ok}/${recs.length} · ${acc}</span></div>`;
+  }).join('');
+}
+function renderGrid(){
+  const el = document.getElementById('gridWrap');
+  document.getElementById('gCnt').textContent = st.list.length;
+  if(!st.list.length){ el.innerHTML = '<div class="empty-big">当前范围没有题目</div>'; return; }
+  el.innerHTML = '<div class="gridcells">' + st.list.map((q,i)=>{
+    const a = S.answered[qid(q)];
+    let c = 'gcell';
+    if(a===1) c+=' ok'; else if(a===0) c+=' bad';
+    if(i===st.idx) c+=' cur';
+    const sm = S.starred[qid(q)] ? '<span class="stmark">★</span>' : '';
+    return `<button class="${c}" data-i="${i}">${q.s}${sm}</button>`;
+  }).join('') + '</div>' +
+  `<div class="glegend"><span><i style="background:var(--green)"></i>答对</span><span><i style="background:var(--red)"></i>答错</span><span><i style="background:var(--card);border:1px solid var(--line)"></i>未刷</span><span><i style="border:2px solid var(--blue)"></i>当前</span><span>★ 已收藏</span></div>`;
+  el.querySelectorAll('[data-i]').forEach(b => b.onclick = ()=>{
+    closeSheet('sheetGrid'); jumpIdx(+b.dataset.i);
+  });
+}
+function finishGroup(){
+  const n = GZ.log.length, ok = GZ.log.filter(x=>x.ok===1).length;
+  document.getElementById('dTag').textContent = n + ' 题';
+  document.getElementById('dSub').textContent = '这组 ' + n + ' 题刷完了，再接再厉！';
+  document.getElementById('dRate').textContent = n ? Math.round(100*ok/n)+'%' : '—';
+  document.getElementById('dDone').textContent = n;
+  document.getElementById('dOk').textContent = ok;
+  document.getElementById('dBad').textContent = n-ok;
+  openSheet('sheetDone');
+}
+function applyDark(){
+  document.body.classList.toggle('dark', !!S.dark);
+  const m = document.querySelector('meta[name=theme-color]');
+  if(m) m.setAttribute('content', S.dark ? '#10141d' : '#5b4bd6');
+}
+/* ===== 事件 ===== */
+document.getElementById('modeSeg').addEventListener('click', e => {
+  if(e.target.dataset.m){ GZ.quick = null; setMode(e.target.dataset.m); }
+});
+document.getElementById('bankSel').onchange = e => { GZ.quick=null; st.bank=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; st.revealed=false; rebuild(); };
+document.getElementById('typeSel').onchange = e => { GZ.quick=null; st.type=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; st.revealed=false; rebuild(); };
+document.getElementById('search').oninput = e => { GZ.quick=null; st.search=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; st.revealed=false; rebuild(); };
+document.getElementById('autoNext').onchange = e => { S.autoNext=e.target.checked; save(); };
+document.getElementById('revealChk').onchange = e => { S.reveal=e.target.checked; save(); st.sel=new Set(); st.graded=null; st.revealed=false; render(); };
+document.getElementById('darkChk').onchange = e => { S.dark=e.target.checked; save(); applyDark(); };
+document.getElementById('sizeChips').addEventListener('click', e => {
+  const b = e.target.closest('button[data-s]'); if(!b) return;
+  S.size = parseInt(b.dataset.s); GZ.quick = null; save();
+  document.querySelectorAll('#sizeChips button').forEach(x => x.classList.toggle('on', x === b));
+  rebuild();
+});
+document.getElementById('resetBtn').onclick = () => {
+  if(!confirm('确定清空全部答题记录和收藏吗？')) return;
+  S.answered={}; S.starred={}; S.pos={}; S.log=[]; save();
+  st.idx=0; st.sel=new Set(); st.graded=null; st.revealed=false; rebuild();
+};
+document.getElementById('goQuiz').onclick = () => { location.href = '/'; };
+document.getElementById('prevBtn').onclick = () => step(-1);
+document.getElementById('nextBtn').onclick = () => step(1);
+document.getElementById('jumpBtn').onclick = () => { const v=parseInt(document.getElementById('jumpNo').value); if(v) jumpTo(v); };
+document.getElementById('jumpNo').onkeydown = e => { if(e.key==='Enter') jumpTo(parseInt(e.target.value)); };
+document.getElementById('stats').addEventListener('click', e => {
+  if(e.target.id==='clearKw'){ st.search=''; document.getElementById('search').value=''; rebuild(); }
+});
+document.getElementById('hWrong').onclick = () => { renderBook('wrong'); openSheet('sheetWrong'); };
+document.getElementById('hStar').onclick  = () => { renderBook('star'); openSheet('sheetStar'); };
+document.getElementById('hSet').onclick   = () => openSheet('sheetSet');
+document.querySelectorAll('#tabbar .tab-item').forEach(t => t.onclick = () => {
+  const tab = t.dataset.tab;
+  if(tab==='quiz'){ window.scrollTo({top:0}); render(); }
+  if(tab==='wrong'){ renderBook('wrong'); openSheet('sheetWrong'); }
+  if(tab==='star'){ renderBook('star'); openSheet('sheetStar'); }
+  if(tab==='set'){ openSheet('sheetSet'); }
+});
+document.getElementById('wClose').onclick = () => closeSheet('sheetWrong');
+document.getElementById('sClose').onclick = () => closeSheet('sheetStar');
+document.getElementById('setClose').onclick = () => closeSheet('sheetSet');
+document.getElementById('tClose').onclick = () => closeSheet('sheetStats');
+document.getElementById('dClose').onclick = () => closeSheet('sheetDone');
+document.getElementById('gClose').onclick = () => closeSheet('sheetGrid');
+['sheetWrong','sheetStar','sheetSet','sheetStats','sheetDone','sheetGrid'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => { if(e.target.id===id) closeSheet(id); });
+});
+document.getElementById('wRetry').onclick = () => {
+  GZ.quick=null; st.bank='all'; st.type='all'; st.search=''; setMode('wrong');
+  document.getElementById('bankSel').value='all'; document.getElementById('typeSel').value='all';
+  document.getElementById('search').value=''; closeSheet('sheetWrong'); window.scrollTo({top:0});
+};
+document.getElementById('wClear').onclick = () => {
+  if(!confirm('清空全部错题记录吗？这些题会回到“未刷”状态。')) return;
+  wrongIds().forEach(id => delete S.answered[id]); save(); renderBook('wrong'); render();
+};
+document.getElementById('sRetry').onclick = () => {
+  GZ.quick=null; st.bank='all'; st.type='all'; st.search=''; setMode('star');
+  document.getElementById('bankSel').value='all'; document.getElementById('typeSel').value='all';
+  document.getElementById('search').value=''; closeSheet('sheetStar'); window.scrollTo({top:0});
+};
+document.getElementById('sClear').onclick = () => {
+  if(!confirm('清空全部收藏吗？')) return;
+  starIds().forEach(id => delete S.starred[id]); save(); renderBook('star'); render();
+};
+document.getElementById('wList').addEventListener('click', e => {
+  const rm = e.target.closest('[data-rm]');
+  if(rm){ delete S.answered[rm.dataset.rm]; save(); renderBook('wrong'); render(); return; }
+  const it = e.target.closest('[data-jump]');
+  if(it){ closeSheet('sheetWrong'); stripJump(it.dataset.jump, 'wrong'); }
+});
+document.getElementById('sList').addEventListener('click', e => {
+  const rm = e.target.closest('[data-rm]');
+  if(rm){ delete S.starred[rm.dataset.rm]; save(); renderBook('star'); render(); return; }
+  const it = e.target.closest('[data-jump]');
+  if(it){ closeSheet('sheetStar'); stripJump(it.dataset.jump, 'star'); }
+});
+document.getElementById('dAgain').onclick = () => { closeSheet('sheetDone'); rebuild(); window.scrollTo({top:0}); };
+document.getElementById('dGrid').onclick = () => { renderGrid(); openSheet('sheetGrid'); };
+document.getElementById('dWrong').onclick = () => { closeSheet('sheetDone'); renderBook('wrong'); openSheet('sheetWrong'); };
+document.getElementById('dHome').onclick = () => { closeSheet('sheetDone'); GZ.quick=null; setMode('random'); window.scrollTo({top:0}); };
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape'){ ['sheetWrong','sheetStar','sheetSet','sheetStats','sheetDone','sheetGrid'].forEach(closeSheet); return; }
+  if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  if(document.querySelector('.mask.open')) return;
+  if(e.key==='ArrowLeft') step(-1);
+  else if(e.key==='ArrowRight') step(1);
+  else if(e.key==='Enter' && st.graded) step(1);
+  else if(/^[1-6]$/.test(e.key)){
+    const q = cur(); if(!q || st.graded || S.reveal) return;
+    const i = parseInt(e.key)-1;
+    if(!q.o[i]) return;
+    if(q.t==='多选'){ toggleSel(LT[i]); render(); } else gradeSingle(LT[i]);
+  }
+});
+/* 初始化 */
+document.querySelectorAll('[data-ic]').forEach(el => { el.innerHTML = IC(el.dataset.ic, parseFloat(el.dataset.ics || 16)); });
+document.getElementById('autoNext').checked = !!S.autoNext;
+document.getElementById('revealChk').checked = !!S.reveal;
+document.getElementById('darkChk').checked = !!S.dark;
+document.querySelectorAll('#sizeChips button').forEach(b => b.classList.toggle('on', parseInt(b.dataset.s) === (S.size||0)));
+applyDark();
+buildBankSel();
+document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === st.mode));
+rebuild();
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  try{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }catch(e){}
+}
+</script>
+</body>
+</html>

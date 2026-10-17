@@ -349,6 +349,10 @@ TEMPLATE = r'''<!DOCTYPE html>
         <div class="row"><span>暗色模式<span class="hint">跟随开关立即生效</span></span>
           <label class="sw"><input type="checkbox" id="darkChk"><span class="kn"></span></label></div>
       </div>
+      <div class="psec">其他题库</div>
+      <div class="szchips">
+        <button id="goOther">信创规划管理师题库（证书类）</button>
+      </div>
       <button class="btn danger" id="resetBtn" style="width:100%;margin-top:14px;"><span data-ic="trash" data-ics="13"></span> 重置全部进度（清空答题与收藏记录）</button>
     </div>
   </div>
@@ -771,6 +775,7 @@ document.getElementById('resetBtn').onclick = () => {
   S.answered={}; S.starred={}; S.pos={}; S.log=[]; save();
   st.idx=0; st.sel=new Set(); st.graded=null; rebuild();
 };
+document.getElementById('goOther').onclick = () => { location.href = '/gh/'; };
 document.getElementById('prevBtn').onclick = () => step(-1);
 document.getElementById('nextBtn').onclick = () => step(1);
 document.getElementById('jumpBtn').onclick = () => { const v=parseInt(document.getElementById('jumpNo').value); if(v) jumpTo(v); };
