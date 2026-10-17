@@ -94,9 +94,13 @@ TEMPLATE = r'''<!DOCTYPE html>
   .why{ margin-top:10px; padding:12px 14px; border-radius:11px; background:#f6f8fb; color:#3a4358;
         line-height:1.75; font-size:14px; white-space:pre-wrap; }
   .multi-note{ margin-top:10px; color:var(--muted); font-size:13px; }
-  .nav{ display:flex; gap:8px; margin:14px 0 4px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
-  .nav .jump{ display:flex; gap:6px; align-items:center; color:var(--muted); font-size:13px; }
-  .nav input[type=number]{ width:74px; font-size:16px; padding:8px; border:1px solid var(--line); border-radius:10px; outline:none; }
+  .nav{ margin:14px 0 4px; }
+  .navbtns{ display:flex; gap:10px; }
+  .navbtns .btn{ flex:1; }
+  .jrow{ display:flex; gap:6px; align-items:center; justify-content:center; color:var(--muted);
+         font-size:13px; margin-top:10px; }
+  .nav input[type=number]{ width:74px; font-size:16px; padding:8px; border:1px solid var(--line);
+                           border-radius:10px; outline:none; }
   .nav input[type=number]:focus{ border-color:var(--blue); }
   .btn{ padding:10px 14px; border:1px solid var(--line); border-radius:11px; background:#fff; cursor:pointer;
         font-size:14.5px; color:var(--text); }
@@ -186,8 +190,6 @@ TEMPLATE = r'''<!DOCTYPE html>
     .picks select{ max-width:none; }
     .picks .selwrap{ flex:1.35; } .picks .selwrap:nth-child(2){ flex:1; }
     .stem{ font-size:16px; }
-    .nav .btn{ flex:1; }
-    .nav .jump{ width:100%; order:-1; justify-content:center; margin-bottom:4px; }
   }
 </style>
 </head>
@@ -224,9 +226,11 @@ TEMPLATE = r'''<!DOCTYPE html>
   <div class="stats" id="stats"></div>
   <div class="card" id="card"></div>
   <div class="nav">
-    <button class="btn" id="prevBtn">← 上一题</button>
-    <div class="jump">跳到第 <input type="number" id="jumpNo" min="1"> 题 <button class="btn" id="jumpBtn">跳转</button></div>
-    <button class="btn primary" id="nextBtn">下一题 →</button>
+    <div class="navbtns">
+      <button class="btn" id="prevBtn">← 上一题</button>
+      <button class="btn primary" id="nextBtn">下一题 →</button>
+    </div>
+    <div class="jrow">跳到第 <input type="number" id="jumpNo" min="1"> 题 <button class="btn" id="jumpBtn">跳转</button></div>
   </div>
 </main>
 
