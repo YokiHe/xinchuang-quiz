@@ -4,19 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2f6fd6">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icon-192.png">
 <title>信创理论题库刷题</title>
 <style>
   :root{ --blue:#2f6fd6; --blue-d:#24529f; --blue-l:#eaf1fc; --green:#1e9e58; --green-l:#e6f6ee;
          --red:#d64545; --red-l:#fdeeee; --amber:#e8990c; --amber-l:#fdf3e0;
-         --bg:#f1f3f8; --card:#fff; --line:#e4e8f0; --text:#232a3b; --muted:#7c8597; }
+         --bg:#f1f3f8; --card:#fff; --line:#e4e8f0; --soft:#f8fafd; --field:#f8fafd; --soft2:#edf1f7;
+         --text:#232a3b; --muted:#7c8597; }
+  body.dark{ --bg:#10141d; --card:#1a2233; --line:#2a3450; --soft:#202a3d; --field:#202a3d; --soft2:#232c40;
+             --text:#e7ecf6; --muted:#92a0b8; --blue:#4b8bf5; --blue-d:#8db3f9; --blue-l:#1d2c4d;
+             --green:#37b573; --green-l:#173429; --red:#e05c5c; --red-l:#3a1d1d;
+             --amber:#e8a53a; --amber-l:#3a2d13; }
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body{ overscroll-behavior:none; }
+  .opt,.btn,.star,.seg,.tab-item,.chin,.hbtn{ touch-action:manipulation; }
   body{ margin:0; background:var(--bg); color:var(--text); font-size:15px; padding-bottom:env(safe-area-inset-bottom);
-        font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; }
+        font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+        transition:background .2s,color .2s; }
   button{ font-family:inherit; }
-  .opt,.btn,.star,.seg,.tab-item,.iwbtn,.chin{ touch-action:manipulation; }
 
-  /* ===== 顶部：应用头 + 工具行 ===== */
+  /* ===== 顶部 ===== */
   .topwrap{ position:sticky; top:0; z-index:20; box-shadow:0 1px 8px rgba(24,44,90,.10); }
   .appbar{ display:flex; align-items:center; gap:10px; padding:10px 14px;
            background:linear-gradient(135deg,#2f6fd6,#4b8bf5 70%,#5f9bff); color:#fff; }
@@ -28,45 +36,51 @@
          padding:7px 11px; font-size:14px; cursor:pointer; }
   .hbtn .bub{ background:#fff; color:var(--blue-d); border-radius:999px; font-weight:800; font-size:12px;
               padding:0 6px; margin-left:4px; }
-  .toolbar{ background:var(--card); padding:9px 12px 10px; }
-  .seg{ display:flex; background:#edf1f7; border-radius:11px; padding:3px; gap:2px; }
+  body.dark .hbtn{ color:#fff; }
+  .toolbar{ background:var(--card); padding:9px 12px 10px; transition:background .2s; }
+  .seg{ display:flex; background:var(--soft2); border-radius:11px; padding:3px; gap:2px; }
   .seg button{ flex:1; border:none; background:transparent; padding:8px 2px; border-radius:9px;
                font-size:14px; color:var(--muted); cursor:pointer; font-weight:600; }
-  .seg button.on{ background:#fff; color:var(--blue-d); box-shadow:0 1px 4px rgba(24,44,90,.14); }
+  .seg button.on{ background:var(--card); color:var(--blue-d); box-shadow:0 1px 4px rgba(24,44,90,.14); }
+  body.dark .seg button.on{ background:var(--soft); }
   .picks{ display:flex; gap:7px; margin-top:8px; }
   .selwrap{ position:relative; }
   .selwrap::after{ content:'▾'; position:absolute; right:9px; top:50%; transform:translateY(-54%);
                    color:var(--muted); font-size:12px; pointer-events:none; }
-  select{ appearance:none; -webkit-appearance:none; border:1px solid var(--line); background:#f8fafd;
+  select{ appearance:none; -webkit-appearance:none; border:1px solid var(--line); background:var(--field);
           border-radius:10px; padding:9px 24px 9px 10px; font-size:14px; color:var(--text); max-width:220px;
           outline:none; }
   select:focus{ border-color:var(--blue); }
   .searchwrap{ flex:1; position:relative; }
   .searchwrap::before{ content:'🔍'; position:absolute; left:9px; top:50%; transform:translateY(-52%); font-size:12px; opacity:.7; }
-  .searchwrap input{ width:100%; border:1px solid var(--line); background:#f8fafd; border-radius:10px;
+  .searchwrap input{ width:100%; border:1px solid var(--line); background:var(--field); border-radius:10px;
                      padding:9px 10px 9px 29px; font-size:16px; color:var(--text); outline:none; min-width:0; }
   .searchwrap input:focus{ border-color:var(--blue); }
+  .gbarw{ margin-top:9px; display:flex; align-items:center; gap:8px; }
+  .gtrack{ flex:1; height:5px; background:var(--soft2); border-radius:99px; overflow:hidden; }
+  .gbar{ height:100%; width:0; background:linear-gradient(90deg,var(--blue),var(--amber)); border-radius:99px; transition:width .25s; }
+  #gpText{ font-size:12px; color:var(--muted); white-space:nowrap; }
 
   /* ===== 主体 ===== */
   .wrap{ max-width:820px; margin:0 auto; padding:10px 12px calc(86px + env(safe-area-inset-bottom)); }
   @media (min-width:641px){ .wrap{ padding-bottom:20px; } }
   .stats{ display:flex; flex-wrap:wrap; gap:5px 6px; align-items:center; margin:2px 2px 9px;
           color:var(--muted); font-size:13px; }
-  .stats b{ color:var(--text); }
-  .statchip{ display:inline-flex; align-items:center; gap:4px; background:#fff; border:1px solid var(--line);
-             border-radius:999px; padding:3px 10px; font-size:12.5px; }
+  .statchip{ display:inline-flex; align-items:center; gap:4px; background:var(--card); border:1px solid var(--line);
+             border-radius:999px; padding:3px 10px; font-size:12.5px; color:var(--muted); }
+  .statchip b{ color:var(--text); }
   .statchip.hero{ background:var(--blue-l); border-color:#d7e4fa; color:var(--blue-d); font-weight:600; }
+  body.dark .statchip.hero{ border-color:#2c3f68; }
   .statchip.link{ cursor:pointer; }
-  .statchip.link:hover{ border-color:var(--blue); }
-  .bar{ height:5px; background:var(--line); border-radius:99px; overflow:hidden; margin:0 2px 10px; }
-  .bar i{ display:block; height:100%; background:linear-gradient(90deg,#2f6fd6,#5f9bff); border-radius:99px; }
+  .statchip.link:active{ border-color:var(--blue); }
+  .statchip.cta{ background:var(--blue); border-color:var(--blue); color:#fff; font-weight:700; }
 
   .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px;
          box-shadow:0 1px 3px rgba(20,40,80,.05); }
   .meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:10px; }
   .chin{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; }
   .chin.bank{ background:var(--blue-l); color:var(--blue-d); font-weight:600; }
-  .chin.gray{ background:#eef1f6; color:var(--muted); }
+  .chin.gray{ background:var(--soft2); color:var(--muted); }
   .chin.fixed{ background:var(--green-l); color:var(--green); font-weight:600; }
   .chin.warn{ background:var(--amber-l); color:var(--amber); font-weight:600; }
   .star{ font-size:21px; cursor:pointer; color:#c6ccda; background:none; border:none; padding:0 4px; line-height:1; }
@@ -74,7 +88,7 @@
   .stem{ font-weight:650; font-size:16px; line-height:1.7; white-space:pre-wrap; }
   .opts{ display:flex; flex-direction:column; gap:9px; margin-top:14px; }
   .opt{ display:flex; gap:10px; align-items:flex-start; padding:12px 13px; border:1.5px solid var(--line);
-        border-radius:12px; cursor:pointer; background:#fafbfd; line-height:1.55; font-size:15px; text-align:left; }
+        border-radius:12px; cursor:pointer; background:var(--soft); line-height:1.55; font-size:15px; text-align:left; }
   .opt .letter{ font-weight:800; color:var(--blue-d); min-width:18px; }
   .opt.sel{ border-color:var(--blue); background:var(--blue-l); }
   .opt.ok{ border-color:var(--green); background:var(--green-l); } .opt.ok .letter{ color:var(--green); }
@@ -83,46 +97,51 @@
   .verdict{ margin-top:13px; padding:11px 13px; border-radius:11px; font-weight:700; }
   .verdict.ok{ background:var(--green-l); color:var(--green); }
   .verdict.bad{ background:var(--red-l); color:var(--red); }
-  .why{ margin-top:10px; padding:12px 14px; border-radius:11px; background:#f6f8fb; color:#3a4358;
+  .why{ margin-top:10px; padding:12px 14px; border-radius:11px; background:var(--soft2); color:#3a4358;
         line-height:1.75; font-size:14px; white-space:pre-wrap; }
+  body.dark .why{ color:#c6d0e0; }
   .multi-note{ margin-top:10px; color:var(--muted); font-size:13px; }
+  .bigcta{ width:100%; margin-top:13px; padding:13px; font-size:16px; }
   .nav{ margin:14px 0 4px; }
   .navbtns{ display:flex; gap:10px; }
   .navbtns .btn{ flex:1; }
   .jrow{ display:flex; gap:6px; align-items:center; justify-content:center; color:var(--muted);
          font-size:13px; margin-top:10px; }
   .nav input[type=number]{ width:74px; font-size:16px; padding:8px; border:1px solid var(--line);
-                           border-radius:10px; outline:none; }
+                           border-radius:10px; outline:none; background:var(--field); color:var(--text); }
   .nav input[type=number]:focus{ border-color:var(--blue); }
-  .btn{ padding:10px 14px; border:1px solid var(--line); border-radius:11px; background:#fff; cursor:pointer;
+  .btn{ padding:10px 14px; border:1px solid var(--line); border-radius:11px; background:var(--card); cursor:pointer;
         font-size:14.5px; color:var(--text); }
-  .btn:hover{ border-color:var(--blue); color:var(--blue-d); }
+  .btn:hover{ border-color:var(--blue); }
   .btn.primary{ background:var(--blue); border-color:var(--blue); color:#fff; font-weight:650; }
   .btn.danger{ color:var(--red); border-color:#f2caca; }
+  body.dark .btn.danger{ border-color:#4a2530; }
   .btn:disabled{ opacity:.4; cursor:default; }
 
   /* ===== 底部标签栏（手机） ===== */
   .tabbar{ position:fixed; left:0; right:0; bottom:0; z-index:25; display:flex; justify-content:space-around;
            background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-top:1px solid var(--line);
            padding:6px 4px calc(6px + env(safe-area-inset-bottom)); }
+  body.dark .tabbar{ background:rgba(16,20,29,.96); }
   .tab-item{ flex:1; border:none; background:none; display:flex; flex-direction:column; align-items:center;
-             gap:2px; font-size:11.5px; color:var(--muted); cursor:pointer; padding:4px 0; border-radius:10px; }
+             gap:2px; font-size:11.5px; color:var(--muted); cursor:pointer; padding:4px 0; border-radius:10px;
+             position:relative; }
   .tab-item .ic{ font-size:19px; line-height:1; }
   .tab-item.on{ color:var(--blue-d); font-weight:700; }
-  .tab-item{ position:relative; }
+  body.dark .tab-item.on{ color:var(--blue); }
   .tbub{ position:absolute; top:-2px; left:calc(50% + 6px); background:var(--red); color:#fff; font-size:10.5px;
          font-weight:800; border-radius:999px; padding:1px 5.5px; line-height:1.5; }
   .tbub.amber{ background:var(--amber); }
   .tbub.zero{ display:none; }
 
-  /* ===== 抽屉面板（错题/收藏/设置/统计） ===== */
+  /* ===== 抽屉 ===== */
   .mask{ position:fixed; inset:0; background:rgba(15,25,48,.48); z-index:40; display:none; }
   .mask.open{ display:block; }
   .panel{ position:absolute; left:0; right:0; bottom:0; max-height:88%; background:var(--bg);
           border-radius:18px 18px 0 0; display:flex; flex-direction:column; padding-bottom:env(safe-area-inset-bottom);
           animation:up .18s ease; }
   @keyframes up{ from{ transform:translateY(40px); opacity:.4; } to{ transform:none; opacity:1; } }
-  .grab{ width:42px; height:4.5px; border-radius:99px; background:#cfd6e2; margin:9px auto 2px; }
+  .grab{ width:42px; height:4.5px; border-radius:99px; background:var(--muted); opacity:.5; margin:9px auto 2px; }
   .phead{ display:flex; align-items:center; gap:8px; padding:6px 14px 10px; flex-wrap:wrap; }
   .phead .ttl{ font-size:16.5px; font-weight:800; display:flex; align-items:center; gap:7px; }
   .phead .cnt{ background:var(--blue-l); color:var(--blue-d); border-radius:999px; font-size:12.5px;
@@ -132,17 +151,16 @@
   .pgroup{ margin:10px 4px 3px; color:var(--muted); font-size:12.5px; font-weight:700;
            display:flex; align-items:center; gap:6px; }
   .pgroup::after{ content:''; flex:1; height:1px; background:var(--line); }
-  .item{ display:flex; gap:10px; align-items:center; background:#fff; border:1px solid var(--line);
+  .item{ display:flex; gap:10px; align-items:center; background:var(--card); border:1px solid var(--line);
          border-radius:13px; padding:12px 12px; margin:7px 1px; cursor:pointer; }
   .item[data-kind="wrong"]{ border-left:4px solid var(--red); }
   .item[data-kind="star"]{ border-left:4px solid var(--amber); }
   .item .info{ flex:1; min-width:0; }
   .item .meta{ color:var(--muted); font-size:12px; margin-bottom:3px; }
   .item .t{ font-size:14px; line-height:1.55; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .item .go{ color:#c3cad8; font-size:17px; flex:none; }
   .iwbtn{ flex:none; border:none; background:var(--red-l); color:var(--red); border-radius:9px;
           padding:7px 9px; font-size:12.5px; font-weight:700; cursor:pointer; }
-  .item[data-kind="star"] .iwbtn{ background:#fdf1de; color:var(--amber); }
+  .item[data-kind="star"] .iwbtn{ background:var(--amber-l); color:var(--amber); }
   .two{ display:flex; gap:8px; margin-top:2px; }
   .two .btn{ flex:1; }
   .chips{ display:flex; flex-direction:column; gap:2px; padding:2px 4px; }
@@ -152,20 +170,47 @@
   .row .hint{ display:block; color:var(--muted); font-size:12.5px; margin-top:3px; font-weight:400; }
   .sw{ position:relative; width:46px; height:27px; flex:none; }
   .sw input{ opacity:0; width:100%; height:100%; position:absolute; margin:0; cursor:pointer; z-index:2; }
-  .sw .kn{ position:absolute; inset:0; background:#d5dbe6; border-radius:99px; transition:.15s; }
-  .sw .kn::after{ content:''; position:absolute; top:3px; left:3px; width:21px; height:21px; background:#fff;
+  .sw .kn{ position:absolute; inset:0; background:var(--muted); opacity:.65; border-radius:99px; transition:.15s; }
+  .sw .kn::after{ content:''; position:absolute; top:3px; left:3px; width:21px; height:21px; background:var(--card);
                   border-radius:50%; transition:.15s; box-shadow:0 1px 3px rgba(0,0,0,.25); }
-  .sw input:checked + .kn{ background:var(--green); }
+  .sw input:checked + .kn{ background:var(--green); opacity:1; }
   .sw input:checked + .kn::after{ left:22px; }
-  .statcard{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:13px 14px; margin:8px 1px; }
+  .psec{ color:var(--muted); font-size:12.5px; font-weight:700; margin:12px 4px 7px; }
+  .szchips{ display:flex; gap:7px; flex-wrap:wrap; padding:0 4px; }
+  .szchips button{ border:1px solid var(--line); background:var(--card); color:var(--text); border-radius:10px;
+                   padding:8px 14px; font-size:14px; cursor:pointer; }
+  .szchips button.on{ border-color:var(--blue); background:var(--blue-l); color:var(--blue-d); font-weight:700; }
+  .statcard{ background:var(--card); border:1px solid var(--line); border-radius:13px; padding:13px 14px; margin:8px 1px; }
   .statcard .nm{ font-weight:700; font-size:14.5px; display:flex; justify-content:space-between; }
   .statcard .nm span{ color:var(--muted); font-weight:500; font-size:12.5px; }
-  .sbar{ height:7px; background:#eef1f6; border-radius:99px; margin-top:9px; overflow:hidden; }
+  .sbar{ height:7px; background:var(--soft2); border-radius:99px; margin-top:9px; overflow:hidden; }
   .sbar i{ display:block; height:100%; border-radius:99px; }
   .sbar.done i{ background:var(--blue); } .sbar.acc i{ background:var(--green); }
   .srow{ display:flex; gap:8px; align-items:center; font-size:12px; color:var(--muted); margin-top:5px; }
   .srow .lbl{ width:30px; flex:none; }
+  .srow .acc-t{ width:78px; flex:none; text-align:right; }
   .srow .sbar{ flex:1; margin:0; }
+  .bchart{ display:flex; align-items:flex-end; gap:6px; height:96px; padding-top:6px; }
+  .bcol{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; }
+  .bcol .bb{ width:100%; max-width:34px; border-radius:5px 5px 2px 2px; background:var(--blue); opacity:.85; min-height:2px; }
+  .bcol .bl{ font-size:10.5px; color:var(--muted); white-space:nowrap; }
+  .bcol .bv{ font-size:11px; font-weight:700; color:var(--text); }
+  .result-card{ text-align:center; padding:8px 4px 4px; }
+  .result-big{ font-size:46px; font-weight:800; color:var(--blue-d); margin:6px 0 2px; }
+  .result-detail{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0 16px; }
+  .rd-item{ background:var(--card); border:1px solid var(--line); border-radius:11px; padding:11px 6px; }
+  .rd-item b{ display:block; font-size:19px; font-weight:700; }
+  .rd-item span{ font-size:12px; color:var(--muted); }
+  .r-ok{ color:var(--green) !important; } .r-bad{ color:var(--red) !important; }
+  .gridcells{ display:grid; grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); gap:8px; }
+  .gcell{ border:1px solid var(--line); background:var(--card); color:var(--text); border-radius:10px;
+          padding:10px 0; font-size:13.5px; font-weight:600; cursor:pointer; position:relative; }
+  .gcell.ok{ background:var(--green-l); border-color:var(--green); color:var(--green); }
+  .gcell.bad{ background:var(--red-l); border-color:var(--red); color:var(--red); }
+  .gcell.cur{ outline:2.5px solid var(--blue); outline-offset:1px; }
+  .gcell .stmark{ position:absolute; top:1px; right:3px; font-size:9px; }
+  .glegend{ display:flex; gap:13px; margin-top:12px; font-size:12px; color:var(--muted); flex-wrap:wrap; }
+  .glegend i{ display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:4px; vertical-align:-1px; }
   .empty-big{ text-align:center; padding:44px 10px 30px; color:var(--muted); }
   .empty-big .em{ font-size:44px; display:block; margin-bottom:10px; }
   @media (min-width:641px){
@@ -211,6 +256,7 @@
       </select></div>
       <div class="searchwrap"><input id="search" type="search" placeholder="搜题干 / 选项关键词"></div>
     </div>
+    <div class="gbarw"><div class="gtrack"><div class="gbar" id="gBar"></div></div><span id="gpText"></span></div>
   </div>
 </header>
 
@@ -273,11 +319,19 @@
     <div class="phead"><span class="ttl">⚙️ 设置</span><span class="sp"></span>
       <button class="btn" id="setClose">✕ 关闭</button></div>
     <div class="pbody">
-      <div class="chips">
+      <div class="psec">每组题量（刷完自动出成绩单）</div>
+      <div class="szchips" id="sizeChips">
+        <button data-s="10">10 题</button><button data-s="20">20 题</button>
+        <button data-s="30">30 题</button><button data-s="50">50 题</button>
+        <button data-s="0">不限</button>
+      </div>
+      <div class="chips" style="margin-top:10px">
         <div class="row"><span>背题模式<span class="hint">直接显示答案与解析，不判分</span></span>
           <label class="sw"><input type="checkbox" id="revealChk"><span class="kn"></span></label></div>
-        <div class="row"><span>答对自动下一题<span class="hint">答错时停留在当前题便于看解析</span></span>
+        <div class="row"><span>答对自动下一题<span class="hint">答错时停在当前题便于看解析</span></span>
           <label class="sw"><input type="checkbox" id="autoNext"><span class="kn"></span></label></div>
+        <div class="row"><span>暗色模式<span class="hint">跟随开关立即生效</span></span>
+          <label class="sw"><input type="checkbox" id="darkChk"><span class="kn"></span></label></div>
       </div>
       <button class="btn danger" id="resetBtn" style="width:100%;margin-top:14px;">🗑 重置全部进度（清空答题与收藏记录）</button>
     </div>
@@ -289,7 +343,49 @@
     <div class="grab"></div>
     <div class="phead"><span class="ttl">📊 全库统计</span><span class="sp"></span>
       <button class="btn" id="tClose">✕ 关闭</button></div>
-    <div class="pbody"><div id="statsBody"></div></div>
+    <div class="pbody">
+      <div class="statcard"><div class="nm">近 7 天练习量<span id="c7Total"></span></div>
+        <div class="bchart" id="chart7"></div></div>
+      <div class="statcard"><div class="nm">分题型正确率<span>累计 · 由答题记录统计</span></div>
+        <div id="typeAcc"></div></div>
+      <div id="statsBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="sheetDone">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead"><span class="ttl">🏁 本组完成 <span class="cnt" id="dTag"></span></span><span class="sp"></span>
+      <button class="btn" id="dClose">✕ 关闭</button></div>
+    <div class="pbody">
+      <div class="result-card">
+        <div class="result-sub" id="dSub"></div>
+        <div class="result-big" id="dRate">—</div>
+        <div class="result-detail">
+          <div class="rd-item"><b id="dDone">0</b><span>答题</span></div>
+          <div class="rd-item"><b id="dOk" class="r-ok">0</b><span>答对</span></div>
+          <div class="rd-item"><b id="dBad" class="r-bad">0</b><span>答错</span></div>
+        </div>
+      </div>
+      <div class="two">
+        <button class="btn primary" id="dAgain">▶ 再来一组</button>
+        <button class="btn" id="dGrid">☑ 答题卡</button>
+      </div>
+      <div class="two" style="margin-top:8px">
+        <button class="btn" id="dWrong">📕 查看错题</button>
+        <button class="btn" id="dHome">回自由刷题</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="sheetGrid">
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="phead"><span class="ttl">☑ 答题卡 <span class="cnt" id="gCnt"></span></span><span class="sp"></span>
+      <button class="btn" id="gClose">✕ 关闭</button></div>
+    <div class="pbody"><div id="gridWrap"></div></div>
   </div>
 </div>
 
@@ -305,12 +401,12 @@ const BANKS = [
 const TYPE_NAME = {'单选':'单选题','多选':'多选题','判断':'判断题'};
 const LS = 'szq_v1';
 const LT = 'ABCDEF';
-let S = {answered:{}, starred:{}, autoNext:true, reveal:false, orders:{}, pos:{}};
+let S = {answered:{}, starred:{}, autoNext:true, reveal:false, dark:false, size:20, log:[], pos:{}};
 try{ const saved = JSON.parse(localStorage.getItem(LS)||'{}'); S = Object.assign(S, saved); }catch(e){}
-S.orders = {}; // 每次打开都重新洗牌，保证覆盖所有题
 const save = () => localStorage.setItem(LS, JSON.stringify(S));
 const qid = q => q.k + ':' + q.s;
 
+const GZ = { log: [] }; // 本组答题记录（会话级，出成绩单用）
 const st = { bank:'y26', type:'all', mode:'random', search:'', list:[], idx:0, sel:new Set(), graded:null };
 
 const QMAP = {}; RAW.forEach(q => QMAP[qid(q)] = q);
@@ -318,6 +414,8 @@ const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 const shuffled = a => { const x=a.slice(); for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; };
 const wrongIds = () => Object.keys(S.answered).filter(id => S.answered[id] === 0);
 const starIds  = () => Object.keys(S.starred).filter(id => S.starred[id]);
+const dstr = dt => { const p=n=>String(n).padStart(2,'0'); return dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate()); };
+const today = () => dstr(new Date());
 
 function buildBankSel(){
   const counts = {};
@@ -340,7 +438,6 @@ function baseList(){
 }
 function scopeKey(){ return st.bank+'|'+st.type+'|'+st.search; }
 function rebuild(keepIdx){
-  const scope = scopeKey();
   let xs = baseList();
   if(st.mode==='wrong') xs = xs.filter(q => S.answered[qid(q)] === 0);
   else if(st.mode==='star') xs = xs.filter(q => S.starred[qid(q)]);
@@ -350,11 +447,13 @@ function rebuild(keepIdx){
     const dn = xs.filter(q => (qid(q) in S.answered));
     xs = shuffled(un).concat(shuffled(dn));
   }
+  const eff = GZ.quick || (S.size||0);
+  if(eff>0 && st.mode!=='seq') xs = xs.slice(0, eff);
   st.list = xs;
+  GZ.log = []; // 每次重建即开启新的一组
   if(keepIdx) st.idx = Math.min(st.idx, Math.max(xs.length-1,0));
-  else if(st.mode==='seq') st.idx = Math.min((S.pos && S.pos[scope])||0, Math.max(xs.length-1,0));
+  else if(st.mode==='seq') st.idx = Math.min((S.pos && S.pos[scopeKey()+'|seq'])||0, Math.max(xs.length-1,0));
   else st.idx = 0;
-  S.pos = S.pos || {}; S.pos[scope + '|' + st.mode] = st.idx;
   save();
   render();
 }
@@ -369,12 +468,26 @@ function scopedStats(){
 const MODE_TAG = {seq:'顺序模式', random:'随机模式', wrong:'错题重刷', star:'收藏重刷'};
 function renderStats(){
   const s = scopedStats();
+  const eff = st.mode==='seq' ? 0 : (GZ.quick || (S.size||0));
   let bits = [`<span class="statchip hero"><b>${bankName(st.bank)}</b></span>`,
               st.type!=='all'?`<span class="statchip">${TYPE_NAME[st.type]}</span>`:'',
-              `<span class="statchip">${MODE_TAG[st.mode]} · 已刷 <b>${s.done}</b>/${s.total} · 答对 <b>${s.ok}</b>${s.rate!==null?' · 正确率 <b>'+s.rate+'%</b>':''}</span>`];
+              `<span class="statchip">${MODE_TAG[st.mode]} · 已刷 <b>${s.done}</b>/${s.total}${eff?'（每组 '+eff+' 题）':''} · 答对 <b>${s.ok}</b>${s.rate!==null?' · 正确率 <b>'+s.rate+'%</b>':''}</span>`];
   if(st.search.trim()) bits.push(`<button class="statchip link" id="clearKw">「${esc(st.search.trim())}」✕</button>`);
+  bits.push(`<span class="statchip link" id="toGrid">☑ 答题卡</span>`);
   bits.push(`<span class="statchip link" id="toStats">📊 全库统计 ›</span>`);
+  bits.push(`<span class="statchip cta link" id="quick10">${GZ.quick===10?'本组 10 题训练中':'⚡ 快速来一组'}</span>`);
   document.getElementById('stats').innerHTML = bits.filter(Boolean).join(' ');
+  // 组内进度条
+  const pct = s.total ? Math.round(100*s.done/s.total) : 0;
+  document.getElementById('gBar').style.width = pct+'%';
+  document.getElementById('gpText').textContent = s.done+'/'+s.total;
+  document.getElementById('quick10').onclick = () => {
+    GZ.quick = 10; st.mode='random'; st.idx=0; st.sel=new Set(); st.graded=null;
+    document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m==='random'));
+    rebuild(); window.scrollTo({top:0});
+  };
+  document.getElementById('toGrid').onclick = () => { renderGrid(); openSheet('sheetGrid'); };
+  document.getElementById('toStats').onclick = () => { renderStatsSheet(); openSheet('sheetStats'); };
 }
 function render(){
   renderStats();
@@ -393,6 +506,7 @@ function render(){
   const aid = qid(q), shown = S.reveal;
   const picked = [...st.sel];
   const graded = st.graded;
+  const isLast = st.idx >= st.list.length-1;
   let h = `<div class="meta"><span class="chin bank">${bankName(q.k)}</span>
     <span class="chin gray">第 ${q.s} 题</span><span class="chin gray">${TYPE_NAME[q.t]}</span>
     ${q.d===2?'<span class="chin fixed">已修正 · 平台原答案有误</span>':q.d===1?'<span class="chin warn">存疑题 · 看解析</span>':''}
@@ -416,6 +530,9 @@ function render(){
     const right = graded === 'ok';
     h += `<div class="verdict ${right?'ok':'bad'}">${right?'✅ 回答正确':'❌ 回答错误'}　正确答案：${q.a.split('').join('、')}</div>`;
     h += `<div class="why">📝 ${esc(q.n)||'（本题暂无解析）'}</div>`;
+    const allDone = st.list.length && st.list.every(x => qid(x) in S.answered);
+    const label = (isLast || allDone) ? '🏁 交卷 · 看本组成绩' : '下一题 →';
+    h += `<button class="btn primary bigcta" id="ctaNext">${label}</button>`;
   } else if(shown){
     h += `<div class="why">📖 答案：${q.a.split('').join('、')}　📝 ${esc(q.n)||'（本题暂无解析）'}</div>`;
   } else if(q.t==='多选'){
@@ -425,12 +542,14 @@ function render(){
   card.classList.toggle('locked', !!graded || shown);
   const noList = st.list.length===0;
   document.getElementById('prevBtn').disabled = noList || st.idx<=0;
-  document.getElementById('nextBtn').disabled = noList || st.idx>=st.list.length-1;
+  document.getElementById('nextBtn').disabled = noList || isLast;
   document.getElementById('jumpNo').value = q.s;
   document.getElementById('starNow').onclick = toggleStar;
+  const cta = document.getElementById('ctaNext');
+  if(cta) cta.onclick = () => { if(cta.textContent.includes('交卷')) finishGroup(); else step(1); };
   const sb = document.getElementById('submitBtn');
   if(sb) sb.onclick = gradeMulti;
-  if(graded==='ok' && document.getElementById('autoNext').checked){
+  if(graded==='ok' && !isLast && document.getElementById('autoNext').checked){
     setTimeout(()=>{ if(st.graded==='ok') step(1); }, 700);
   }
   if(!graded && !shown){
@@ -451,7 +570,15 @@ function finishGrade(){
   const right = picked === q.a.split('').sort().join('');
   st.graded = right ? 'ok' : 'bad';
   S.answered[qid(q)] = right ? 1 : 0;
+  const rec = {d: today(), t: q.t, ok: right?1:0};
+  S.log.push(rec); if(S.log.length>20000) S.log.splice(0, S.log.length-20000);
+  GZ.log.push({id: qid(q), ok: rec.ok});
+  if(!right){ try{ navigator.vibrate && navigator.vibrate(70); }catch(e){} }
   save(); render();
+  // 本组全部答完 → 自动弹出成绩单
+  if(st.list.length && st.list.every(x => qid(x) in S.answered) && st.mode!=='seq' && (GZ.quick || (S.size||0)>0)){
+    setTimeout(()=>{ if(st.list.length && st.list.every(x => qid(x) in S.answered)) finishGroup(); }, 900);
+  }
 }
 function step(d){
   const ni = st.idx + d;
@@ -463,7 +590,13 @@ function step(d){
 }
 function jumpTo(no){
   const i = st.list.findIndex(q=>q.s===no);
-  if(i>=0){ st.idx=i; st.sel=new Set(); st.graded=null; window.scrollTo({top:0}); render(); }
+  if(i>=0) jumpIdx(i);
+}
+function jumpIdx(i){
+  if(i<0 || i>=st.list.length) return;
+  st.idx = i; st.sel = new Set(); st.graded = null;
+  S.pos = S.pos || {}; S.pos[scopeKey()+'|'+st.mode] = st.idx; save();
+  window.scrollTo({top:0}); render();
 }
 function toggleStar(){
   const q = cur(); if(!q) return;
@@ -494,7 +627,7 @@ function renderBook(kind){
     `<div class="pgroup">${b.n}（${byBank[b.k].length}）</div>` +
     byBank[b.k].map(q => `
       <div class="item" data-jump="${qid(q)}" data-kind="${kind}">
-        <div class="info"><div class="meta">第 ${q.s} 题 · ${TYPE_NAME[q.t]}${q.d===2?' · 已修正':q.d===1?' · 存疑':''}</div>
+        <div class="info"><div class="meta">第 ${q.s} 题 · ${TYPE_NAME[q.t]} · 答案 ${q.a}${q.d===2?' · 已修正':q.d===1?' · 存疑':''}</div>
           <div class="t">${esc(q.q)}</div></div>
         <span class="go">›</span>
         <button class="iwbtn" data-rm="${qid(q)}" data-kind="${kind}">${kind==='wrong'?'移出':'✕'}</button>
@@ -503,18 +636,20 @@ function renderBook(kind){
 }
 function stripJump(id, mode){
   const q = QMAP[id]; if(!q) return;
+  GZ.quick = null;
   st.bank = q.k; st.type = q.t; st.mode = mode; st.search = '';
   document.getElementById('bankSel').value = st.bank;
   document.getElementById('typeSel').value = st.type;
   document.getElementById('search').value = '';
   document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === mode));
   st.sel = new Set(); st.graded = null; st.idx = 0;
-  rebuild();
+  rebuild(false);
   const i = st.list.findIndex(x => qid(x) === id);
   if(i>=0){ st.idx = i; S.pos = S.pos || {}; S.pos[scopeKey()+'|'+st.mode] = st.idx; save(); }
   window.scrollTo({top:0}); render();
 }
 function renderStatsSheet(){
+  // 分库卡片
   const per = BANKS.filter(b=>b.k!=='all').map(b => {
     const qs = RAW.filter(q=>q.k===b.k);
     const done = qs.filter(q => qid(q) in S.answered);
@@ -529,20 +664,75 @@ function renderStatsSheet(){
       <div class="srow"><span class="lbl">已刷</span><div class="sbar done"><i style="width:${x.total?Math.round(100*x.done/x.total):0}%"></i></div></div>
       <div class="srow"><span class="lbl">正确</span><div class="sbar acc"><i style="width:${x.acc===null?0:x.acc}%"></i></div></div>
     </div>`;
-  document.getElementById('statsBody').innerHTML = card(all) + card(per[0]) + card(per[1]) + card(per[2]) + card(per[3]);
+  document.getElementById('statsBody').innerHTML = card(all) + per.map(card).join('');
+  // 近 7 天练习量
+  const days = []; for(let i=6;i>=0;i--) days.push(dstr(new Date(Date.now()-i*864e5)));
+  const cnt = days.map(d => S.log.filter(r=>r.d===d).length);
+  document.getElementById('c7Total').textContent = '近7天共 ' + cnt.reduce((a,b)=>a+b,0) + ' 题';
+  const max = Math.max(...cnt, 1);
+  document.getElementById('chart7').innerHTML = days.map((d,i) => {
+    const lbl = i===6?'今天' : i===5?'昨天' : d.slice(5).replace('-','/');
+    return `<div class="bcol"><span class="bv">${cnt[i]||''}</span><div class="bb" style="height:${Math.max( cnt[i]/max*100, cnt[i]?4:2 )}%;${cnt[i]?'':'opacity:.3'}"></div><span class="bl">${lbl}</span></div>`;
+  }).join('');
+  // 分题型正确率
+  document.getElementById('typeAcc').innerHTML = ['单选','多选','判断'].map(t => {
+    const recs = S.log.filter(r=>r.t===t);
+    const ok = recs.filter(r=>r.ok===1).length;
+    const acc = recs.length? Math.round(100*ok/recs.length)+ '%' : '—';
+    return `<div class="srow"><span class="lbl">${t}</span><div class="sbar acc"><i style="width:${recs.length?Math.round(100*ok/recs.length):0}%"></i></div><span class="acc-t">${ok}/${recs.length} · ${acc}</span></div>`;
+  }).join('');
+}
+function renderGrid(){
+  const el = document.getElementById('gridWrap');
+  document.getElementById('gCnt').textContent = st.list.length;
+  if(!st.list.length){ el.innerHTML = '<div class="empty-big">当前范围没有题目</div>'; return; }
+  el.innerHTML = '<div class="gridcells">' + st.list.map((q,i)=>{
+    const a = S.answered[qid(q)];
+    let c = 'gcell';
+    if(a===1) c+=' ok'; else if(a===0) c+=' bad';
+    if(i===st.idx) c+=' cur';
+    const sm = S.starred[qid(q)] ? '<span class="stmark">★</span>' : '';
+    return `<button class="${c}" data-i="${i}">${q.s}${sm}</button>`;
+  }).join('') + '</div>' +
+  `<div class="glegend"><span><i style="background:var(--green)"></i>答对</span><span><i style="background:var(--red)"></i>答错</span><span><i style="background:var(--card);border:1px solid var(--line)"></i>未刷</span><span><i style="border:2px solid var(--blue)"></i>当前</span><span>★ 已收藏</span></div>`;
+  el.querySelectorAll('[data-i]').forEach(b => b.onclick = ()=>{
+    closeSheet('sheetGrid'); jumpIdx(+b.dataset.i);
+  });
+}
+function finishGroup(){
+  const n = GZ.log.length, ok = GZ.log.filter(x=>x.ok===1).length;
+  document.getElementById('dTag').textContent = n + ' 题';
+  document.getElementById('dSub').textContent = '这组 ' + n + ' 题刷完了，再接再厉！';
+  document.getElementById('dRate').textContent = n ? Math.round(100*ok/n)+'%' : '—';
+  document.getElementById('dDone').textContent = n;
+  document.getElementById('dOk').textContent = ok;
+  document.getElementById('dBad').textContent = n-ok;
+  openSheet('sheetDone');
+}
+function applyDark(){
+  document.body.classList.toggle('dark', !!S.dark);
+  const m = document.querySelector('meta[name=theme-color]');
+  if(m) m.setAttribute('content', S.dark ? '#10141d' : '#2f6fd6');
 }
 /* ===== 事件 ===== */
 document.getElementById('modeSeg').addEventListener('click', e => {
-  if(e.target.dataset.m) setMode(e.target.dataset.m);
+  if(e.target.dataset.m){ GZ.quick = null; setMode(e.target.dataset.m); }
 });
-document.getElementById('bankSel').onchange = e => { st.bank=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; rebuild(); };
-document.getElementById('typeSel').onchange = e => { st.type=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; rebuild(); };
-document.getElementById('search').oninput = e => { st.search=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; rebuild(); };
+document.getElementById('bankSel').onchange = e => { GZ.quick=null; st.bank=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; rebuild(); };
+document.getElementById('typeSel').onchange = e => { GZ.quick=null; st.type=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; rebuild(); };
+document.getElementById('search').oninput = e => { GZ.quick=null; st.search=e.target.value; st.idx=0; st.sel=new Set(); st.graded=null; rebuild(); };
 document.getElementById('autoNext').onchange = e => { S.autoNext=e.target.checked; save(); };
 document.getElementById('revealChk').onchange = e => { S.reveal=e.target.checked; save(); st.sel=new Set(); st.graded=null; render(); };
+document.getElementById('darkChk').onchange = e => { S.dark=e.target.checked; save(); applyDark(); };
+document.getElementById('sizeChips').addEventListener('click', e => {
+  const b = e.target.closest('button[data-s]'); if(!b) return;
+  S.size = parseInt(b.dataset.s); GZ.quick = null; save();
+  document.querySelectorAll('#sizeChips button').forEach(x => x.classList.toggle('on', x === b));
+  rebuild();
+});
 document.getElementById('resetBtn').onclick = () => {
   if(!confirm('确定清空全部答题记录和收藏吗？')) return;
-  S.answered={}; S.starred={}; S.pos={}; save();
+  S.answered={}; S.starred={}; S.pos={}; S.log=[]; save();
   st.idx=0; st.sel=new Set(); st.graded=null; rebuild();
 };
 document.getElementById('prevBtn').onclick = () => step(-1);
@@ -551,7 +741,6 @@ document.getElementById('jumpBtn').onclick = () => { const v=parseInt(document.g
 document.getElementById('jumpNo').onkeydown = e => { if(e.key==='Enter') jumpTo(parseInt(e.target.value)); };
 document.getElementById('stats').addEventListener('click', e => {
   if(e.target.id==='clearKw'){ st.search=''; document.getElementById('search').value=''; rebuild(); }
-  if(e.target.id==='toStats'){ renderStatsSheet(); openSheet('sheetStats'); }
 });
 document.getElementById('hWrong').onclick = () => { renderBook('wrong'); openSheet('sheetWrong'); };
 document.getElementById('hStar').onclick  = () => { renderBook('star'); openSheet('sheetStar'); };
@@ -567,11 +756,13 @@ document.getElementById('wClose').onclick = () => closeSheet('sheetWrong');
 document.getElementById('sClose').onclick = () => closeSheet('sheetStar');
 document.getElementById('setClose').onclick = () => closeSheet('sheetSet');
 document.getElementById('tClose').onclick = () => closeSheet('sheetStats');
-['sheetWrong','sheetStar','sheetSet','sheetStats'].forEach(id => {
+document.getElementById('dClose').onclick = () => closeSheet('sheetDone');
+document.getElementById('gClose').onclick = () => closeSheet('sheetGrid');
+['sheetWrong','sheetStar','sheetSet','sheetStats','sheetDone','sheetGrid'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => { if(e.target.id===id) closeSheet(id); });
 });
 document.getElementById('wRetry').onclick = () => {
-  st.bank='all'; st.type='all'; st.search=''; setMode('wrong');
+  GZ.quick=null; st.bank='all'; st.type='all'; st.search=''; setMode('wrong');
   document.getElementById('bankSel').value='all'; document.getElementById('typeSel').value='all';
   document.getElementById('search').value=''; closeSheet('sheetWrong'); window.scrollTo({top:0});
 };
@@ -580,7 +771,7 @@ document.getElementById('wClear').onclick = () => {
   wrongIds().forEach(id => delete S.answered[id]); save(); renderBook('wrong'); render();
 };
 document.getElementById('sRetry').onclick = () => {
-  st.bank='all'; st.type='all'; st.search=''; setMode('star');
+  GZ.quick=null; st.bank='all'; st.type='all'; st.search=''; setMode('star');
   document.getElementById('bankSel').value='all'; document.getElementById('typeSel').value='all';
   document.getElementById('search').value=''; closeSheet('sheetStar'); window.scrollTo({top:0});
 };
@@ -592,16 +783,20 @@ document.getElementById('wList').addEventListener('click', e => {
   const rm = e.target.closest('[data-rm]');
   if(rm){ delete S.answered[rm.dataset.rm]; save(); renderBook('wrong'); render(); return; }
   const it = e.target.closest('[data-jump]');
-  if(it){ stripJump(it.dataset.jump, 'wrong'); closeSheet('sheetWrong'); }
+  if(it){ closeSheet('sheetWrong'); stripJump(it.dataset.jump, 'wrong'); }
 });
 document.getElementById('sList').addEventListener('click', e => {
   const rm = e.target.closest('[data-rm]');
   if(rm){ delete S.starred[rm.dataset.rm]; save(); renderBook('star'); render(); return; }
   const it = e.target.closest('[data-jump]');
-  if(it){ stripJump(it.dataset.jump, 'star'); closeSheet('sheetStar'); }
+  if(it){ closeSheet('sheetStar'); stripJump(it.dataset.jump, 'star'); }
 });
+document.getElementById('dAgain').onclick = () => { closeSheet('sheetDone'); rebuild(); window.scrollTo({top:0}); };
+document.getElementById('dGrid').onclick = () => { renderGrid(); openSheet('sheetGrid'); };
+document.getElementById('dWrong').onclick = () => { closeSheet('sheetDone'); renderBook('wrong'); openSheet('sheetWrong'); };
+document.getElementById('dHome').onclick = () => { closeSheet('sheetDone'); GZ.quick=null; setMode('random'); window.scrollTo({top:0}); };
 document.addEventListener('keydown', e => {
-  if(e.key==='Escape'){ ['sheetWrong','sheetStar','sheetSet','sheetStats'].forEach(closeSheet); return; }
+  if(e.key==='Escape'){ ['sheetWrong','sheetStar','sheetSet','sheetStats','sheetDone','sheetGrid'].forEach(closeSheet); return; }
   if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
   if(document.querySelector('.mask.open')) return;
   if(e.key==='ArrowLeft') step(-1);
@@ -614,11 +809,18 @@ document.addEventListener('keydown', e => {
     if(q.t==='多选'){ toggleSel(LT[i]); render(); } else gradeSingle(LT[i]);
   }
 });
+/* 初始化 */
 document.getElementById('autoNext').checked = !!S.autoNext;
 document.getElementById('revealChk').checked = !!S.reveal;
+document.getElementById('darkChk').checked = !!S.dark;
+document.querySelectorAll('#sizeChips button').forEach(b => b.classList.toggle('on', parseInt(b.dataset.s) === (S.size||0)));
+applyDark();
 buildBankSel();
 document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === st.mode));
 rebuild();
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  try{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }catch(e){}
+}
 </script>
 </body>
 </html>
