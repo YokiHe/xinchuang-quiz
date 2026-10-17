@@ -411,7 +411,17 @@ const BANKS = [
   {k:'card', n:'科目二 · 背诵卡'},
 ];
 const TYPE_NAME = {'单选':'单选题','多选':'多选题','判断':'判断题','背诵卡':'背诵卡'};
-const LS = 'ghq_v1';
+/* 进度命名空间按子路径自动派生：/gh/ → xqcert_gh_v1。不同证书错题本/收藏集各管各的 */
+const CERT_KEY = (location.pathname.match(/^\/([A-Za-z0-9-]+)/) || [])[1];
+const LS = CERT_KEY ? ('xqcert_' + CERT_KEY.toLowerCase() + '_v1') : 'certquiz_local_v1';
+try{
+  const LEGACY_LS = {gh: 'ghq_v1'};
+  const legacy = CERT_KEY && LEGACY_LS[CERT_KEY.toLowerCase()];
+  if(legacy && !localStorage.getItem(LS) && localStorage.getItem(legacy)){
+    localStorage.setItem(LS, localStorage.getItem(legacy));
+    localStorage.removeItem(legacy);
+  }
+}catch(e){}
 const LT = 'ABCDEF';
 /* 统一线条图标集（Feather 风格内联 SVG） */
 const PB = {
